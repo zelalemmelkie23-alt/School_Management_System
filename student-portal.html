@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Portal | School Management</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f8fafc;
+            color: #0f172a;
+        }
+        a { text-decoration: none; color: inherit; }
+        .topbar {
+            background: #0f172a; color: white; padding: 18px 60px;
+        }
+        nav { display: flex; gap: 20px; align-items: center; }
+        nav a { color: #e2e8f0; font-weight: 600; }
+            max-width: 1100px; margin: 0 auto; padding: 38px 20px 60px;
+        }
+        .hero {
+            background: linear-gradient(135deg, #dbeafe 0%, #dcfce7 100%);
+            border-radius: 20px; padding: 28px; margin-bottom: 28px;
+        }
+        .hero h1 { margin: 0 0 8px; font-size: 2.4rem; }
+        .hero p { margin: 0; color: #334155; }
+        .grid {
+            display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 22px;
+        }
+        .panel {
+            background: white; border: 1px solid #e2e8f0; border-radius: 18px;
+            padding: 22px; box-shadow: 0 12px 24px rgba(15,23,42,0.04);
+        }
+        .panel h2 { margin-top: 0; }
+        table {
+            width: 100%; border-collapse: collapse;
+        }
+        th, td {
+            text-align: left; padding: 12px 10px; border-bottom: 1px solid #e2e8f0;
+        }
+        th { color: #475569; text-transform: uppercase; font-size: 0.75rem; }
+        .badge {
+            display: inline-block; background: #dcfce7; color: #166534;
+            padding: 6px 10px; border-radius: 999px; font-weight: 700; font-size: 0.75rem;
+        }
+        .profile {
+            display: grid; gap: 12px; font-size: 1rem;
+        }
+        .profile div {
+            border-radius: 12px; padding: 12px 14px; background: #f8fafc;
+            border: 1px solid #e2e8f0;
+        }
+        .profile strong { display: block; margin-bottom: 5px; color: #334155; }
+        @media (max-width: 800px) {
+            .topbar { flex-wrap: wrap; gap: 12px; padding: 18px 20px; }
+            nav { flex-wrap: wrap; justify-content: center; }
+            .grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <header class="topbar">
+        <div class="logo">Green Valley Academy</div>
+        <nav>
+            <a href="indx.html">Home</a>
+            <a href="student-portal.html">Student Portal</a>
+            <a href="teacher-portal.html">Teacher Portal</a>
+        </nav>
+    </header>
+
+    <main class="page">
+        <section class="hero">
+            <h1>Student Result Portal</h1>
+            <p>View your academic performance and track your progress term by term.</p>
+        </section>
+
+        <section class="grid">
+            <div class="panel">
+                <h2>Academic Results</h2>
+
+                <div class="field" style="margin-bottom: 20px;">
+                    <label for="studentIdInput" style="font-weight: 700;">Enter Student ID</label>
+                    <input id="studentIdInput" type="text" placeholder="Example: ST-2048" style="padding: 12px; border: 1px solid #cbd5e1; border-radius: 10px;">
+                    <button id="viewResultBtn" type="button" style="margin-top: 10px; width: 180px;">View Result</button>
+                </div>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Subject</th>
+                            <th>Score</th>
+                            <th>Grade</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="studentResultTableBody">
+                        <tr>
+                            <td colspan="4">No result found for this student ID.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="panel">
+                <h2>Student Profile</h2>
+                <div class="profile" id="studentProfile">
+                    <div>
+                        <strong>Student Name</strong>
+                        Enter a student ID to view results.
+                    </div>
+                    <div>
+                        <strong>Student ID</strong>
+                        --
+                    </div>
+                    <div>
+                        <strong>Class</strong>
+                        --
+                    </div>
+                    <div>
+                        <strong>Term Average</strong>
+                        --
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="app.js"></script>
+    <script>
+        SchoolApp.requireAuth('student');
+
+        const studentIdInput = document.getElementById('studentIdInput');
+        const viewResultBtn = document.getElementById('viewResultBtn');
+        const studentResultTableBody = document.getElementById('studentResultTableBody');
+        const studentProfile = document.getElementById('studentProfile');
+
+        function getStatus(score) {
+            if (score >= 85) return 'Excellent';
+            if (score >= 75) return 'Good';
+            if (score >= 60) return 'Fair';
+            return 'Needs Improvement';
+        }
+
+        async function renderStudentResults(studentId) {
+            const [students, allResults] = await Promise.all([SchoolApp.getStudents(), SchoolApp.getResults()]);
+            const resultRecord = students.find(student => student.studentId.toLowerCase() === studentId.toLowerCase());
+            const results = allResults.filter(r => r.studentId.toLowerCase() === studentId.toLowerCase());
+
+            if (!results.length) {
+                studentResultTableBody.innerHTML = '<tr><td colspan="4">No result found for this student ID.</td></tr>';
+                studentProfile.innerHTML = `
+                    <div><strong>Student Name</strong> ${resultRecord ? `${resultRecord.firstName} ${resultRecord.lastName}` : 'No record found'}</div>
+                    <div><strong>Student ID</strong> ${studentId}</div>
+                    <div><strong>Class</strong> ${resultRecord ? resultRecord.grade : '--'}</div>
+                    <div><strong>Department</strong> ${resultRecord ? resultRecord.department || 'N/A' : '--'}</div>
+                    <div><strong>Term Average</strong> --</div>
+                `;
+                return;
+            }
+
+            const total = results.reduce((sum, item) => sum + Number(item.score), 0);
+            const average = (total / results.length).toFixed(2);
+            const studentName = results[0].studentName;
+
+            studentProfile.innerHTML = `
+                <div><strong>Student Name</strong> ${studentName}</div>
+                <div><strong>Student ID</strong> ${studentId}</div>
+                <div><strong>Class</strong> ${resultRecord ? resultRecord.grade : 'N/A'}</div>
+                <div><strong>Department</strong> ${resultRecord ? resultRecord.department || 'N/A' : 'N/A'}</div>
+                <div><strong>Term Average</strong> ${average}%</div>
+            `;
+
+            studentResultTableBody.innerHTML = results.map(item => `
+                <tr>
+                    <td>${item.subject}</td>
+                    <td>${item.score}</td>
+                    <td>${item.grade}</td>
+                    <td><span class="badge">${getStatus(Number(item.score))}</span></td>
+                </tr>
+            `).join('');
+        }
+
+        viewResultBtn.addEventListener('click', async function () {
+            const studentId = studentIdInput.value.trim();
+            if (!studentId) {
+                alert('Please enter a student ID.');
+                return;
+            }
+            await renderStudentResults(studentId);
+        });
+
+        studentIdInput.addEventListener('keydown', function (event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                viewResultBtn.click();
+            }
+        });
+    </script>
+</body>
+</html>

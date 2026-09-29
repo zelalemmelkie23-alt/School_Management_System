@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Portal | School Management</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            margin: 0; font-family: Arial, sans-serif;
+            background: #f8fafc; color: #0f172a;
+        }
+        a { text-decoration: none; color: inherit; }
+        .topbar {
+            display: flex; justify-content: space-between; align-items: center;
+            background: #0f172a; color: white; padding: 18px 60px;
+        }
+        .logo { font-size: 1.6rem; font-weight: 700; }
+        nav { display: flex; gap: 20px; align-items: center; }
+        nav a { color: #e2e8f0; font-weight: 600; }
+        .page {
+            max-width: 1100px; margin: 0 auto; padding: 38px 20px 60px;
+        }
+        .grid {
+            display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 22px;
+        }
+        .panel {
+            background: white; border: 1px solid #e2e8f0; border-radius: 18px;
+            padding: 22px; box-shadow: 0 12px 24px rgba(15,23,42,0.04);
+        }
+        .panel h2 { margin-top: 0; }
+        .message {
+            margin-top: 12px; padding: 10px 12px; border-radius: 10px; font-weight: 600;
+            display: none;
+        }
+        .message.success {
+            background: #dcfce7; color: #166534; display: block;
+        }
+        .result-form {
+            display: grid; gap: 16px;
+        }
+        .field { display: grid; gap: 7px; }
+        label { font-weight: 700; color: #334155; }
+        input, select, textarea {
+            width: 100%; padding: 12px 14px; border: 1px solid #cbd5e1; border-radius: 10px;
+            font-size: 1rem; outline: none;
+        }
+        input:focus, select:focus, textarea:focus {
+            border-color: #16a34a; box-shadow: 0 0 0 3px rgba(22,163,74,0.12);
+        }
+        button {
+            border: none; border-radius: 10px; background: #16a34a; color: white;
+            font-weight: 700; padding: 13px 16px; cursor: pointer;
+        }
+        table {
+            width: 100%; border-collapse: collapse;
+        }
+        th, td {
+            padding: 12px 10px; text-align: left; border-bottom: 1px solid #e2e8f0;
+        }
+        th { color: #475569; font-size: 0.75rem; text-transform: uppercase; }
+        .badge {
+            display: inline-block; padding: 6px 10px; border-radius: 999px; font-size: 0.75rem; font-weight: 700;
+            background: #dbeafe; color: #1d4ed8;
+        }
+        @media (max-width: 800px) {
+            .topbar { flex-wrap: wrap; gap: 12px; padding: 18px 20px; }
+            nav { flex-wrap: wrap; justify-content: center; }
+            .grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <header class="topbar">
+        <div class="logo">Green Valley Academy</div>
+        <nav>
+            <a href="indx.html">Home</a>
+            <a href="teacher-portal.html">Teacher Portal</a>
+            <a href="student-portal.html">Student Results</a>
+        </nav>
+    </header>
+
+    <main class="page">
+        <section class="grid">
+            <div class="panel">
+                <h2>Send Student Result</h2>
+                <form class="result-form" id="resultForm">
+                    <div class="field">
+                        <label for="studentName">Student Name</label>
+                        <input type="text" id="studentName" name="studentName" placeholder="Enter student name" required>
+                    </div>
+
+                    <div class="field">
+                        <label for="studentId">Student ID</label>
+                        <input type="text" id="studentId" name="studentId" placeholder="Enter student ID" required>
+                    </div>
+
+                    <div class="field">
+                        <label for="subject">Subject</label>
+                        <select id="subject" name="subject">
+                            <option value="Mathematics">Mathematics</option>
+                            <option value="Physics">Physics</option>
+                            <option value="Biology">Biology</option>
+                            <option value="English">English</option>
+                            <option value="Computer Science">Computer Science</option>
+                        </select>
+                    </div>
+
+                    <div class="field">
+                        <label for="score">Score</label>
+                        <input type="number" id="score" name="score" min="0" max="100" placeholder="Enter score" required>
+                    </div>
+
+                    <div class="field">
+                        <label for="grade">Grade</label>
+                        <select id="grade" name="grade">
+                            <option value="A">A</option>
+                            <option value="B+">B+</option>
+                            <option value="B">B</option>
+                            <option value="C">C</option>
+                            <option value="D">D</option>
+                        </select>
+                    </div>
+
+                    <div class="field">
+                        <label for="remarks">Teacher Comment</label>
+                        <textarea id="remarks" name="remarks" rows="4" placeholder="Add teacher remarks"></textarea>
+                    </div>
+
+                    <button type="submit">Send Result</button>
+                    <div id="resultMessage" class="message"></div>
+                </form>
+            </div>
+
+            <div class="panel">
+                <h2>Recent Results</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Student</th>
+                            <th>Subject</th>
+                            <th>Grade</th>
+                        </tr>
+                    </thead>
+                    <tbody id="teacherResultTableBody">
+                        <tr>
+                            <td>Abebe Kassa</td>
+                            <td>Mathematics</td>
+                            <td><span class="badge">A</span></td>
+                        </tr>
+                        <tr>
+                            <td>Selam Bekele</td>
+                            <td>Physics</td>
+                            <td><span class="badge">A</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <script src="app.js"></script>
+    <script>
+        SchoolApp.requireAuth('teacher');
+
+        const resultForm = document.getElementById('resultForm');
+        const resultMessage = document.getElementById('resultMessage');
+        const resultTableBody = document.getElementById('teacherResultTableBody');
+
+        async function renderTeacherResults() {
+            const results = await SchoolApp.getResults();
+            if (!results.length) {
+                resultTableBody.innerHTML = '<tr><td colspan="3">No results sent yet.</td></tr>';
+                return;
+            }
+
+            resultTableBody.innerHTML = results.slice().reverse().map(result => `
+                <tr>
+                    <td>${result.studentName}</td>
+                    <td>${result.subject}</td>
+                    <td><span class="badge">${result.grade}</span></td>
+                </tr>
+            `).join('');
+        }
+
+        resultForm.addEventListener('submit', async function (event) {
+            event.preventDefault();
+
+            const studentName = document.getElementById('studentName').value.trim();
+            const studentId = document.getElementById('studentId').value.trim();
+            const subject = document.getElementById('subject').value;
+            const score = document.getElementById('score').value;
+            const grade = document.getElementById('grade').value;
+            const remarks = document.getElementById('remarks').value.trim();
+
+            if (!studentName || !studentId || !score) {
+                showMessage('Please fill in all required fields.', 'error');
+                return;
+            }
+
+            await SchoolApp.addResult({
+                studentName,
+                studentId,
+                subject,
+                score: Number(score),
+                grade,
+                remarks,
+                date: new Date().toLocaleString()
+            });
+
+            await renderTeacherResults();
+            resultForm.reset();
+            showMessage('Result sent successfully to the student portal.', 'success');
+        });
+
+        function showMessage(message, type) {
+            resultMessage.textContent = message;
+            resultMessage.className = 'message ' + type;
+        }
+
+        renderTeacherResults().catch(error => showMessage(error.message, 'error'));
+    </script>
+</body>
+</html>

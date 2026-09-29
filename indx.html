@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Green Valley Academy</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(180deg, #eef6ff 0%, #f8fafc 100%);
+            color: #1f2937;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #0f172a;
+            color: #f8fafc;
+            padding: 18px 70px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .logo {
+            font-size: 1.7rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        nav {
+            display: flex;
+            gap: 28px;
+            font-weight: 600;
+        }
+
+        nav a {
+            opacity: 0.9;
+        }
+
+        nav a:hover {
+            opacity: 1;
+            color: #7dd3fc;
+        }
+
+        .nav-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-weight: 700;
+            transition: 0.3s ease;
+        }
+
+        .btn.primary {
+            background: #16a34a;
+            color: #fff;
+        }
+
+        .btn.secondary {
+            background: #e2e8f0;
+            color: #0f172a;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 18px rgba(15, 23, 42, 0.15);
+        }
+
+        .hero {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 80px 20px 40px;
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .tag {
+            display: inline-block;
+            background: #dcfce7;
+            color: #166534;
+            padding: 8px 14px;
+            border-radius: 999px;
+            font-weight: 700;
+            margin-bottom: 14px;
+        }
+
+        .hero h1 {
+            margin: 0;
+            font-size: clamp(2.5rem, 4vw, 4rem);
+            line-height: 1.1;
+            color: #0f172a;
+        }
+
+        .hero p {
+            font-size: 1.08rem;
+            line-height: 1.8;
+            color: #475569;
+        }
+
+        .cta-row {
+            display: flex;
+            gap: 16px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .hero-card {
+            background: #ffffff;
+            border: 1px solid #dbeafe;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 18px 45px rgba(15, 23, 42, 0.08);
+        }
+
+        .hero-card h3 {
+            margin-top: 0;
+            color: #0f172a;
+            font-size: 1.5rem;
+        }
+
+        .hero-card ul {
+            list-style: none;
+            padding: 0;
+            margin: 24px 0 0;
+            display: grid;
+            gap: 16px;
+        }
+
+        .hero-card li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 14px;
+            border-radius: 12px;
+            background: #f8fafc;
+            font-weight: 600;
+            color: #0f172a;
+        }
+
+        .hero-card li span:last-child {
+            background: #dcfce7;
+            color: #166534;
+            padding: 5px 10px;
+            border-radius: 999px;
+            font-size: 0.8rem;
+        }
+
+        .features, .stats {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.2rem;
+            margin-bottom: 30px;
+            color: #0f172a;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 24px;
+        }
+
+        .feature-card {
+            background: white;
+            border-radius: 18px;
+            padding: 28px 22px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 12px 30px rgba(15, 23, 42, 0.05);
+        }
+
+        .feature-card .icon {
+            width: 52px;
+            height: 52px;
+            display: grid;
+            place-items: center;
+            border-radius: 14px;
+            font-size: 1.5rem;
+            background: #dcfce7;
+            margin-bottom: 16px;
+        }
+
+        .feature-card h3 {
+            margin: 0 0 8px;
+            color: #0f172a;
+        }
+
+        .feature-card p {
+            margin: 0;
+            line-height: 1.7;
+            color: #475569;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            padding-bottom: 80px;
+        }
+
+        .stat-box {
+            background: #0f172a;
+            color: white;
+            border-radius: 18px;
+            padding: 26px 20px;
+            text-align: center;
+        }
+
+        .stat-box strong {
+            display: block;
+            font-size: 2rem;
+            margin-bottom: 8px;
+        }
+
+        .contact-section {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px 20px 80px;
+        }
+
+        .contact-wrap {
+            display: grid;
+            grid-template-columns: 0.9fr 1.1fr;
+            gap: 24px;
+            background: white;
+            border-radius: 22px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 18px 40px rgba(15, 23, 42, 0.06);
+            overflow: hidden;
+        }
+
+        .contact-info {
+            background: linear-gradient(135deg, #0f172a 0%, #1d4ed8 100%);
+            color: white;
+            padding: 36px 28px;
+        }
+
+        .contact-info h3 {
+            margin-top: 0;
+            font-size: 2rem;
+        }
+
+        .contact-info p {
+            line-height: 1.8;
+            color: #dbeafe;
+        }
+
+        .info-list {
+            list-style: none;
+            padding: 0;
+            margin: 24px 0 0;
+            display: grid;
+            gap: 16px;
+        }
+
+        .info-list li {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 600;
+        }
+
+        .icon-badge {
+            width: 36px;
+            height: 36px;
+            display: grid;
+            place-items: center;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.12);
+            font-size: 1.1rem;
+        }
+
+        .contact-form {
+            padding: 36px 28px;
+        }
+
+        .contact-form h3 {
+            margin-top: 0;
+            font-size: 1.9rem;
+            color: #0f172a;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
+            margin-top: 20px;
+        }
+
+        .field {
+            display: grid;
+            gap: 8px;
+        }
+
+        .field.full {
+            grid-column: 1 / -1;
+        }
+
+        .field label {
+            font-weight: 700;
+            color: #334155;
+        }
+
+        .field input,
+        .field textarea {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid #cbd5e1;
+            border-radius: 10px;
+            font-size: 1rem;
+            outline: none;
+            resize: vertical;
+        }
+
+        .field input:focus,
+        .field textarea:focus {
+            border-color: #16a34a;
+            box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.12);
+        }
+
+        .submit-btn {
+            margin-top: 20px;
+            border: none;
+            background: #16a34a;
+            color: white;
+            padding: 13px 18px;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        footer {
+            background: #0f172a;
+            color: #e2e8f0;
+            text-align: center;
+            padding: 22px 20px;
+        }
+
+        @media (max-width: 900px) {
+            .topbar {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 14px;
+                padding: 18px 20px;
+            }
+
+            .hero,
+            .feature-grid,
+            .stats {
+                grid-template-columns: 1fr;
+            }
+
+            nav {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="topbar">
+        <div class="logo">Green Valley Academy</div>
+        <nav>
+            <a href="indx.html">Home</a>
+            <a href="#about">About</a>
+            <a href="#programs">Programs</a>
+            <a href="#contact">Contact</a>
+        </nav>
+        <div class="nav-actions">
+            <a class="btn secondary" href="login.html">Login</a>
+            <a class="btn primary" href="signup.html">Sign Up</a>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div>
+            <span class="tag">School Management System</span>
+            <h1>Smart solutions for every school day.</h1>
+            <p>
+                Manage admissions, attendance, classes, teachers, student records, and fee collection in one digital platform designed to keep your institution organized and efficient.
+            </p>
+            <div class="cta-row">
+                <a class="btn primary" href="registrationform.html">Register Student</a>
+                <a class="btn secondary" href="dashboard.html">Open Dashboard</a>
+            </div>
+        </div>
+
+        <div class="hero-card">
+            <h3>Today at a glance</h3>
+            <ul>
+                <li><span>Students</span><span>1,240</span></li>
+                <li><span>Teachers</span><span>86</span></li>
+                <li><span>Classes</span><span>32</span></li>
+                <li><span>Attendance</span><span>96%</span></li>
+            </ul>
+        </div>
+    </section>
+
+    <section class="features" id="about">
+        <h2 class="section-title">Why schools choose us</h2>
+        <div class="feature-grid">
+            <div class="feature-card">
+                <div class="icon">👨‍🎓</div>
+                <h3>Student Records</h3>
+                <p>Keep complete academic, personal, and contact information organized and easy to access.</p>
+            </div>
+            <div class="feature-card">
+                <div class="icon">👩‍🏫</div>
+                <h3>Teacher Portal</h3>
+                <p>Track staff profiles, schedules, workloads, and performance from one dashboard.</p>
+            </div>
+            <div class="feature-card">
+                <div class="icon">📊</div>
+                <h3>Attendance & Grades</h3>
+                <p>Monitor class participation, performance trends, and academic progress in real time.</p>
+            </div>
+            <div class="feature-card">
+                <div class="icon">💰</div>
+                <h3>Fees & Finance</h3>
+                <p>Manage tuition, payment records, due dates, and monthly fee summaries efficiently.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="stats" id="programs">
+        <div class="stat-box">
+            <strong>96%</strong>
+            Student Attendance
+        </div>
+        <div class="stat-box">
+            <strong>14</strong>
+            Academic Programs
+        </div>
+        <div class="stat-box">
+            <strong>12k</strong>
+            Exam Records
+        </div>
+        <div class="stat-box">
+            <strong>24/7</strong>
+            Digital Access
+        </div>
+    </section>
+
+    <section class="contact-section" id="contact">
+        <div class="contact-wrap">
+            <div class="contact-info">
+                <h3>Contact Us</h3>
+                <p>Have a question about admissions, programs, or school services? Our team is ready to help.</p>
+
+                <ul class="info-list">
+                    <li><span class="icon-badge">📍</span> Addis Ababa, Ethiopia</li>
+                    <li><span class="icon-badge">📞</span> +251 900 000 000</li>
+                    <li><span class="icon-badge">✉️</span> admin@greenvalley.edu</li>
+                    <li><span class="icon-badge">🕒</span> Mon - Sat: 8:00 AM - 5:00 PM</li>
+                </ul>
+            </div>
+
+            <div class="contact-form">
+                <h3>Send a Message</h3>
+                <form>
+                    <div class="form-grid">
+                        <div class="field">
+                            <label for="name">Full Name</label>
+                            <input type="text" id="name" placeholder="Your name">
+                        </div>
+
+                        <div class="field">
+                            <label for="email">Email</label>
+                            <input type="email" id="email" placeholder="Your email">
+                        </div>
+
+                        <div class="field full">
+                            <label for="subject">Subject</label>
+                            <input type="text" id="subject" placeholder="How can we help?">
+                        </div>
+
+                        <div class="field full">
+                            <label for="message">Message</label>
+                            <textarea id="message" rows="5" placeholder="Write your message here..."></textarea>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="submit-btn">Send Message</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>Green Valley Academy • admin@greenvalley.edu • +251 900 000 000</p>
+    </footer>
+</body>
+</html>

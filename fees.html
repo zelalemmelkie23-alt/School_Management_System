@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fee Tracking | School Management</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f8fafc;
+            color: #0f172a;
+        }
+        a { text-decoration: none; color: inherit; }
+        .topbar {
+            display: flex; justify-content: space-between; align-items: center;
+            background: #0f172a; color: white; padding: 18px 60px;
+        }
+        .logo { font-size: 1.6rem; font-weight: 700; }
+        nav { display: flex; gap: 20px; align-items: center; }
+        nav a { color: #e2e8f0; font-weight: 600; }
+        .page { max-width: 1100px; margin: 0 auto; padding: 40px 20px 60px; }
+        .stats { display: grid; grid-template-columns: repeat(3, minmax(180px,1fr)); gap: 18px; margin-bottom: 22px; }
+        .card {
+            background: white; border-radius: 18px; border: 1px solid #e2e8f0;
+            padding: 24px 20px; box-shadow: 0 10px 24px rgba(15, 23, 42, 0.05);
+        }
+        .card strong { display: block; font-size: 2rem; margin-bottom: 8px; }
+        .grid { display: grid; grid-template-columns: 1fr 1.2fr; gap: 24px; }
+        .panel {
+            background: white; border: 1px solid #e2e8f0; border-radius: 18px;
+            padding: 24px; box-shadow: 0 10px 24px rgba(15, 23, 42, 0.05);
+        }
+        .panel h2 { margin-top: 0; }
+        .form-grid { display: grid; gap: 16px; }
+        .field { display: grid; gap: 8px; }
+        label { font-weight: 700; color: #334155; }
+        input, select, button {
+            width: 100%; padding: 12px 14px; border-radius: 10px;
+            border: 1px solid #cbd5e1; font-size: 1rem;
+        }
+        input:focus, select:focus { border-color: #16a34a; outline: none; }
+        button {
+            background: #16a34a; color: white; border: none; cursor: pointer; font-weight: 700;
+        }
+        table { width: 100%; border-collapse: collapse; margin-top: 18px; }
+        th, td { text-align: left; padding: 12px 10px; border-bottom: 1px solid #e2e8f0; }
+        th { color: #475569; font-size: 0.75rem; text-transform: uppercase; }
+        .status-pill {
+            display: inline-block; padding: 6px 10px; border-radius: 999px; font-size: 0.75rem; font-weight: 700;
+        }
+        .paid { background: #dcfce7; color: #166534; }
+        .pending { background: #fef3c7; color: #92400e; }
+        .overdue { background: #fee2e2; color: #991b1b; }
+        .message {
+            display: none; margin-top: 14px; font-weight: 700; padding: 10px 12px; border-radius: 10px;
+        }
+        .message.success { display: block; background: #dcfce7; color: #166534; }
+        @media (max-width: 820px) {
+            .topbar { flex-wrap: wrap; padding: 18px 20px; }
+            nav { flex-wrap: wrap; }
+            .grid, .stats { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <header class="topbar">
+        <div class="logo">Green Valley Academy</div>
+        <nav>
+            <a href="dashboard.html">Dashboard</a>
+            <a href="attendance.html">Attendance</a>
+            <a href="login.html">Logout</a>
+        </nav>
+    </header>
+
+    <main class="page">
+        <div class="stats">
+            <div class="card">
+                <strong id="totalCollected">$0</strong>
+                <span>Total Collected</span>
+            </div>
+            <div class="card">
+                <strong id="totalDue">$0</strong>
+                <span>Total Due</span>
+            </div>
+            <div class="card">
+                <strong id="pendingCount">0</strong>
+                <span>Pending Payments</span>
+            </div>
+        </div>
+
+        <div class="grid">
+            <section class="panel">
+                <h2>Record Payment</h2>
+                <form id="feeForm" class="form-grid">
+                    <div class="field">
+                        <label for="feeStudent">Student</label>
+                        <select id="feeStudent" required></select>
+                    </div>
+                    <div class="field">
+                        <label for="feeAmount">Amount</label>
+                        <input id="feeAmount" type="number" min="0" required />
+                    </div>
+                    <div class="field">
+                        <label for="dueDate">Due Date</label>
+                        <input id="dueDate" type="date" required />
+                    </div>
+                    <div class="field">
+                        <label for="feeStatus">Status</label>
+                        <select id="feeStatus">
+                            <option value="Paid">Paid</option>
+                            <option value="Pending">Pending</option>
+                            <option value="Overdue">Overdue</option>
+                        </select>
+                    </div>
+                    <button type="submit">Save Fee</button>
+                    <div id="feeMessage" class="message"></div>
+                </form>
+            </section>
+
+            <section class="panel">
+                <h2>Fee Ledger</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Student</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                            <th>Due</th>
+                        </tr>
+                    </thead>
+                    <tbody id="feesTableBody"></tbody>
+                </table>
+            </section>
+        </div>
+    </main>
+
+    <script src="app.js"></script>
+    <script>
+        const feeForm = document.getElementById('feeForm');
+        const feeStudent = document.getElementById('feeStudent');
+        const feeAmount = document.getElementById('feeAmount');
+        const dueDate = document.getElementById('dueDate');
+        const feeStatus = document.getElementById('feeStatus');
+        const feesTableBody = document.getElementById('feesTableBody');
+        const feeMessage = document.getElementById('feeMessage');
+
+        async function loadStudents() {
+            const students = await SchoolApp.getStudents();
+            feeStudent.innerHTML = students.map(student => `
+                <option value="${student.studentId}">${student.firstName} ${student.lastName} (${student.studentId})</option>
+            `).join('');
+        }
+
+        async function renderFees() {
+            const records = await SchoolApp.getFees();
+            const totalCollected = records.filter(item => item.status === 'Paid').reduce((sum, item) => sum + Number(item.amount), 0);
+            const totalDue = records.reduce((sum, item) => sum + Number(item.amount), 0);
+            const pendingCount = records.filter(item => item.status !== 'Paid').length;
+
+            document.getElementById('totalCollected').textContent = '$' + totalCollected.toLocaleString();
+            document.getElementById('totalDue').textContent = '$' + totalDue.toLocaleString();
+            document.getElementById('pendingCount').textContent = pendingCount;
+
+            feesTableBody.innerHTML = records.slice().reverse().map(record => `
+                <tr>
+                    <td>${record.studentName}</td>
+                    <td>$${Number(record.amount).toLocaleString()}</td>
+                    <td><span class="status-pill ${record.status.toLowerCase()}">${record.status}</span></td>
+                    <td>${record.dueDate}</td>
+                </tr>
+            `).join('');
+        }
+
+        function showMessage(text, type) {
+            feeMessage.textContent = text;
+            feeMessage.className = 'message ' + type;
+        }
+
+        feeForm.addEventListener('submit', async function (event) {
+            event.preventDefault();
+
+            const studentId = feeStudent.value;
+            const students = await SchoolApp.getStudents();
+            const student = students.find(item => item.studentId === studentId);
+            const record = {
+                id: 'F-' + Date.now(),
+                studentId: student.studentId,
+                studentName: `${student.firstName} ${student.lastName}`,
+                amount: Number(feeAmount.value),
+                status: feeStatus.value,
+                dueDate: dueDate.value || new Date().toISOString().split('T')[0]
+            };
+
+            await SchoolApp.addFee(record);
+            await renderFees();
+            showMessage('Fee record saved successfully.', 'success');
+            feeForm.reset();
+            dueDate.value = new Date().toISOString().split('T')[0];
+        });
+
+        dueDate.value = new Date().toISOString().split('T')[0];
+        Promise.all([loadStudents(), renderFees()]).catch(error => showMessage(error.message, 'error'));
+    </script>
+</body>
+</html>

@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Registration | School Management</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #eef6ff 0%, #f8fafc 100%);
+            color: #0f172a;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #0f172a;
+            color: #f8fafc;
+            padding: 18px 70px;
+        }
+
+        .logo {
+            font-size: 1.6rem;
+            font-weight: 700;
+        }
+
+        nav {
+            display: flex;
+            gap: 26px;
+        }
+
+        nav a {
+            color: #f8fafc;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .page {
+            padding: 40px 20px 60px;
+        }
+
+        .form-box {
+            max-width: 980px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            border: 1px solid #dbeafe;
+            padding: 32px 26px;
+            box-shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
+        }
+
+        .form-box h1 {
+            margin: 0 0 24px;
+            text-align: center;
+            color: #166534;
+            font-size: 2.2rem;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(220px, 1fr));
+            gap: 18px;
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+        }
+
+        .field.full {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            font-weight: 700;
+            color: #334155;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 12px 14px;
+            border-radius: 10px;
+            border: 1px solid #cbd5e1;
+            font-size: 1rem;
+            outline: none;
+        }
+
+        input:focus,
+        select:focus {
+            border-color: #16a34a;
+            box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.12);
+        }
+
+        .button-row {
+            margin-top: 28px;
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 12px 18px;
+            border: none;
+            border-radius: 10px;
+            background: #16a34a;
+            color: white;
+            cursor: pointer;
+            font-weight: 700;
+            min-width: 140px;
+            transition: 0.3s ease;
+        }
+
+        button:hover {
+            background: #15803d;
+        }
+
+        button.secondary {
+            background: #e2e8f0;
+            color: #0f172a;
+        }
+
+        button.secondary:hover {
+            background: #cbd5e1;
+        }
+
+        .message {
+            display: none;
+            margin-top: 18px;
+            text-align: center;
+            padding: 12px 14px;
+            border-radius: 10px;
+            font-weight: 700;
+        }
+
+        .message.success {
+            display: block;
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .message.error {
+            display: block;
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        footer {
+            background: #0f172a;
+            color: #e2e8f0;
+            text-align: center;
+            padding: 18px 20px;
+        }
+
+        @media (max-width: 700px) {
+            .topbar {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 12px;
+                padding: 16px 20px;
+            }
+
+            nav {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="topbar">
+        <div class="logo">Green Valley Academy</div>
+        <nav>
+            <a href="indx.html">Home</a>
+            <a href="dashboard.html">Dashboard</a>
+            <a href="login.html">Login</a>
+        </nav>
+    </header>
+
+    <main class="page">
+        <div class="form-box">
+            <h1>Student Registration Form</h1>
+
+            <form id="studentRegistrationForm">
+                <div class="form-grid">
+                    <div class="field">
+                        <label for="studentId">Student ID</label>
+                        <input type="text" id="studentId" name="studentId" placeholder="Enter student ID">
+                    </div>
+
+                    <div class="field">
+                        <label for="grade">Grade</label>
+                        <select id="grade" name="grade" required>
+                            <option value="">Select grade</option>
+                            <option value="Grade 9">Grade 9</option>
+                            <option value="Grade 10">Grade 10</option>
+                            <option value="Grade 11">Grade 11</option>
+                            <option value="Grade 12">Grade 12</option>
+                        </select>
+                    </div>
+
+                    <div class="field">
+                        <label for="fname">First Name</label>
+                        <input type="text" id="fname" name="fname" placeholder="Enter first name" required>
+                    </div>
+
+                    <div class="field">
+                        <label for="lname">Last Name</label>
+                        <input type="text" id="lname" name="lname" placeholder="Enter last name" required>
+                    </div>
+
+                    <div class="field">
+                        <label for="dob">Date of Birth</label>
+                        <input type="date" id="dob" name="dob">
+                    </div>
+
+                    <div class="field">
+                        <label for="gender">Gender</label>
+                        <select id="gender" name="gender">
+                            <option value="">Select gender</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                        </select>
+                    </div>
+
+                    <div class="field">
+                        <label for="phone">Phone Number</label>
+                        <input type="tel" id="phone" name="phone" placeholder="Enter phone number">
+                    </div>
+
+                    <div class="field">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email" placeholder="Enter email address">
+                    </div>
+
+                    <div class="field full">
+                        <label for="address">Address</label>
+                        <input type="text" id="address" name="address" placeholder="Enter student address">
+                    </div>
+
+                    <div class="field">
+                        <label for="department">Department</label>
+                        <select id="department" name="department">
+                            <option value="">Select department</option>
+                            <option value="Science">Science</option>
+                            <option value="Commerce">Commerce</option>
+                            <option value="Arts">Arts</option>
+                            <option value="Technology">Technology</option>
+                        </select>
+                    </div>
+
+                    <div class="field">
+                        <label for="guardian">Guardian Contact</label>
+                        <input type="tel" id="guardian" name="guardian" placeholder="Guardian phone number">
+                    </div>
+                </div>
+
+                <div class="button-row">
+                    <button type="submit">Register</button>
+                    <button type="button" class="secondary">Update</button>
+                    <button type="button" class="secondary">Delete</button>
+                    <button type="button" class="secondary">Search</button>
+                </div>
+                <div id="formMessage" class="message"></div>
+            </form>
+        </div>
+    </main>
+
+    <footer>
+        Green Valley Academy © 2026
+    </footer>
+
+    <script>
+        const form = document.getElementById('studentRegistrationForm');
+        const updateBtn = document.querySelectorAll('button.secondary')[0];
+        const deleteBtn = document.querySelectorAll('button.secondary')[1];
+        const searchBtn = document.querySelectorAll('button.secondary')[2];
+
+        function showMessage(text, type) {
+            const message = document.getElementById('formMessage');
+            message.textContent = text;
+            message.className = 'message ' + type;
+        }
+
+        function populateForm(student) {
+            form.studentId.value = student.studentId || '';
+            form.grade.value = student.grade || '';
+            form.fname.value = student.firstName || '';
+            form.lname.value = student.lastName || '';
+            form.dob.value = student.dob || '';
+            form.gender.value = student.gender || '';
+            form.phone.value = student.phone || '';
+            form.email.value = student.email || '';
+            form.address.value = student.address || '';
+            form.department.value = student.department || '';
+            form.guardian.value = student.guardian || '';
+        }
+
+        function readFormData() {
+            return {
+                studentId: form.studentId.value.trim() || 'ST-' + Date.now().toString().slice(-6),
+                firstName: form.fname.value.trim(),
+                lastName: form.lname.value.trim(),
+                grade: form.grade.value.trim(),
+                dob: form.dob.value,
+                gender: form.gender.value,
+                phone: form.phone.value,
+                email: form.email.value,
+                address: form.address.value,
+                department: form.department.value,
+                guardian: form.guardian.value,
+                status: 'Active'
+            };
+        }
+
+        searchBtn.addEventListener('click', async function () {
+            const studentId = form.studentId.value.trim();
+            if (!studentId) {
+                showMessage('Please enter a student ID to search.', 'error');
+                return;
+            }
+
+            const students = await SchoolApp.getStudents();
+            const student = students.find(item => item.studentId.toLowerCase() === studentId.toLowerCase());
+
+            if (!student) {
+                showMessage('Student not found.', 'error');
+                return;
+            }
+
+            populateForm(student);
+            showMessage('Student record found.', 'success');
+        });
+
+        updateBtn.addEventListener('click', async function () {
+            const studentId = form.studentId.value.trim();
+
+            if (!studentId) {
+                showMessage('Enter a student ID before updating.', 'error');
+                return;
+            }
+
+            try {
+                await SchoolApp.updateStudent(studentId, readFormData());
+                showMessage('Student information updated successfully.', 'success');
+            } catch (error) {
+                showMessage(error.message, 'error');
+            }
+        });
+
+        deleteBtn.addEventListener('click', async function () {
+            const studentId = form.studentId.value.trim();
+            if (!studentId) {
+                showMessage('Enter a student ID before deleting.', 'error');
+                return;
+            }
+
+            try {
+                await SchoolApp.deleteStudent(studentId);
+                form.reset();
+                showMessage('Student deleted successfully.', 'success');
+            } catch (error) {
+                showMessage(error.message, 'error');
+            }
+        });
+
+        form.addEventListener('submit', async function (event) {
+            event.preventDefault();
+
+            const formData = readFormData();
+            const firstName = formData.firstName;
+            const lastName = formData.lastName;
+            const grade = formData.grade;
+
+            if (!firstName || !lastName || !grade) {
+                showMessage('Please complete the required student details.', 'error');
+                return;
+            }
+
+            try {
+                await SchoolApp.addStudent(formData);
+                showMessage('Student registered successfully. Redirecting to the dashboard...', 'success');
+                setTimeout(() => { window.location.href = 'dashboard.html'; }, 700);
+            } catch (error) {
+                showMessage(error.message, 'error');
+            }
+        });
+    </script>
+</body>
+</html>

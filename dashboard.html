@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | School Management</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f8fafc;
+            color: #0f172a;
+        }
+        a { text-decoration: none; color: inherit; }
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #0f172a;
+            color: white;
+            padding: 18px 60px;
+        }
+        .logo { font-size: 1.6rem; font-weight: 700; }
+        nav {
+            display: flex;
+            gap: 24px;
+            align-items: center;
+        }
+        nav a {
+            color: #e2e8f0;
+            font-weight: 600;
+        }
+        .layout {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            min-height: calc(100vh - 72px);
+        }
+        .sidebar {
+            background: #111827;
+            color: white;
+            padding: 26px 18px;
+        }
+        .sidebar h3 {
+            margin-top: 0;
+            color: #7dd3fc;
+            font-size: 1.1rem;
+            letter-spacing: 0.04em;
+        }
+        .nav-list {
+            list-style: none;
+            padding: 0;
+            margin: 20px 0 0;
+            display: grid;
+            gap: 10px;
+        }
+        .nav-list a {
+            display: block;
+            background: #1f2937;
+            color: #f8fafc;
+            padding: 12px 14px;
+            border-radius: 10px;
+            transition: 0.2s ease;
+        }
+        .nav-list a:hover {
+            background: #16a34a;
+        }
+        .content {
+            padding: 30px;
+        }
+        .welcome {
+            background: linear-gradient(135deg, #dcfce7 0%, #dbeafe 100%);
+            border-radius: 18px;
+            padding: 28px;
+            margin-bottom: 28px;
+        }
+        .welcome h1 {
+            margin: 0 0 8px;
+            font-size: 2.4rem;
+        }
+        .welcome p {
+            margin: 0;
+            color: #334155;
+            font-size: 1.04rem;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(180px, 1fr));
+            gap: 18px;
+            margin-bottom: 28px;
+        }
+        .card {
+            background: white;
+            border-radius: 18px;
+            border: 1px solid #e2e8f0;
+            padding: 24px 20px;
+            box-shadow: 0 10px 24px rgba(15, 23, 42, 0.04);
+        }
+        .card strong {
+            display: block;
+            font-size: 2rem;
+            margin-bottom: 8px;
+        }
+        .card span {
+            color: #475569;
+            font-weight: 600;
+        }
+        .row {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr;
+            gap: 20px;
+        }
+        .panel {
+            background: white;
+            border-radius: 18px;
+            border: 1px solid #e2e8f0;
+            padding: 22px;
+        }
+        .panel h2 {
+            margin-top: 0;
+            font-size: 1.3rem;
+        }
+        .admin-role-list {
+            list-style: none;
+            padding: 0;
+            margin: 18px 0 0;
+            display: grid;
+            gap: 12px;
+        }
+        .admin-role-list li {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 12px 14px;
+            color: #334155;
+            line-height: 1.6;
+        }
+        .admin-role-list strong {
+            color: #0f172a;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            text-align: left;
+            padding: 12px 10px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        th {
+            color: #475569;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+        .status {
+            display: inline-block;
+            padding: 6px 10px;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+        .status.good { background: #dcfce7; color: #166534; }
+        .status.warn { background: #fef3c7; color: #92400e; }
+        .mini-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: grid;
+            gap: 12px;
+        }
+        .mini-list li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 10px;
+        }
+        .pill {
+            background: #e0f2fe;
+            color: #075985;
+            padding: 6px 10px;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+        @media (max-width: 900px) {
+            .layout {
+                grid-template-columns: 1fr;
+            }
+            .sidebar {
+                padding-bottom: 10px;
+            }
+            .stats, .row {
+                grid-template-columns: 1fr;
+            }
+            .topbar {
+                flex-wrap: wrap;
+                gap: 12px;
+                padding: 18px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="topbar">
+        <div class="logo">Green Valley Academy</div>
+        <nav>
+            <a href="indx.html">Home</a>
+            <a href="registrationform.html">Students</a>
+            <a href="login.html">Logout</a>
+        </nav>
+    </header>
+
+    <main class="layout">
+        <aside class="sidebar">
+            <h3>School Panel</h3>
+            <ul class="nav-list">
+                <li><a href="dashboard.html">Overview</a></li>
+                <li><a href="registrationform.html">Student Registration</a></li>
+                <li><a href="teacher-portal.html">Teacher Management</a></li>
+                <li><a href="attendance.html">Attendance</a></li>
+                <li><a href="teacher-portal.html">Exam Results</a></li>
+                <li><a href="fees.html">Finance</a></li>
+                <li><a href="dashboard.html">Settings</a></li>
+            </ul>
+        </aside>
+
+        <section class="content">
+            <div class="welcome">
+                <h1>Welcome back, Admin</h1>
+                <p id="welcomeText">Here is your school performance overview for today.</p>
+            </div>
+
+            <div class="stats">
+                <div class="card">
+                    <strong id="studentCount">0</strong>
+                    <span>Total Students</span>
+                </div>
+                <div class="card">
+                    <strong id="teacherCount">0</strong>
+                    <span>Total Teachers</span>
+                </div>
+                <div class="card">
+                    <strong id="attendanceRate">0%</strong>
+                    <span>Attendance</span>
+                </div>
+                <div class="card">
+                    <strong id="monthlyFee">$0</strong>
+                    <span>Monthly Fees</span>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="panel">
+                    <h2>Recent Student Records</h2>
+                    <div style="margin: 12px 0 18px;">
+                        <input id="studentSearch" type="text" placeholder="Search student name or ID" style="width: 100%; padding: 11px 12px; border: 1px solid #cbd5e1; border-radius: 10px;">
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Grade</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="studentTableBody"></tbody>
+                    </table>
+                </div>
+
+                <div class="panel">
+                    <h2>Automation Features</h2>
+                    <ul class="admin-role-list">
+                        <li><strong>1.</strong> Student registrations are saved automatically to the dashboard.</li>
+                        <li><strong>2.</strong> Result data from the teacher portal updates student result views instantly.</li>
+                        <li><strong>3.</strong> Dashboard totals refresh without manual editing.</li>
+                        <li><strong>4.</strong> Search makes it easy to find students without scrolling through all records.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="panel" style="margin-top: 24px;">
+                <h2>Upcoming Tasks</h2>
+                <ul class="mini-list" id="taskList">
+                    <li><span>Class attendance</span><span class="pill">Today</span></li>
+                    <li><span>Fee reminder</span><span class="pill">2 Tasks</span></li>
+                    <li><span>Exam review</span><span class="pill">Due</span></li>
+                    <li><span>Staff meeting</span><span class="pill">3 PM</span></li>
+                </ul>
+            </div>
+        </section>
+    </main>
+
+    <script src="app.js"></script>
+    <script>
+        SchoolApp.requireAuth('admin');
+
+        const STORAGE_KEY = SchoolApp.STORAGE_KEYS.students;
+
+        function getStudents() {
+            return SchoolApp.getStudents();
+        }
+
+        function getResults() {
+            return SchoolApp.getResults();
+        }
+
+        async function renderStats() {
+            const [students, results, attendanceRecords, fees, users] = await Promise.all([
+                getStudents(), getResults(), SchoolApp.getAttendance(), SchoolApp.getFees(), SchoolApp.getUsers()
+            ]);
+            const teacherCount = users.filter(user => user.role === 'teacher').length;
+            const presentCount = attendanceRecords.filter(record => record.status && record.status.toLowerCase() === 'present').length;
+            const attendanceRate = attendanceRecords.length ? Math.round((presentCount / attendanceRecords.length) * 100) : 0;
+            const totalFees = fees.reduce((sum, fee) => sum + Number(fee.amount || 0), 0);
+            const studentCount = students.length;
+
+            document.getElementById('studentCount').textContent = studentCount;
+            document.getElementById('teacherCount').textContent = teacherCount;
+            document.getElementById('attendanceRate').textContent = attendanceRate + '%';
+            document.getElementById('monthlyFee').textContent = '$' + (totalFees / 1000).toFixed(1) + 'K';
+
+            const rows = students.slice().reverse().map(student => {
+                const statusClass = student.status === 'Active' ? 'good' : 'warn';
+                return `
+                    <tr>
+                        <td>${student.firstName} ${student.lastName}</td>
+                        <td>${student.grade}</td>
+                        <td><span class="status ${statusClass}">${student.status}</span></td>
+                    </tr>
+                `;
+            }).join('');
+
+            document.getElementById('studentTableBody').innerHTML = rows || '<tr><td colspan="3">No students found.</td></tr>';
+
+            const today = new Date();
+            const dateText = today.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+            document.getElementById('welcomeText').textContent = 'Here is your school performance overview for ' + dateText + '.';
+
+            const resultCount = results.length;
+            document.getElementById('taskList').innerHTML = `
+                <li><span>Class attendance</span><span class="pill">${attendanceRate}%</span></li>
+                <li><span>Students registered</span><span class="pill">${studentCount}</span></li>
+                <li><span>Result entries</span><span class="pill">${resultCount}</span></li>
+                <li><span>Teacher review</span><span class="pill">Today</span></li>
+            `;
+        }
+
+        async function filterStudents(query) {
+            const students = await getStudents();
+
+            const filtered = students.filter(student => {
+                const fullName = `${student.firstName} ${student.lastName}`.toLowerCase();
+                const id = student.studentId.toLowerCase();
+                return fullName.includes(query.toLowerCase()) || id.includes(query.toLowerCase());
+            });
+
+            const rows = filtered.slice().reverse().map(student => {
+                const statusClass = student.status === 'Active' ? 'good' : 'warn';
+                return `
+                    <tr>
+                        <td>${student.firstName} ${student.lastName}</td>
+                        <td>${student.grade}</td>
+                        <td><span class="status ${statusClass}">${student.status}</span></td>
+                    </tr>
+                `;
+            }).join('');
+
+            document.getElementById('studentTableBody').innerHTML = rows || '<tr><td colspan="3">No matching students found.</td></tr>';
+        }
+
+        document.getElementById('studentSearch').addEventListener('input', async function () {
+            await filterStudents(this.value.trim());
+        });
+
+        renderStats().catch(error => console.error(error));
+    </script>
+</body>
+</html>
