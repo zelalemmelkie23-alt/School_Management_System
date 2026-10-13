@@ -1,380 +1,1193 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard | School Management</title>
+
+    <title>Admin Dashboard | Nibrete Buzuneh School</title>
+
     <style>
-        * { box-sizing: border-box; }
+        :root {
+            --primary: #0f172a;
+            --sidebar: #111827;
+            --green: #16a34a;
+            --green-light: #dcfce7;
+            --blue: #2563eb;
+            --blue-light: #dbeafe;
+            --orange: #d97706;
+            --orange-light: #fef3c7;
+            --red: #dc2626;
+            --red-light: #fee2e2;
+            --background: #f8fafc;
+            --white: #ffffff;
+            --border: #e2e8f0;
+            --text: #0f172a;
+            --muted: #64748b;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
         body {
             margin: 0;
-            font-family: Arial, sans-serif;
-            background: #f8fafc;
-            color: #0f172a;
+            font-family: Arial, Helvetica, sans-serif;
+            background: var(--background);
+            color: var(--text);
         }
-        a { text-decoration: none; color: inherit; }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        button,
+        input,
+        select {
+            font: inherit;
+        }
+
+        button {
+            cursor: pointer;
+        }
+
         .topbar {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: #0f172a;
+            gap: 20px;
+            background: var(--primary);
             color: white;
-            padding: 18px 60px;
+            padding: 18px 28px;
         }
-        .logo { font-size: 1.6rem; font-weight: 700; }
-        nav {
+
+        .brand {
+            font-size: 1.1rem;
+            font-weight: 800;
+            line-height: 1.5;
+        }
+
+        .brand small {
+            display: block;
+            color: #cbd5e1;
+            font-size: 0.75rem;
+            font-weight: 400;
+        }
+
+        .top-nav {
             display: flex;
-            gap: 24px;
             align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
         }
-        nav a {
+
+        .top-nav a {
             color: #e2e8f0;
+            font-size: 0.9rem;
             font-weight: 600;
         }
+
+        .top-nav a:hover {
+            color: #86efac;
+        }
+
         .layout {
             display: grid;
-            grid-template-columns: 250px 1fr;
-            min-height: calc(100vh - 72px);
+            grid-template-columns: 250px minmax(0, 1fr);
+            min-height: calc(100vh - 75px);
         }
+
         .sidebar {
-            background: #111827;
+            background: var(--sidebar);
             color: white;
-            padding: 26px 18px;
+            padding: 25px 16px;
         }
+
         .sidebar h3 {
-            margin-top: 0;
+            margin: 0;
+            padding: 0 12px 18px;
             color: #7dd3fc;
-            font-size: 1.1rem;
+            font-size: 1rem;
             letter-spacing: 0.04em;
         }
+
         .nav-list {
             list-style: none;
             padding: 0;
-            margin: 20px 0 0;
+            margin: 0;
             display: grid;
-            gap: 10px;
+            gap: 7px;
         }
+
         .nav-list a {
             display: block;
-            background: #1f2937;
-            color: #f8fafc;
-            padding: 12px 14px;
+            padding: 12px 13px;
+            border-radius: 9px;
+            color: #e2e8f0;
+            font-size: 0.9rem;
+            transition: background 0.2s;
+        }
+
+        .nav-list a:hover,
+        .nav-list a.active {
+            background: var(--green);
+            color: white;
+        }
+
+        .sidebar-note {
+            margin-top: 35px;
+            padding: 15px 12px;
+            border: 1px solid #374151;
             border-radius: 10px;
-            transition: 0.2s ease;
-        }
-        .nav-list a:hover {
-            background: #16a34a;
-        }
-        .content {
-            padding: 30px;
-        }
-        .welcome {
-            background: linear-gradient(135deg, #dcfce7 0%, #dbeafe 100%);
-            border-radius: 18px;
-            padding: 28px;
-            margin-bottom: 28px;
-        }
-        .welcome h1 {
-            margin: 0 0 8px;
-            font-size: 2.4rem;
-        }
-        .welcome p {
-            margin: 0;
-            color: #334155;
-            font-size: 1.04rem;
-        }
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(4, minmax(180px, 1fr));
-            gap: 18px;
-            margin-bottom: 28px;
-        }
-        .card {
-            background: white;
-            border-radius: 18px;
-            border: 1px solid #e2e8f0;
-            padding: 24px 20px;
-            box-shadow: 0 10px 24px rgba(15, 23, 42, 0.04);
-        }
-        .card strong {
-            display: block;
-            font-size: 2rem;
-            margin-bottom: 8px;
-        }
-        .card span {
-            color: #475569;
-            font-weight: 600;
-        }
-        .row {
-            display: grid;
-            grid-template-columns: 1.5fr 1fr;
-            gap: 20px;
-        }
-        .panel {
-            background: white;
-            border-radius: 18px;
-            border: 1px solid #e2e8f0;
-            padding: 22px;
-        }
-        .panel h2 {
-            margin-top: 0;
-            font-size: 1.3rem;
-        }
-        .admin-role-list {
-            list-style: none;
-            padding: 0;
-            margin: 18px 0 0;
-            display: grid;
-            gap: 12px;
-        }
-        .admin-role-list li {
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
-            border-radius: 12px;
-            padding: 12px 14px;
-            color: #334155;
+            color: #cbd5e1;
+            font-size: 0.8rem;
             line-height: 1.6;
         }
-        .admin-role-list strong {
-            color: #0f172a;
+
+        .content {
+            min-width: 0;
+            padding: 30px;
         }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        th, td {
-            text-align: left;
-            padding: 12px 10px;
-            border-bottom: 1px solid #e2e8f0;
-        }
-        th {
-            color: #475569;
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
-        }
-        .status {
-            display: inline-block;
-            padding: 6px 10px;
-            border-radius: 999px;
-            font-size: 0.75rem;
-            font-weight: 700;
-        }
-        .status.good { background: #dcfce7; color: #166534; }
-        .status.warn { background: #fef3c7; color: #92400e; }
-        .mini-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            display: grid;
-            gap: 12px;
-        }
-        .mini-list li {
+
+        .page-heading {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid #e2e8f0;
-            padding-bottom: 10px;
+            gap: 18px;
+            margin-bottom: 25px;
         }
-        .pill {
-            background: #e0f2fe;
-            color: #075985;
-            padding: 6px 10px;
-            border-radius: 999px;
-            font-size: 0.75rem;
+
+        .page-heading h1 {
+            margin: 0 0 8px;
+            font-size: 1.8rem;
+        }
+
+        .page-heading p {
+            margin: 0;
+            color: var(--muted);
+            line-height: 1.6;
+        }
+
+        .date-label {
+            color: var(--muted);
+            font-size: 0.85rem;
+            text-align: right;
+        }
+
+        .welcome {
+            background: linear-gradient(135deg, #dcfce7, #dbeafe);
+            border: 1px solid #d1fae5;
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+
+        .welcome h2 {
+            margin: 0 0 9px;
+            font-size: 1.45rem;
+        }
+
+        .welcome p {
+            margin: 0;
+            color: #334155;
+            line-height: 1.7;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 17px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            min-width: 0;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 21px;
+            box-shadow: 0 5px 18px rgba(15, 23, 42, 0.04);
+        }
+
+        .stat-label {
+            color: var(--muted);
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .stat-value {
+            display: block;
+            margin: 13px 0 8px;
+            font-size: 1.65rem;
+            font-weight: 800;
+            overflow-wrap: anywhere;
+        }
+
+        .stat-description {
+            color: var(--muted);
+            font-size: 0.77rem;
+            line-height: 1.5;
+        }
+
+        .green {
+            color: var(--green);
+        }
+
+        .blue {
+            color: var(--blue);
+        }
+
+        .orange {
+            color: var(--orange);
+        }
+
+        .red {
+            color: var(--red);
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1.6fr) minmax(260px, 1fr);
+            gap: 20px;
+            align-items: start;
+        }
+
+        .panel {
+            min-width: 0;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 15px;
+            padding: 22px;
+            box-shadow: 0 5px 18px rgba(15, 23, 42, 0.03);
+        }
+
+        .panel + .panel {
+            margin-top: 20px;
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+
+        .panel-header h2 {
+            margin: 0 0 7px;
+            font-size: 1.12rem;
+        }
+
+        .panel-header p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 0.83rem;
+            line-height: 1.6;
+        }
+
+        .search {
+            width: 100%;
+            padding: 12px 13px;
+            border: 1px solid #cbd5e1;
+            border-radius: 9px;
+            outline: none;
+            margin-bottom: 15px;
+        }
+
+        .search:focus {
+            border-color: var(--green);
+            box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1);
+        }
+
+        .table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            white-space: nowrap;
+        }
+
+        th,
+        td {
+            text-align: left;
+            padding: 13px 10px;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.83rem;
+        }
+
+        th {
+            background: #f8fafc;
+            color: var(--muted);
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        tbody tr:hover {
+            background: #f8fafc;
+        }
+
+        .student-name {
             font-weight: 700;
         }
-        @media (max-width: 900px) {
+
+        .student-id {
+            margin-top: 4px;
+            color: var(--muted);
+            font-size: 0.73rem;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 6px 9px;
+            border-radius: 999px;
+            font-size: 0.72rem;
+            font-weight: 800;
+        }
+
+        .status.good {
+            background: var(--green-light);
+            color: #166534;
+        }
+
+        .status.warn {
+            background: var(--orange-light);
+            color: #92400e;
+        }
+
+        .status.inactive {
+            background: var(--red-light);
+            color: #991b1b;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: var(--muted);
+            padding: 30px 12px;
+            white-space: normal;
+        }
+
+        .panel-link {
+            color: var(--blue);
+            font-size: 0.82rem;
+            font-weight: 700;
+        }
+
+        .panel-link:hover {
+            text-decoration: underline;
+        }
+
+        .quick-links {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+        }
+
+        .quick-link {
+            display: block;
+            border: 1px solid var(--border);
+            border-radius: 11px;
+            padding: 15px 12px;
+            transition: 0.2s;
+        }
+
+        .quick-link:hover {
+            border-color: #86efac;
+            background: #f0fdf4;
+        }
+
+        .quick-link strong {
+            display: block;
+            font-size: 0.87rem;
+            margin-bottom: 6px;
+        }
+
+        .quick-link span {
+            color: var(--muted);
+            font-size: 0.75rem;
+            line-height: 1.5;
+        }
+
+        .activity-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: grid;
+            gap: 0;
+        }
+
+        .activity-list li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            padding: 14px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .activity-list li:last-child {
+            border-bottom: none;
+        }
+
+        .activity-name {
+            font-size: 0.86rem;
+            font-weight: 600;
+        }
+
+        .activity-description {
+            color: var(--muted);
+            font-size: 0.76rem;
+            margin-top: 5px;
+            line-height: 1.5;
+        }
+
+        .pill {
+            display: inline-block;
+            padding: 6px 9px;
+            border-radius: 999px;
+            background: var(--blue-light);
+            color: #1e40af;
+            font-size: 0.72rem;
+            font-weight: 800;
+            white-space: nowrap;
+        }
+
+        .notice {
+            display: none;
+            padding: 12px 14px;
+            margin-bottom: 20px;
+            border-radius: 9px;
+            font-size: 0.86rem;
+            line-height: 1.6;
+        }
+
+        .notice.error {
+            display: block;
+            background: var(--red-light);
+            color: #991b1b;
+        }
+
+        .notice.info {
+            display: block;
+            background: var(--blue-light);
+            color: #1e40af;
+        }
+
+        .refresh-button {
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 9px 12px;
+            background: white;
+            color: var(--text);
+            font-weight: 700;
+        }
+
+        .refresh-button:hover {
+            background: #f1f5f9;
+        }
+
+        .footer {
+            text-align: center;
+            color: var(--muted);
+            font-size: 0.8rem;
+            padding: 25px 15px;
+        }
+
+        @media (max-width: 1200px) {
+            .stats {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 800px) {
             .layout {
                 grid-template-columns: 1fr;
             }
+
             .sidebar {
-                padding-bottom: 10px;
+                padding: 18px;
             }
-            .stats, .row {
+
+            .nav-list {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .sidebar-note {
+                margin-top: 18px;
+            }
+
+            .content {
+                padding: 22px 16px;
+            }
+
+            .topbar {
+                align-items: flex-start;
+                flex-direction: column;
+                padding: 18px 20px;
+            }
+
+            .top-nav {
+                gap: 14px;
+            }
+        }
+
+        @media (max-width: 500px) {
+            .page-heading {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .date-label {
+                text-align: left;
+            }
+
+            .stats {
                 grid-template-columns: 1fr;
             }
-            .topbar {
-                flex-wrap: wrap;
-                gap: 12px;
-                padding: 18px 20px;
+
+            .nav-list {
+                grid-template-columns: 1fr;
+            }
+
+            .quick-links {
+                grid-template-columns: 1fr;
+            }
+
+            .panel {
+                padding: 16px;
             }
         }
     </style>
+
+    <link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
-    <header class="topbar">
-        <div class="logo">Green Valley Academy</div>
-        <nav>
-            <a href="indx.html">Home</a>
-            <a href="registrationform.html">Students</a>
-            <a href="login.html">Logout</a>
-        </nav>
-    </header>
 
-    <main class="layout">
-        <aside class="sidebar">
-            <h3>School Panel</h3>
-            <ul class="nav-list">
-                <li><a href="dashboard.html">Overview</a></li>
-                <li><a href="registrationform.html">Student Registration</a></li>
-                <li><a href="teacher-portal.html">Teacher Management</a></li>
-                <li><a href="attendance.html">Attendance</a></li>
-                <li><a href="teacher-portal.html">Exam Results</a></li>
-                <li><a href="fees.html">Finance</a></li>
-                <li><a href="dashboard.html">Settings</a></li>
-            </ul>
-        </aside>
+<header class="topbar">
 
-        <section class="content">
-            <div class="welcome">
-                <h1>Welcome back, Admin</h1>
-                <p id="welcomeText">Here is your school performance overview for today.</p>
+    <div class="brand">
+        NIBRETE BUZUNEH
+        <small>Secondary and Preparatory School</small>
+    </div>
+
+    <nav class="top-nav">
+        <a href="indx.html">Home</a>
+        <a href="registrationform.html">Students</a>
+        <a href="fees.html">Finance</a>
+        <a href="login.html" id="logoutLink">Logout</a>
+    </nav>
+
+</header>
+
+<main class="layout">
+
+    <aside class="sidebar">
+
+        <h3>SCHOOL PANEL</h3>
+
+        <ul class="nav-list">
+            <li><a href="dashboard.html" class="active">Dashboard Overview</a></li>
+            <li><a href="registrationform.html">Student Registration</a></li>
+            <li><a href="teacher-portal.html">Teacher Management</a></li>
+            <li><a href="attendance.html">Attendance</a></li>
+            <li><a href="teacher-portal.html">Exam Results</a></li>
+            <li><a href="fees.html">Fee Management</a></li>
+            <li><a href="login.html">Account</a></li>
+        </ul>
+
+        <div class="sidebar-note">
+            <strong>Administrator Panel</strong>
+            <br>
+            Monitor school activities, student records, attendance, and finances.
+        </div>
+
+    </aside>
+
+    <section class="content">
+
+        <div class="page-heading">
+            <div>
+                <h1>School Dashboard</h1>
+                <p>Monitor your school's performance and daily activities.</p>
             </div>
 
-            <div class="stats">
-                <div class="card">
-                    <strong id="studentCount">0</strong>
-                    <span>Total Students</span>
-                </div>
-                <div class="card">
-                    <strong id="teacherCount">0</strong>
-                    <span>Total Teachers</span>
-                </div>
-                <div class="card">
-                    <strong id="attendanceRate">0%</strong>
-                    <span>Attendance</span>
-                </div>
-                <div class="card">
-                    <strong id="monthlyFee">$0</strong>
-                    <span>Monthly Fees</span>
-                </div>
-            </div>
+            <div class="date-label" id="currentDate"></div>
+        </div>
 
-            <div class="row">
-                <div class="panel">
-                    <h2>Recent Student Records</h2>
-                    <div style="margin: 12px 0 18px;">
-                        <input id="studentSearch" type="text" placeholder="Search student name or ID" style="width: 100%; padding: 11px 12px; border: 1px solid #cbd5e1; border-radius: 10px;">
+        <div id="dashboardMessage" class="notice" role="status" aria-live="polite"></div>
+
+        <section class="welcome">
+            <h2 id="welcomeTitle">Welcome, Administrator</h2>
+            <p id="welcomeText">
+                Your school performance overview will appear here.
+            </p>
+        </section>
+
+        <!-- Summary statistics -->
+
+        <section class="stats">
+
+            <article class="stat-card">
+                <span class="stat-label">Total Students</span>
+                <strong class="stat-value blue" id="studentCount">0</strong>
+                <span class="stat-description">Registered student records</span>
+            </article>
+
+            <article class="stat-card">
+                <span class="stat-label">Total Teachers</span>
+                <strong class="stat-value green" id="teacherCount">0</strong>
+                <span class="stat-description">Registered teacher accounts</span>
+            </article>
+
+            <article class="stat-card">
+                <span class="stat-label">Attendance Rate</span>
+                <strong class="stat-value orange" id="attendanceRate">0%</strong>
+                <span class="stat-description">Based on recorded attendance entries</span>
+            </article>
+
+            <article class="stat-card">
+                <span class="stat-label">Fees Collected</span>
+                <strong class="stat-value green" id="monthlyFee">ETB 0.00</strong>
+                <span class="stat-description">Recorded collected payments</span>
+            </article>
+
+        </section>
+
+        <section class="content-grid">
+
+            <!-- Student records -->
+
+            <div class="panel">
+
+                <div class="panel-header">
+                    <div>
+                        <h2>Student Records</h2>
+                        <p>Search and review registered students.</p>
                     </div>
+
+                    <a class="panel-link" href="registrationform.html">
+                        Add Student
+                    </a>
+                </div>
+
+                <input
+                    type="search"
+                    id="studentSearch"
+                    class="search"
+                    placeholder="Search by student name or ID..."
+                    aria-label="Search students"
+                >
+
+                <div class="table-wrapper">
                     <table>
                         <thead>
                             <tr>
-                                <th>Name</th>
+                                <th>Student</th>
                                 <th>Grade</th>
                                 <th>Status</th>
                             </tr>
                         </thead>
-                        <tbody id="studentTableBody"></tbody>
+
+                        <tbody id="studentTableBody">
+                            <tr>
+                                <td colspan="3" class="empty-state">
+                                    Loading student records...
+                                </td>
+                            </tr>
+                        </tbody>
                     </table>
                 </div>
 
-                <div class="panel">
-                    <h2>Automation Features</h2>
-                    <ul class="admin-role-list">
-                        <li><strong>1.</strong> Student registrations are saved automatically to the dashboard.</li>
-                        <li><strong>2.</strong> Result data from the teacher portal updates student result views instantly.</li>
-                        <li><strong>3.</strong> Dashboard totals refresh without manual editing.</li>
-                        <li><strong>4.</strong> Search makes it easy to find students without scrolling through all records.</li>
+            </div>
+
+            <!-- Quick links and school activity -->
+
+            <div>
+
+                <section class="panel">
+
+                    <div class="panel-header">
+                        <div>
+                            <h2>Quick Actions</h2>
+                            <p>Open common school management pages.</p>
+                        </div>
+                    </div>
+
+                    <div class="quick-links">
+
+                        <a class="quick-link" href="registrationform.html">
+                            <strong>Student Registration</strong>
+                            <span>Register new students.</span>
+                        </a>
+
+                        <a class="quick-link" href="teacher-portal.html">
+                            <strong>Teacher Portal</strong>
+                            <span>Access teacher features.</span>
+                        </a>
+
+                        <a class="quick-link" href="attendance.html">
+                            <strong>Attendance</strong>
+                            <span>Review attendance records.</span>
+                        </a>
+
+                        <a class="quick-link" href="fees.html">
+                            <strong>Finance</strong>
+                            <span>Review student fees.</span>
+                        </a>
+
+                    </div>
+
+                </section>
+
+                <section class="panel">
+
+                    <div class="panel-header">
+                        <div>
+                            <h2>School Overview</h2>
+                            <p>Current totals from available records.</p>
+                        </div>
+
+                        <button type="button" class="refresh-button" id="refreshButton">
+                            Refresh
+                        </button>
+                    </div>
+
+                    <ul class="activity-list" id="activityList">
+
+                        <li>
+                            <div>
+                                <div class="activity-name">Attendance Records</div>
+                                <div class="activity-description">
+                                    Recorded attendance entries
+                                </div>
+                            </div>
+                            <span class="pill">0</span>
+                        </li>
+
                     </ul>
-                </div>
+
+                </section>
+
             </div>
 
-            <div class="panel" style="margin-top: 24px;">
-                <h2>Upcoming Tasks</h2>
-                <ul class="mini-list" id="taskList">
-                    <li><span>Class attendance</span><span class="pill">Today</span></li>
-                    <li><span>Fee reminder</span><span class="pill">2 Tasks</span></li>
-                    <li><span>Exam review</span><span class="pill">Due</span></li>
-                    <li><span>Staff meeting</span><span class="pill">3 PM</span></li>
-                </ul>
-            </div>
         </section>
-    </main>
 
-    <script src="app.js"></script>
-    <script>
-        SchoolApp.requireAuth('admin');
+    </section>
 
-        const STORAGE_KEY = SchoolApp.STORAGE_KEYS.students;
+</main>
 
-        function getStudents() {
-            return SchoolApp.getStudents();
+<footer class="footer">
+    &copy; <span id="currentYear"></span>
+    Nibrete Buzuneh Secondary and Preparatory School.
+    School Management System.
+</footer>
+
+<script src="app.js"></script>
+
+<script>
+(function () {
+    'use strict';
+
+    const $ = id => document.getElementById(id);
+
+    let students = [];
+    let users = [];
+    let attendanceRecords = [];
+    let fees = [];
+    let results = [];
+    let loading = false;
+
+    function escapeHTML(value) {
+        return String(value ?? '').replace(/[&<>"']/g, character => ({
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#39;'
+        })[character]);
+    }
+
+    function studentId(student) {
+        return String(student.studentId ?? student.id ?? '');
+    }
+
+    function studentName(student) {
+        return [
+            student.firstName,
+            student.middleName,
+            student.lastName
+        ].filter(Boolean).join(' ') || student.name || 'Unnamed Student';
+    }
+
+    function money(value) {
+        return 'ETB ' + new Intl.NumberFormat('en-ET', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        }).format(Number(value) || 0);
+    }
+
+    function showMessage(text, type) {
+        const element = $('dashboardMessage');
+
+        element.textContent = text;
+        element.className = 'notice ' + type;
+    }
+
+    function clearMessage() {
+        $('dashboardMessage').textContent = '';
+        $('dashboardMessage').className = 'notice';
+    }
+
+    /*
+     * Calculate collected payments.
+     * New fee records use amountPaid.
+     * Older records marked Paid are treated as fully paid.
+     */
+    function getCollectedAmount(fee) {
+        if (fee.amountPaid !== undefined && fee.amountPaid !== null) {
+            const total = Math.max(0, Number(fee.amount) || 0);
+            const paid = Math.max(0, Number(fee.amountPaid) || 0);
+
+            return Math.min(total, paid);
         }
 
-        function getResults() {
-            return SchoolApp.getResults();
+        return String(fee.status).toLowerCase() === 'paid'
+            ? Math.max(0, Number(fee.amount) || 0)
+            : 0;
+    }
+
+    function getOutstandingAmount(fee) {
+        const total = Math.max(0, Number(fee.amount) || 0);
+
+        return Math.max(0, total - getCollectedAmount(fee));
+    }
+
+    function calculateAttendanceRate() {
+        if (!attendanceRecords.length) {
+            return 0;
         }
 
-        async function renderStats() {
-            const [students, results, attendanceRecords, fees, users] = await Promise.all([
-                getStudents(), getResults(), SchoolApp.getAttendance(), SchoolApp.getFees(), SchoolApp.getUsers()
-            ]);
-            const teacherCount = users.filter(user => user.role === 'teacher').length;
-            const presentCount = attendanceRecords.filter(record => record.status && record.status.toLowerCase() === 'present').length;
-            const attendanceRate = attendanceRecords.length ? Math.round((presentCount / attendanceRecords.length) * 100) : 0;
-            const totalFees = fees.reduce((sum, fee) => sum + Number(fee.amount || 0), 0);
-            const studentCount = students.length;
+        /*
+         * This is the percentage of records marked Present.
+         * It is not necessarily the attendance percentage for today.
+         */
+        const present = attendanceRecords.filter(record =>
+            String(record.status || '').toLowerCase() === 'present'
+        ).length;
 
-            document.getElementById('studentCount').textContent = studentCount;
-            document.getElementById('teacherCount').textContent = teacherCount;
-            document.getElementById('attendanceRate').textContent = attendanceRate + '%';
-            document.getElementById('monthlyFee').textContent = '$' + (totalFees / 1000).toFixed(1) + 'K';
+        return Math.round((present / attendanceRecords.length) * 100);
+    }
 
-            const rows = students.slice().reverse().map(student => {
-                const statusClass = student.status === 'Active' ? 'good' : 'warn';
-                return `
-                    <tr>
-                        <td>${student.firstName} ${student.lastName}</td>
-                        <td>${student.grade}</td>
-                        <td><span class="status ${statusClass}">${student.status}</span></td>
-                    </tr>
-                `;
-            }).join('');
+    function renderStudents(list) {
+        const tbody = $('studentTableBody');
 
-            document.getElementById('studentTableBody').innerHTML = rows || '<tr><td colspan="3">No students found.</td></tr>';
-
-            const today = new Date();
-            const dateText = today.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
-            document.getElementById('welcomeText').textContent = 'Here is your school performance overview for ' + dateText + '.';
-
-            const resultCount = results.length;
-            document.getElementById('taskList').innerHTML = `
-                <li><span>Class attendance</span><span class="pill">${attendanceRate}%</span></li>
-                <li><span>Students registered</span><span class="pill">${studentCount}</span></li>
-                <li><span>Result entries</span><span class="pill">${resultCount}</span></li>
-                <li><span>Teacher review</span><span class="pill">Today</span></li>
+        if (!list.length) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="3" class="empty-state">
+                        No matching students found.
+                    </td>
+                </tr>
             `;
+
+            return;
         }
 
-        async function filterStudents(query) {
-            const students = await getStudents();
+        tbody.innerHTML = list
+            .slice()
+            .reverse()
+            .map(student => {
+                const status = String(student.status || 'Active');
 
-            const filtered = students.filter(student => {
-                const fullName = `${student.firstName} ${student.lastName}`.toLowerCase();
-                const id = student.studentId.toLowerCase();
-                return fullName.includes(query.toLowerCase()) || id.includes(query.toLowerCase());
-            });
+                const normalizedStatus = status.toLowerCase();
 
-            const rows = filtered.slice().reverse().map(student => {
-                const statusClass = student.status === 'Active' ? 'good' : 'warn';
+                const statusClass =
+                    normalizedStatus === 'active' ? 'good' :
+                    normalizedStatus === 'inactive' ? 'inactive' : 'warn';
+
                 return `
                     <tr>
-                        <td>${student.firstName} ${student.lastName}</td>
-                        <td>${student.grade}</td>
-                        <td><span class="status ${statusClass}">${student.status}</span></td>
+                        <td>
+                            <div class="student-name">
+                                ${escapeHTML(studentName(student))}
+                            </div>
+
+                            <div class="student-id">
+                                ID: ${escapeHTML(studentId(student) || 'N/A')}
+                            </div>
+                        </td>
+
+                        <td>${escapeHTML(student.grade || 'N/A')}</td>
+
+                        <td>
+                            <span class="status ${statusClass}">
+                                ${escapeHTML(status)}
+                            </span>
+                        </td>
                     </tr>
                 `;
-            }).join('');
+            })
+            .join('');
+    }
 
-            document.getElementById('studentTableBody').innerHTML = rows || '<tr><td colspan="3">No matching students found.</td></tr>';
-        }
+    function filterStudents() {
+        const query = $('studentSearch').value.trim().toLowerCase();
 
-        document.getElementById('studentSearch').addEventListener('input', async function () {
-            await filterStudents(this.value.trim());
+        const filtered = students.filter(student => {
+            const name = studentName(student).toLowerCase();
+            const id = studentId(student).toLowerCase();
+            const grade = String(student.grade || '').toLowerCase();
+
+            return (
+                name.includes(query) ||
+                id.includes(query) ||
+                grade.includes(query)
+            );
         });
 
-        renderStats().catch(error => console.error(error));
-    </script>
+        renderStudents(filtered);
+    }
+
+    function renderActivities() {
+        const attendanceRate = calculateAttendanceRate();
+
+        const collected = fees.reduce(
+            (sum, fee) => sum + getCollectedAmount(fee),
+            0
+        );
+
+        const outstanding = fees.reduce(
+            (sum, fee) => sum + getOutstandingAmount(fee),
+            0
+        );
+
+        const unpaidCount = fees.filter(
+            fee => getOutstandingAmount(fee) > 0
+        ).length;
+
+        const activeStudents = students.filter(
+            student => String(student.status || 'Active').toLowerCase() === 'active'
+        ).length;
+
+        $('activityList').innerHTML = `
+            <li>
+                <div>
+                    <div class="activity-name">Attendance Records</div>
+                    <div class="activity-description">
+                        Entries currently stored in the system
+                    </div>
+                </div>
+                <span class="pill">${attendanceRecords.length}</span>
+            </li>
+
+            <li>
+                <div>
+                    <div class="activity-name">Active Students</div>
+                    <div class="activity-description">
+                        Students marked as active
+                    </div>
+                </div>
+                <span class="pill">${activeStudents}</span>
+            </li>
+
+            <li>
+                <div>
+                    <div class="activity-name">Outstanding Fee Records</div>
+                    <div class="activity-description">
+                        Fee records with an unpaid balance
+                    </div>
+                </div>
+                <span class="pill">${unpaidCount}</span>
+            </li>
+
+            <li>
+                <div>
+                    <div class="activity-name">Outstanding Balance</div>
+                    <div class="activity-description">
+                        Total unpaid amount
+                    </div>
+                </div>
+                <span class="pill">${money(outstanding)}</span>
+            </li>
+
+            <li>
+                <div>
+                    <div class="activity-name">Exam Result Records</div>
+                    <div class="activity-description">
+                        Result entries currently stored
+                    </div>
+                </div>
+                <span class="pill">${results.length}</span>
+            </li>
+
+            <li>
+                <div>
+                    <div class="activity-name">Fees Collected</div>
+                    <div class="activity-description">
+                        Total collected across loaded fee records
+                    </div>
+                </div>
+                <span class="pill">${money(collected)}</span>
+            </li>
+        `;
+    }
+
+    function renderDashboard() {
+        $('studentCount').textContent = students.length;
+
+        $('teacherCount').textContent = users.filter(user =>
+            String(user.role || '').toLowerCase() === 'teacher'
+        ).length;
+
+        $('attendanceRate').textContent =
+            calculateAttendanceRate() + '%';
+
+        const collected = fees.reduce(
+            (sum, fee) => sum + getCollectedAmount(fee),
+            0
+        );
+
+        $('monthlyFee').textContent = money(collected);
+
+        renderStudents(students);
+        renderActivities();
+
+        const date = new Date();
+
+        $('currentDate').textContent = date.toLocaleDateString('en-ET', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+
+        $('welcomeText').textContent =
+            `There are ${students.length} registered students, ` +
+            `${attendanceRecords.length} attendance records, and ` +
+            `${results.length} exam result records in the system.`;
+    }
+
+    async function loadDashboard() {
+        if (loading) {
+            return;
+        }
+
+        loading = true;
+        clearMessage();
+
+        $('refreshButton').disabled = true;
+        $('refreshButton').textContent = 'Loading...';
+
+        try {
+            const [
+                studentData,
+                resultData,
+                attendanceData,
+                feeData,
+                userData
+            ] = await Promise.all([
+                SchoolApp.getStudents(),
+                SchoolApp.getResults(),
+                SchoolApp.getAttendance(),
+                SchoolApp.getFees(),
+                SchoolApp.getUsers()
+            ]);
+
+            students = Array.isArray(studentData) ? studentData : [];
+            results = Array.isArray(resultData) ? resultData : [];
+            attendanceRecords = Array.isArray(attendanceData)
+                ? attendanceData : [];
+            fees = Array.isArray(feeData) ? feeData : [];
+            users = Array.isArray(userData) ? userData : [];
+
+            renderDashboard();
+
+        } catch (error) {
+            console.error('Dashboard loading error:', error);
+
+            showMessage(
+                error.message ||
+                'Unable to load dashboard information. Check your backend and app.js.',
+                'error'
+            );
+
+        } finally {
+            loading = false;
+            $('refreshButton').disabled = false;
+            $('refreshButton').textContent = 'Refresh';
+        }
+    }
+
+    /*
+     * The dashboard requires the existing application authentication
+     * function. This function must enforce access to protected data,
+     * preferably through server-side session/token validation too.
+     */
+    if (
+        typeof SchoolApp === 'undefined' ||
+        typeof SchoolApp.requireAuth !== 'function' ||
+        typeof SchoolApp.getStudents !== 'function' ||
+        typeof SchoolApp.getResults !== 'function' ||
+        typeof SchoolApp.getAttendance !== 'function' ||
+        typeof SchoolApp.getFees !== 'function' ||
+        typeof SchoolApp.getUsers !== 'function'
+    ) {
+        showMessage(
+            'Required SchoolApp functions were not found. Check app.js.',
+            'error'
+        );
+
+        $('studentTableBody').innerHTML = `
+            <tr>
+                <td colspan="3" class="empty-state">
+                    The dashboard cannot connect to the application.
+                </td>
+            </tr>
+        `;
+
+        return;
+    }
+
+    try {
+        SchoolApp.requireAuth('admin');
+    } catch (error) {
+        console.error('Authentication check failed:', error);
+
+        showMessage(
+            'Your administrator session could not be verified.',
+            'error'
+        );
+
+        return;
+    }
+
+    $('studentSearch').addEventListener('input', filterStudents);
+
+    $('refreshButton').addEventListener('click', loadDashboard);
+
+    $('currentYear').textContent = new Date().getFullYear();
+
+    $('logoutLink').addEventListener('click', function (event) {
+        if (!confirm('Are you sure you want to log out?')) {
+            event.preventDefault();
+        }
+    });
+
+    loadDashboard();
+
+})();
+</script>
+
 </body>
 </html>
+```
+

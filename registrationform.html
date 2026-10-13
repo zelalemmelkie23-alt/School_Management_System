@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Registration | School Management</title>
+    <title>Student Registration | NIBRETE BUZUNEH SECONDARY AND PREPARATORY SCHOOL</title>
     <style>
         * {
             box-sizing: border-box;
@@ -72,6 +72,36 @@
             display: flex;
             flex-direction: column;
             gap: 7px;
+        }
+
+        .gender-options {
+            border: 0;
+            margin: 0;
+            padding: 0;
+        }
+
+        .gender-options legend {
+            margin-bottom: 7px;
+            font-weight: 700;
+            color: #334155;
+        }
+
+        .gender-choice-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 18px;
+        }
+
+        .gender-choice {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 400;
+        }
+
+        .gender-choice input {
+            width: auto;
+            margin: 0;
         }
 
         .field.full {
@@ -178,10 +208,11 @@
             }
         }
     </style>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <header class="topbar">
-        <div class="logo">Green Valley Academy</div>
+        <div class="logo">NIBRETE BUZUNEH SECONDARY AND PREPARATORY SCHOOL</div>
         <nav>
             <a href="indx.html">Home</a>
             <a href="dashboard.html">Dashboard</a>
@@ -197,17 +228,27 @@
                 <div class="form-grid">
                     <div class="field">
                         <label for="studentId">Student ID</label>
-                        <input type="text" id="studentId" name="studentId" placeholder="Enter student ID">
+                        <input type="text" id="studentId" name="studentId" placeholder="Generated automatically for Grade 9" required>
+                        <small id="studentIdHelp">Grade 9 IDs are generated automatically; Grades 10–12 use existing IDs.</small>
                     </div>
 
                     <div class="field">
-                        <label for="grade">Grade</label>
+                        <label for="grade">Grade (9–12)</label>
                         <select id="grade" name="grade" required>
                             <option value="">Select grade</option>
                             <option value="Grade 9">Grade 9</option>
                             <option value="Grade 10">Grade 10</option>
                             <option value="Grade 11">Grade 11</option>
                             <option value="Grade 12">Grade 12</option>
+                        </select>
+                    </div>
+
+                    <div class="field full" id="streamField" hidden>
+                        <label for="stream">Stream</label>
+                        <select id="stream" name="stream" disabled>
+                            <option value="">Select stream</option>
+                            <option value="Natural Science">Natural Science</option>
+                            <option value="Social Science">Social Science</option>
                         </select>
                     </div>
 
@@ -226,14 +267,13 @@
                         <input type="date" id="dob" name="dob">
                     </div>
 
-                    <div class="field">
-                        <label for="gender">Gender</label>
-                        <select id="gender" name="gender">
-                            <option value="">Select gender</option>
-                            <option value="Male">Male</option>
-                            <option value="Female">Female</option>
-                        </select>
-                    </div>
+                    <fieldset class="field gender-options">
+                        <legend>Gender</legend>
+                        <div class="gender-choice-row">
+                            <label class="gender-choice"><input type="radio" name="gender" value="Male"> Male</label>
+                            <label class="gender-choice"><input type="radio" name="gender" value="Female"> Female</label>
+                        </div>
+                    </fieldset>
 
                     <div class="field">
                         <label for="phone">Phone Number</label>
@@ -251,19 +291,35 @@
                     </div>
 
                     <div class="field">
-                        <label for="department">Department</label>
-                        <select id="department" name="department">
-                            <option value="">Select department</option>
-                            <option value="Science">Science</option>
-                            <option value="Commerce">Commerce</option>
-                            <option value="Arts">Arts</option>
-                            <option value="Technology">Technology</option>
+                        <label for="guardian">Guardian Contact</label>
+                        <input type="tel" id="guardian" name="guardian" placeholder="Guardian phone number">
+                    </div>
+
+                    <fieldset class="field gender-options">
+                        <legend>Does the student have a disability?</legend>
+                        <div class="gender-choice-row">
+                            <label class="gender-choice"><input type="radio" name="hasDisability" value="Yes" required> Yes</label>
+                            <label class="gender-choice"><input type="radio" name="hasDisability" value="No" required> No</label>
+                        </div>
+                    </fieldset>
+
+                    <div class="field full" id="disabilityTypeField" hidden>
+                        <label for="disabilityType">Select disability</label>
+                        <select id="disabilityType" name="disabilityType" disabled>
+                            <option value="">Select disability type</option>
+                            <option value="Physical">Physical disability</option>
+                            <option value="Visual">Visual impairment</option>
+                            <option value="Hearing">Hearing impairment</option>
+                            <option value="Speech">Speech or communication disability</option>
+                            <option value="Learning">Learning disability</option>
+                            <option value="Other">Other</option>
                         </select>
                     </div>
 
-                    <div class="field">
-                        <label for="guardian">Guardian Contact</label>
-                        <input type="tel" id="guardian" name="guardian" placeholder="Guardian phone number">
+                    <div class="field full" id="grade8CertificateField" hidden>
+                        <label for="grade8Certificate">Grade 8 Certificate</label>
+                        <input type="file" id="grade8Certificate" name="grade8Certificate" accept=".pdf,.jpg,.jpeg,.png" disabled>
+                        <small>Attach the student’s Grade 8 certificate (PDF, JPG, or PNG).</small>
                     </div>
                 </div>
 
@@ -279,7 +335,7 @@
     </main>
 
     <footer>
-        Green Valley Academy © 2026
+        NIBRETE BUZUNEH SECONDARY AND PREPARATORY SCHOOL © 2026
     </footer>
 
     <script>
@@ -287,6 +343,105 @@
         const updateBtn = document.querySelectorAll('button.secondary')[0];
         const deleteBtn = document.querySelectorAll('button.secondary')[1];
         const searchBtn = document.querySelectorAll('button.secondary')[2];
+        const gradeSelect = document.getElementById('grade');
+        const studentIdInput = document.getElementById('studentId');
+        const studentIdHelp = document.getElementById('studentIdHelp');
+        const streamField = document.getElementById('streamField');
+        const streamSelect = document.getElementById('stream');
+        const grade8CertificateField = document.getElementById('grade8CertificateField');
+        const grade8CertificateInput = document.getElementById('grade8Certificate');
+        const disabilityTypeField = document.getElementById('disabilityTypeField');
+        const disabilityTypeSelect = document.getElementById('disabilityType');
+        const grade9IdKeyPrefix = 'nbs_grade9_last_sequence_';
+        let generatedStudentId = false;
+
+        function updateDisabilityField() {
+            const hasDisability = form.querySelector('input[name="hasDisability"]:checked')?.value === 'Yes';
+            disabilityTypeField.hidden = !hasDisability;
+            disabilityTypeSelect.disabled = !hasDisability;
+            disabilityTypeSelect.required = hasDisability;
+            if (!hasDisability) {
+                disabilityTypeSelect.value = '';
+            }
+        }
+
+        form.querySelectorAll('input[name="hasDisability"]').forEach(input => {
+            input.addEventListener('change', updateDisabilityField);
+        });
+
+        function generateGrade9StudentId() {
+            const yearPart = new Intl.DateTimeFormat('en-u-ca-ethiopic', { year: 'numeric' })
+                .formatToParts(new Date())
+                .find(part => part.type === 'year')?.value;
+
+            if (!yearPart || !/^\d+$/.test(yearPart)) {
+                throw new Error('Unable to determine the Ethiopian registration year.');
+            }
+
+            const yearSuffix = yearPart.slice(-2);
+            const storageKey = grade9IdKeyPrefix + yearPart;
+            const previousSequence = Number(localStorage.getItem(storageKey) || 0);
+
+            if (!Number.isSafeInteger(previousSequence) || previousSequence < 0) {
+                throw new Error('The saved Grade 9 student ID sequence is invalid.');
+            }
+
+            const nextSequence = previousSequence + 1;
+            localStorage.setItem(storageKey, String(nextSequence));
+            return yearSuffix + String(nextSequence).padStart(3, '0');
+        }
+
+        function updateGradeFields() {
+            const grade = gradeSelect.value;
+            const needsStream = grade === 'Grade 11' || grade === 'Grade 12';
+            const needsGrade8Certificate = grade === 'Grade 9';
+
+            streamField.hidden = !needsStream;
+            streamSelect.disabled = !needsStream;
+            streamSelect.required = needsStream;
+            if (!needsStream) {
+                streamSelect.value = '';
+            }
+
+            grade8CertificateField.hidden = !needsGrade8Certificate;
+            grade8CertificateInput.disabled = !needsGrade8Certificate;
+            grade8CertificateInput.required = needsGrade8Certificate;
+            if (!needsGrade8Certificate) {
+                grade8CertificateInput.value = '';
+            }
+
+            if (grade === 'Grade 9') {
+                studentIdInput.readOnly = true;
+                studentIdInput.placeholder = 'Generated automatically for Grade 9';
+                studentIdHelp.textContent = 'Grade 9 IDs are generated using the Ethiopian registration year.';
+                if (!studentIdInput.value) {
+                    studentIdInput.value = generateGrade9StudentId();
+                    generatedStudentId = true;
+                }
+            } else if (grade !== 'Grade 9' && generatedStudentId) {
+                studentIdInput.value = '';
+                generatedStudentId = false;
+            }
+
+            if (grade !== 'Grade 9') {
+                studentIdInput.readOnly = false;
+                studentIdInput.placeholder = 'Enter the student ID';
+                studentIdHelp.textContent = 'Enter the existing student ID for Grades 10–12.';
+            }
+        }
+
+        gradeSelect.addEventListener('change', function () {
+            try {
+                updateGradeFields();
+            } catch (error) {
+                studentIdInput.value = '';
+                generatedStudentId = false;
+                showMessage(error.message, 'error');
+            }
+        });
+        studentIdInput.addEventListener('input', function () {
+            generatedStudentId = false;
+        });
 
         function showMessage(text, type) {
             const message = document.getElementById('formMessage');
@@ -295,31 +450,44 @@
         }
 
         function populateForm(student) {
+            generatedStudentId = false;
             form.studentId.value = student.studentId || '';
             form.grade.value = student.grade || '';
+            updateGradeFields();
+            streamSelect.value = student.stream || '';
             form.fname.value = student.firstName || '';
             form.lname.value = student.lastName || '';
             form.dob.value = student.dob || '';
-            form.gender.value = student.gender || '';
+            const genderInput = form.querySelector('input[name="gender"][value="' + student.gender + '"]');
+            if (genderInput) {
+                genderInput.checked = true;
+            }
+            const disabilityInput = form.querySelector('input[name="hasDisability"][value="' + (student.hasDisability || 'No') + '"]');
+            if (disabilityInput) {
+                disabilityInput.checked = true;
+            }
+            updateDisabilityField();
+            disabilityTypeSelect.value = student.disabilityType || '';
             form.phone.value = student.phone || '';
             form.email.value = student.email || '';
             form.address.value = student.address || '';
-            form.department.value = student.department || '';
             form.guardian.value = student.guardian || '';
         }
 
         function readFormData() {
             return {
-                studentId: form.studentId.value.trim() || 'ST-' + Date.now().toString().slice(-6),
+                studentId: form.studentId.value.trim(),
                 firstName: form.fname.value.trim(),
                 lastName: form.lname.value.trim(),
                 grade: form.grade.value.trim(),
+                stream: streamSelect.value,
                 dob: form.dob.value,
-                gender: form.gender.value,
+                gender: form.querySelector('input[name="gender"]:checked')?.value || '',
+                hasDisability: form.querySelector('input[name="hasDisability"]:checked')?.value || '',
+                disabilityType: disabilityTypeSelect.value,
                 phone: form.phone.value,
                 email: form.email.value,
                 address: form.address.value,
-                department: form.department.value,
                 guardian: form.guardian.value,
                 status: 'Active'
             };
@@ -379,12 +547,16 @@
         form.addEventListener('submit', async function (event) {
             event.preventDefault();
 
+            if (!form.reportValidity()) {
+                return;
+            }
+
             const formData = readFormData();
             const firstName = formData.firstName;
             const lastName = formData.lastName;
             const grade = formData.grade;
 
-            if (!firstName || !lastName || !grade) {
+            if (!formData.studentId || !firstName || !lastName || !grade) {
                 showMessage('Please complete the required student details.', 'error');
                 return;
             }

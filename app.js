@@ -1,348 +1,613 @@
 ```javascript
 (function () {
-  'use strict';
+    'use strict';
 
-  // =========================================================
-  // CONFIGURATION
-  // =========================================================
+    // =====================================================
+    // CONFIGURATION
+    // =====================================================
 
-  const API_BASE = '/api';
-  const SESSION_KEY = 'current_user';
+    const API_BASE = '/api';
+    const SESSION_KEY = 'current_user';
 
-  // Only keep data in localStorage that actually belongs there.
-  // Students, fees, attendance, and results are stored on the backend.
-  const STORAGE_KEYS = {
-    currentUser: SESSION_KEY,
-    students: 'students'
-  };
+    const STORAGE_KEYS = {
+        currentUser: SESSION_KEY,
+        students: 'students'
+    };
 
-  // =========================================================
-  // API REQUEST HELPER
-  // =========================================================
+    // =====================================================
+    // API REQUEST HELPER
+    // =====================================================
 
-  async function request(path, options = {}) {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 10000);
+    async function request(path, options = {}) {
+        const controller = new AbortController();
 
-    try {
-      const response = await fetch(API_BASE + path, {
-        method: options.method || 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(options.headers || {})
-        },
-        body: options.body,
-        signal: controller.signal
-      });
-      const result = await response.json().catch(() => null);
+        const timeoutId = setTimeout(() => {
+            controller.abort();
+        }, 10000);
 
-      if (!response.ok) {
-        throw new Error(result?.message || 'Request failed (' + response.status + ').');
-      }
-
-      return result;
-    } catch (error) {
-      if (error.name === 'AbortError') {
-        throw new Error('The server took too long to respond. Please try again.');
-      }
-
-      throw error;
-    } finally {
-      clearTimeout(timeout);
-    }
-  }
-
-  function getCurrentUser() {
-    const storedUser = localStorage.getItem(STORAGE_KEYS.currentUser);
-    if (!storedUser) return null;
-
-    try {
-      return JSON.parse(storedUser);
-    } catch (error) {
-      console.error('Unable to read current user:', error);
-      clearCurrentUser();
-      return null;
-    }
-  }
-
-  function setCurrentUser(user) {
-    if (!user) {
-      return false;
-    }
-
-    try {
-      localStorage.setItem(
-        STORAGE_KEYS.currentUser,
-        JSON.stringify(user)
-      );
-
-      return true;
-
-    } catch (error) {
-      console.error('Unable to save current user:', error);
-      return false;
-    }
-  }
-
-  function clearCurrentUser() {
-    localStorage.removeItem(STORAGE_KEYS.currentUser);
-  }
-
-  function getUsers() {
-    return request('/users');
-  }
-
-  function getStudents() {
-    return request('/students');
-  }
-
-  function addStudent(student) {
-    return request('/students', { method: 'POST', body: JSON.stringify(student) });
-  }
-
-  function updateStudent(studentId, student) {
-    return request('/students/' + encodeURIComponent(studentId), {
-      method: 'PUT',
-      body: JSON.stringify(student)
-    });
-  }
-
-  function deleteStudent(studentId) {
-    return request('/students/' + encodeURIComponent(studentId), { method: 'DELETE' });
-  }
-
-  function getAttendance() {
-    return request('/attendance');
-  }
-
-  function addAttendance(record) {
-    return request('/attendance', { method: 'POST', body: JSON.stringify(record) });
-  }
-
-  function getFees() {
-    return request('/fees');
-  }
-
-  function addFee(fee) {
-    return request('/fees', { method: 'POST', body: JSON.stringify(fee) });
-  }
-
-  function getResults() {
-    return request('/results');
-  }
-
-  function addResult(result) {
-    return request('/results', { method: 'POST', body: JSON.stringify(result) });
-  }
-
-  // =========================================================
-  // LOGIN
-  // =========================================================
-
-  async function loginUser(identifier, password) {
-    // Basic frontend validation
-    if (!identifier || !password) {
-      return {
-        success: false,
-        message: 'Username/email and password are required.'
-      };
-    }
-
-    try {
-      const result = await request('/auth/login', {
-        method: 'POST',
-        body: JSON.stringify({
-          identifier: identifier.trim(),
-          password
-        })
-      });
-
-      if (!result || !result.user) {
-        return {
-          success: false,
-          message: 'Invalid response from the server.'
+        const headers = {
+            ...(options.headers || {})
         };
-      }
 
-      setCurrentUser(result.user);
+        const requestOptions = {
+            method: options.method || 'GET',
+            headers,
+            signal: controller.signal,
 
-      return {
-        success: true,
-        user: result.user
-      };
-
-    } catch (error) {
-      console.error('Login error:', error);
-
-      return {
-        success: false,
-        message: error.message
-      };
-    }
-  }
-
-  // =========================================================
-  // SIGN UP
-  // =========================================================
-
-  async function signupUser(data) {
-    if (!data || typeof data !== 'object') {
-      return {
-        success: false,
-        message: 'Invalid registration data.'
-      };
-    }
-
-    try {
-      const result = await request('/auth/signup', {
-        method: 'POST',
-        body: JSON.stringify(data)
-      });
-
-      if (!result || !result.user) {
-        return {
-          success: false,
-          message: 'Invalid response from the server.'
+            // Supports same-origin cookie sessions if your
+            // backend has been configured to use them.
+            credentials: 'same-origin'
         };
-      }
 
-      setCurrentUser(result.user);
+        if (options.body !== undefined) {
+            if (
+                !headers['Content-Type'] &&
+                !headers['content-type']
+            ) {
+                headers['Content-Type'] = 'application/json';
+            }
 
-      return {
-        success: true,
-        user: result.user
-      };
+            requestOptions.body = options.body;
+        }
 
-    } catch (error) {
-      console.error('Signup error:', error);
+        try {
+            const response = await fetch(
+                API_BASE + path,
+                requestOptions
+            );
 
-      return {
-        success: false,
-        message: error.message
-      };
+            const contentType =
+                response.headers.get('content-type') || '';
+
+            let result = null;
+
+            if (contentType.includes('application/json')) {
+                result = await response.json().catch(() => null);
+            } else {
+                const responseText =
+                    await response.text().catch(() => '');
+
+                if (responseText) {
+                    result = { message: responseText };
+                }
+            }
+
+            if (!response.ok) {
+                const error = new Error(
+                    result?.message ||
+                    'Request failed (' + response.status + ').'
+                );
+
+                error.status = response.status;
+                throw error;
+            }
+
+            return result;
+
+        } catch (error) {
+            if (error.name === 'AbortError') {
+                throw new Error(
+                    'The server took too long to respond. Please try again.'
+                );
+            }
+
+            if (error instanceof TypeError) {
+                throw new Error(
+                    'Cannot connect to the server. Check that the backend is running.'
+                );
+            }
+
+            throw error;
+
+        } finally {
+            clearTimeout(timeoutId);
+        }
     }
-  }
 
-  // =========================================================
-  // AUTHENTICATION CHECK
-  // =========================================================
+    // =====================================================
+    // CURRENT USER DISPLAY INFORMATION
+    // =====================================================
 
-  function requireAuth(expectedRole) {
-    const user = getCurrentUser();
+    // IMPORTANT:
+    // localStorage can be changed by the user.
+    // It is NOT proof of authentication.
+    // The backend must protect every private API endpoint.
 
-    // User is not logged in
-    if (!user) {
-      window.location.href = 'login.html';
-      return null;
+    function safeUserForStorage(user) {
+        if (!user || typeof user !== 'object') {
+            return null;
+        }
+
+        return {
+            id: user.id ?? user.userId ?? null,
+
+            fullName:
+                typeof user.fullName === 'string'
+                    ? user.fullName
+                    : '',
+
+            username:
+                typeof user.username === 'string'
+                    ? user.username
+                    : '',
+
+            email:
+                typeof user.email === 'string'
+                    ? user.email
+                    : '',
+
+            role:
+                typeof user.role === 'string'
+                    ? user.role.toLowerCase()
+                    : ''
+        };
     }
 
-    // Check specific role if requested
-    if (expectedRole && user.role !== expectedRole) {
-      redirectByRole();
-      return null;
+    function getCurrentUser() {
+        const storedUser =
+            localStorage.getItem(STORAGE_KEYS.currentUser);
+
+        if (!storedUser) {
+            return null;
+        }
+
+        try {
+            const user = JSON.parse(storedUser);
+
+            if (
+                !user ||
+                typeof user !== 'object' ||
+                typeof user.role !== 'string'
+            ) {
+                clearCurrentUser();
+                return null;
+            }
+
+            return user;
+
+        } catch (error) {
+            console.warn(
+                'Unable to read current-user information:',
+                error
+            );
+
+            clearCurrentUser();
+            return null;
+        }
     }
 
-    return user;
-  }
+    function setCurrentUser(user) {
+        const safeUser = safeUserForStorage(user);
 
-  // =========================================================
-  // ROLE-BASED REDIRECTION
-  // =========================================================
+        if (!safeUser || !safeUser.role) {
+            return false;
+        }
 
-  function redirectByRole() {
-    const user = getCurrentUser();
+        try {
+            localStorage.setItem(
+                STORAGE_KEYS.currentUser,
+                JSON.stringify(safeUser)
+            );
 
-    if (!user) {
-      window.location.href = 'login.html';
-      return;
+            return true;
+
+        } catch (error) {
+            console.warn(
+                'Unable to save current-user information:',
+                error
+            );
+
+            return false;
+        }
     }
 
-    switch (user.role) {
-      case 'admin':
-        window.location.href = 'dashboard.html';
-        break;
-
-      case 'teacher':
-        window.location.href = 'teacher-portal.html';
-        break;
-
-      case 'student':
-        window.location.href = 'student-portal.html';
-        break;
-
-      default:
-        console.error('Unknown user role:', user.role);
-
-        clearCurrentUser();
-
-        window.location.href = 'login.html';
+    function clearCurrentUser() {
+        localStorage.removeItem(STORAGE_KEYS.currentUser);
     }
-  }
 
-  // =========================================================
-  // LOGOUT
-  // =========================================================
+    // =====================================================
+    // USERS
+    // =====================================================
 
-  function logoutUser() {
-    clearCurrentUser();
-    window.location.href = 'login.html';
-  }
+    function getUsers() {
+        // The backend must restrict this endpoint to authorized staff.
+        return request('/users');
+    }
 
-  // =========================================================
-  // ROLE CHECK HELPER
-  // =========================================================
+    // =====================================================
+    // STUDENTS
+    // =====================================================
 
-  function hasRole(role) {
-    const user = getCurrentUser();
+    function getStudents() {
+        return request('/students');
+    }
 
-    return Boolean(user && user.role === role);
-  }
+    function addStudent(student) {
+        return request('/students', {
+            method: 'POST',
+            body: JSON.stringify(student)
+        });
+    }
 
-  // =========================================================
-  // EXPORT FUNCTIONS
-  // =========================================================
+    function updateStudent(studentId, student) {
+        return request(
+            '/students/' + encodeURIComponent(studentId),
+            {
+                method: 'PUT',
+                body: JSON.stringify(student)
+            }
+        );
+    }
 
-  window.SchoolApp = {
-    // Configuration
-    API_BASE,
-    STORAGE_KEYS,
+    function deleteStudent(studentId) {
+        return request(
+            '/students/' + encodeURIComponent(studentId),
+            {
+                method: 'DELETE'
+            }
+        );
+    }
 
-    // Users
-    getUsers,
+    // =====================================================
+    // ATTENDANCE
+    // =====================================================
 
-    // Students
-    getStudents,
-    addStudent,
-    updateStudent,
-    deleteStudent,
+    function getAttendance() {
+        return request('/attendance');
+    }
 
-    // Attendance
-    getAttendance,
-    addAttendance,
+    function addAttendance(record) {
+        return request('/attendance', {
+            method: 'POST',
+            body: JSON.stringify(record)
+        });
+    }
 
-    // Fees
-    getFees,
-    addFee,
+    // =====================================================
+    // FEES
+    // =====================================================
 
-    // Results
-    getResults,
-    addResult,
+    function getFees() {
+        return request('/fees');
+    }
 
-    // Authentication
-    loginUser,
-    signupUser,
-    logoutUser,
+    function addFee(fee) {
+        return request('/fees', {
+            method: 'POST',
+            body: JSON.stringify(fee)
+        });
+    }
 
-    // Current user
-    getCurrentUser,
-    setCurrentUser,
-    clearCurrentUser,
+    // =====================================================
+    // RESULTS
+    // =====================================================
 
-    // Authorization
-    requireAuth,
-    redirectByRole,
-    hasRole
-  };
+    function getResults() {
+        return request('/results');
+    }
+
+    function addResult(result) {
+        return request('/results', {
+            method: 'POST',
+            body: JSON.stringify(result)
+        });
+    }
+
+    // =====================================================
+    // LOGIN
+    // =====================================================
+
+    async function loginUser(identifier, password) {
+        if (
+            typeof identifier !== 'string' ||
+            !identifier.trim() ||
+            typeof password !== 'string' ||
+            !password
+        ) {
+            return {
+                success: false,
+                message: 'Username/email and password are required.'
+            };
+        }
+
+        try {
+            const result = await request('/auth/login', {
+                method: 'POST',
+
+                body: JSON.stringify({
+                    identifier: identifier.trim(),
+                    password
+                })
+            });
+
+            if (!result || !result.user) {
+                return {
+                    success: false,
+                    message:
+                        result?.message ||
+                        'The server returned an unexpected login response.'
+                };
+            }
+
+            // The backend should create the actual session.
+            // This stores only a small profile for display purposes.
+            setCurrentUser(result.user);
+
+            return {
+                success: true,
+                user: safeUserForStorage(result.user),
+                message: result.message || 'Login successful.'
+            };
+
+        } catch (error) {
+            console.error('Login request failed:', error);
+
+            return {
+                success: false,
+                message:
+                    error.message ||
+                    'Login failed. Please try again.'
+            };
+        }
+    }
+
+    // =====================================================
+    // STUDENT SIGNUP
+    // =====================================================
+
+    // Public registration does not send a role.
+    // The backend MUST assign role="student" and reject
+    // public attempts to create privileged accounts.
+
+    async function signupUser(data) {
+        if (!data || typeof data !== 'object') {
+            return {
+                success: false,
+                message: 'Invalid registration data.'
+            };
+        }
+
+        const fullName =
+            typeof data.fullName === 'string'
+                ? data.fullName.trim()
+                : '';
+
+        const username =
+            typeof data.username === 'string'
+                ? data.username.trim()
+                : '';
+
+        const email =
+            typeof data.email === 'string'
+                ? data.email.trim()
+                : '';
+
+        const password =
+            typeof data.password === 'string'
+                ? data.password
+                : '';
+
+        if (!fullName || !username || !email || !password) {
+            return {
+                success: false,
+                message: 'Please complete all required fields.'
+            };
+        }
+
+        if (fullName.length < 2 || fullName.length > 100) {
+            return {
+                success: false,
+                message: 'Full name must be between 2 and 100 characters.'
+            };
+        }
+
+        if (!/^[A-Za-z0-9._-]{3,30}$/.test(username)) {
+            return {
+                success: false,
+                message:
+                    'Username must be 3–30 characters and use only letters, numbers, dots, underscores, or hyphens.'
+            };
+        }
+
+        if (
+            email.length > 254 ||
+            !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+        ) {
+            return {
+                success: false,
+                message: 'Please enter a valid email address.'
+            };
+        }
+
+        if (password.length < 8 || password.length > 128) {
+            return {
+                success: false,
+                message: 'Password must be between 8 and 128 characters.'
+            };
+        }
+
+        try {
+            const result = await request('/auth/signup', {
+                method: 'POST',
+
+                // Do not accept or send a role from the public form.
+                body: JSON.stringify({
+                    fullName,
+                    username,
+                    email,
+                    password
+                })
+            });
+
+            // Expected response:
+            // { "success": true, "message": "Account created." }
+
+            if (!result || result.success !== true) {
+                return {
+                    success: false,
+                    message:
+                        result?.message ||
+                        'The server did not confirm account creation.'
+                };
+            }
+
+            // Registration does not automatically log the user in.
+            return {
+                success: true,
+                message:
+                    result.message ||
+                    'Account created successfully. Please log in.'
+            };
+
+        } catch (error) {
+            console.error('Signup request failed:', error);
+
+            return {
+                success: false,
+                message:
+                    error.message ||
+                    'Registration failed. Please try again.'
+            };
+        }
+    }
+
+    // =====================================================
+    // AUTHENTICATION CHECK
+    // =====================================================
+
+    function requireAuth(expectedRole) {
+        const user = getCurrentUser();
+
+        if (!user) {
+            window.location.href = 'login.html';
+            return null;
+        }
+
+        if (expectedRole) {
+            const allowedRoles = Array.isArray(expectedRole)
+                ? expectedRole
+                : [expectedRole];
+
+            if (!allowedRoles.includes(user.role)) {
+                redirectByRole();
+                return null;
+            }
+        }
+
+        // This is only a frontend navigation check.
+        // The backend must verify the real session too.
+        return user;
+    }
+
+    // =====================================================
+    // ROLE-BASED REDIRECTION
+    // =====================================================
+
+    function redirectByRole() {
+        const user = getCurrentUser();
+
+        if (!user) {
+            window.location.href = 'login.html';
+            return;
+        }
+
+        const rolePages = {
+            admin: 'dashboard.html',
+            principal: 'principal-dashboard.html',
+            teacher: 'teacher-portal.html',
+            student: 'student-portal.html',
+            parent: 'parent-portal.html',
+            registrar: 'registrar-portal.html',
+            hr: 'hr-portal.html',
+            accountant: 'accountant-portal.html'
+        };
+
+        const destination = rolePages[user.role];
+
+        if (!destination) {
+            clearCurrentUser();
+            window.location.href = 'login.html';
+            return;
+        }
+
+        window.location.href = destination;
+    }
+
+    // =====================================================
+    // LOGOUT
+    // =====================================================
+
+    async function logoutUser() {
+        try {
+            // Your backend must implement POST /api/auth/logout
+            // to destroy the server-side session.
+            await request('/auth/logout', {
+                method: 'POST'
+            });
+
+        } catch (error) {
+            console.warn(
+                'Could not confirm server logout:',
+                error.message
+            );
+
+        } finally {
+            clearCurrentUser();
+            window.location.href = 'login.html';
+        }
+    }
+
+    // =====================================================
+    // ROLE CHECK
+    // =====================================================
+
+    function hasRole(role) {
+        const user = getCurrentUser();
+
+        return Boolean(
+            user &&
+            user.role === String(role).toLowerCase()
+        );
+    }
+
+    // =====================================================
+    // EXPORT FUNCTIONS
+    // =====================================================
+
+    window.SchoolApp = {
+        API_BASE,
+        STORAGE_KEYS,
+
+        getUsers,
+
+        getStudents,
+        addStudent,
+        updateStudent,
+        deleteStudent,
+
+        getAttendance,
+        addAttendance,
+
+        getFees,
+        addFee,
+
+        getResults,
+        addResult,
+
+        loginUser,
+        signupUser,
+        logoutUser,
+
+        getCurrentUser,
+        setCurrentUser,
+        clearCurrentUser,
+
+        requireAuth,
+        redirectByRole,
+        hasRole
+    };
 
 })();
+```
+
 
