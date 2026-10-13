@@ -12,7 +12,8 @@
   // Only keep data in localStorage that actually belongs there.
   // Students, fees, attendance, and results are stored on the backend.
   const STORAGE_KEYS = {
-    currentUser: SESSION_KEY
+    currentUser: SESSION_KEY,
+    students: 'students'
   };
 
   // =========================================================
@@ -21,37 +22,45 @@
 
   async function request(path, options = {}) {
     const controller = new AbortController();
-
-    // Stop waiting after 10 seconds
-    const timeout = setTimeout(() => {
-      controller.abort();
-    }, 10000);
+    const timeout = setTimeout(() => controller.abort(), 10000);
 
     try {
-      const response = await fetch(`${API_BASE}${path}`, {
+      const response = await fetch(API_BASE + path, {
         method: options.method || 'GET',
-
         headers: {
           'Content-Type': 'application/json',
           ...(options.headers || {})
         },
-
         body: options.body,
-
         signal: controller.signal
+      });
+      const result = await response.json().catch(() => null);
 
-      if (!user) {
-        return null;
+      if (!response.ok) {
+        throw new Error(result?.message || 'Request failed (' + response.status + ').');
       }
 
-      return JSON.parse(user);
+      return result;
+    } catch (error) {
+      if (error.name === 'AbortError') {
+        throw new Error('The server took too long to respond. Please try again.');
+      }
 
+      throw error;
+    } finally {
+      clearTimeout(timeout);
+    }
+  }
+
+  function getCurrentUser() {
+    const storedUser = localStorage.getItem(STORAGE_KEYS.currentUser);
+    if (!storedUser) return null;
+
+    try {
+      return JSON.parse(storedUser);
     } catch (error) {
       console.error('Unable to read current user:', error);
-
-      // Remove corrupted session data
-      localStorage.removeItem(STORAGE_KEYS.currentUser);
-
+      clearCurrentUser();
       return null;
     }
   }
@@ -77,6 +86,53 @@
 
   function clearCurrentUser() {
     localStorage.removeItem(STORAGE_KEYS.currentUser);
+  }
+
+  function getUsers() {
+    return request('/users');
+  }
+
+  function getStudents() {
+    return request('/students');
+  }
+
+  function addStudent(student) {
+    return request('/students', { method: 'POST', body: JSON.stringify(student) });
+  }
+
+  function updateStudent(studentId, student) {
+    return request('/students/' + encodeURIComponent(studentId), {
+      method: 'PUT',
+      body: JSON.stringify(student)
+    });
+  }
+
+  function deleteStudent(studentId) {
+    return request('/students/' + encodeURIComponent(studentId), { method: 'DELETE' });
+  }
+
+  function getAttendance() {
+    return request('/attendance');
+  }
+
+  function addAttendance(record) {
+    return request('/attendance', { method: 'POST', body: JSON.stringify(record) });
+  }
+
+  function getFees() {
+    return request('/fees');
+  }
+
+  function addFee(fee) {
+    return request('/fees', { method: 'POST', body: JSON.stringify(fee) });
+  }
+
+  function getResults() {
+    return request('/results');
+  }
+
+  function addResult(result) {
+    return request('/results', { method: 'POST', body: JSON.stringify(result) });
   }
 
   // =========================================================
@@ -289,144 +345,4 @@
   };
 
 })();
-```
-
-### What I improved
-
-**1. Better login errors**
-
-Your old code:
-
-```js
-catch (error) {
-  return null;
-}
-```
-
-hid the actual problem.
-
-Now it returns:
-
-```js
-{
-  success: false,
-  message: error.message
-}
-```
-
-So your login page can show the user what went wrong.
-
-**2. Server timeout**
-
-The new code stops waiting after **10 seconds**.
-
-If your Node.js server is not running, the user gets a useful message instead of waiting indefinitely.
-
-**3. Removed unnecessary localStorage keys**
-
-Your old code had:
-
-```js
-users
-students
-attendance
-fees
-results
-```
-
-inside `STORAGE_KEYS`.
-
-But those records are supposed to come from your backend.
-
-Now only the logged-in user is stored:
-
-```js
-const STORAGE_KEYS = {
-  currentUser: 'current_user'
-};
-```
-
-**4. Added logout**
-
-You can now use:
-
-```js
-SchoolApp.logoutUser();
-```
-
-from your logout button.
-
-For example:
-
-```html
-<button onclick="SchoolApp.logoutUser()">
-  Logout
-</button>
-```
-
-**5. Added `hasRole()`**
-
-You can check:
-
-```js
-if (SchoolApp.hasRole('admin')) {
-  console.log('This user is an admin');
-}
-```
-
-**6. Better role handling**
-
-Instead of several `if/else` statements, I used:
-
-```js
-switch (user.role)
-```
-
-and added handling for an unknown role.
-
-**7. Student ID validation**
-
-These functions now check that an ID exists:
-
-```js
-updateStudent(id, student)
-deleteStudent(id)
-```
-
-This prevents accidental requests such as:
-
-```text
-/api/students/undefined
-```
-
-### Important
-
-This improved `app.js` is the **frontend side**. It does **not** replace your Node.js backend.
-
-Your backend still needs to provide these routes:
-
-```text
-POST   /api/auth/login
-POST   /api/auth/signup
-
-GET    /api/users
-
-GET    /api/students
-POST   /api/students
-PUT    /api/students/:id
-DELETE /api/students/:id
-
-GET    /api/attendance
-POST   /api/attendance
-
-GET    /api/fees
-POST   /api/fees
-
-GET    /api/results
-POST   /api/results
-```
-
-Also, **do not consider `localStorage` role checking as real security**. Your Express backend must check authentication and authorization before allowing sensitive operations such as deleting students or modifying fees/results.
-
-If you send me your **`index.js` / `server.js` backend code**, I can rewrite that next so it matches this improved `app.js` exactly.
 
