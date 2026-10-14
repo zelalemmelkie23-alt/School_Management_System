@@ -1,300 +1,1365 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#12372a">
-  <title>Login | NIBRETE BUZUNEH School</title>
-  <style>
-    :root {
-      --green-900: #12372a;
-      --green-800: #176044;
-      --green-700: #16804a;
-      --green-100: #e7f6ed;
-      --ink: #15251d;
-      --muted: #64746b;
-      --line: #d9e4dc;
-      --page: #f3f7f4;
-      --danger: #b42318;
-      --danger-bg: #fff0ee;
-    }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0; min-height: 100vh; display: flex; flex-direction: column;
-      font-family: Inter, "Segoe UI", Arial, sans-serif; line-height: 1.5;
-      color: var(--ink); background: var(--page);
-    }
-    .topbar {
-      display: flex; align-items: center; justify-content: space-between;
-      gap: 22px; padding: 16px clamp(18px, 5vw, 72px);
-      background: var(--green-900); color: #fff;
-    }
-    .brand { display: flex; align-items: center; gap: 13px; min-width: 0; }
-    .brand-mark {
-      display: grid; place-items: center; flex: 0 0 44px;
-      width: 44px; height: 44px; border-radius: 13px;
-      background: #d9fbe5; color: var(--green-900);
-      font-size: 1.1rem; font-weight: 900;
-    }
-    .brand-title { font-weight: 800; letter-spacing: .02em; line-height: 1.25; }
-    .brand-subtitle { color: #c5ddd0; font-size: .8rem; margin-top: 3px; }
-    nav { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-    nav a {
-      padding: 9px 12px; border-radius: 9px; color: #e5f2e9;
-      text-decoration: none; font-weight: 650; font-size: .93rem;
-    }
-    nav a:hover, nav a:focus-visible { background: rgba(255,255,255,.13); outline: none; }
-    nav a.active { background: #e0f6e8; color: var(--green-900); }
-    main {
-      flex: 1; display: grid; place-items: center;
-      padding: 44px 18px;
-      background:
-        radial-gradient(circle at 12% 15%, rgba(198, 237, 210, .6), transparent 32%),
-        radial-gradient(circle at 88% 82%, rgba(215, 238, 224, .7), transparent 30%),
-        var(--page);
-    }
-    .login-layout {
-      width: min(100%, 920px); display: grid;
-      grid-template-columns: 1fr 1fr; overflow: hidden;
-      border: 1px solid var(--line); border-radius: 22px;
-      background: #fff; box-shadow: 0 22px 60px rgba(18,55,42,.12);
-    }
-    .welcome-panel {
-      padding: 42px 34px; color: #fff;
-      background: linear-gradient(150deg, #12372a, #176044 70%, #218353);
-      display: flex; flex-direction: column; justify-content: center;
-    }
-    .welcome-badge {
-      display: inline-flex; align-self: flex-start; align-items: center; gap: 8px;
-      border: 1px solid rgba(255,255,255,.28); border-radius: 999px;
-      padding: 6px 11px; color: #e2f8e9; font-size: .8rem; font-weight: 700;
-    }
-    .welcome-panel h1 { margin: 23px 0 12px; font-size: clamp(1.8rem, 3vw, 2.5rem); line-height: 1.15; }
-    .welcome-panel p { color: #d4e8dc; margin: 0; }
-    .benefits { list-style: none; padding: 0; margin: 26px 0 0; display: grid; gap: 13px; }
-    .benefits li { display: flex; gap: 10px; color: #f0fbf3; font-size: .93rem; }
-    .check { color: #a7f3c0; font-weight: 900; }
-    .login-panel { padding: 42px 34px; align-self: center; }
-    .login-panel h2 { margin: 0 0 7px; color: var(--green-900); font-size: 1.8rem; }
-    .subheading { color: var(--muted); margin: 0 0 25px; }
-    .field { margin-bottom: 18px; }
-    label { display: block; margin-bottom: 7px; color: #30473a; font-weight: 750; font-size: .91rem; }
-    input {
-      width: 100%; min-height: 47px; padding: 11px 13px;
-      border: 1px solid #cbd9cf; border-radius: 10px; color: var(--ink);
-      background: #fff; font: inherit; transition: border-color .15s, box-shadow .15s;
-    }
-    input:focus { outline: none; border-color: var(--green-700); box-shadow: 0 0 0 3px rgba(22,128,74,.13); }
-    .password-wrap { position: relative; }
-    .password-wrap input { padding-right: 82px; }
-    .toggle-password {
-      position: absolute; top: 50%; right: 8px; transform: translateY(-50%);
-      border: 0; border-radius: 7px; padding: 6px 8px; min-height: 0;
-      background: transparent; color: var(--green-800); cursor: pointer;
-      font-size: .83rem; font-weight: 800;
-    }
-    .toggle-password:hover { background: var(--green-100); }
-    .form-options {
-      display: flex; align-items: center; justify-content: space-between;
-      gap: 12px; margin: 3px 0 22px; color: var(--muted); font-size: .88rem;
-    }
-    .remember { display: inline-flex; align-items: center; gap: 8px; margin: 0; font-weight: 500; }
-    .remember input { width: 16px; min-height: 16px; height: 16px; margin: 0; accent-color: var(--green-700); }
-    .login-btn {
-      width: 100%; min-height: 47px; border: 0; border-radius: 10px;
-      background: var(--green-800); color: #fff; font: inherit; font-weight: 800;
-      cursor: pointer; transition: background .15s, transform .12s;
-    }
-    .login-btn:hover { background: var(--green-900); }
-    .login-btn:focus-visible { outline: 3px solid rgba(22,128,74,.25); outline-offset: 3px; }
-    .login-btn:disabled { opacity: .7; cursor: wait; }
-    .message {
-      display: none; padding: 11px 12px; border-radius: 10px;
-      margin: 0 0 17px; font-size: .9rem; font-weight: 650;
-      overflow-wrap: anywhere;
-    }
-    .message.visible { display: block; }
-    .message.error { background: var(--danger-bg); color: var(--danger); border: 1px solid #f2c4bf; }
-    .message.success { background: var(--green-100); color: var(--green-800); border: 1px solid #b9e5c8; }
-    .help-text { margin: 22px 0 0; text-align: center; color: var(--muted); font-size: .91rem; }
-    .help-text a { color: var(--green-800); font-weight: 800; text-decoration: none; }
-    .help-text a:hover { text-decoration: underline; }
-    footer { background: var(--green-900); color: #d6e5dc; text-align: center; padding: 19px 16px; font-size: .88rem; }
-    footer span { display: block; color: #a9c5b5; margin-top: 4px; font-size: .8rem; }
-    @media (max-width: 760px) {
-      .topbar { align-items: flex-start; flex-direction: column; padding: 16px 20px; }
-      nav { width: 100%; }
-      .login-layout { grid-template-columns: 1fr; max-width: 470px; }
-      .welcome-panel { padding: 27px 25px; }
-      .welcome-panel h1 { margin-top: 16px; }
-      .benefits { grid-template-columns: 1fr; margin-top: 17px; }
-      .login-panel { padding: 30px 25px; }
-    }
-    @media (max-width: 400px) {
-      .form-options { align-items: flex-start; flex-direction: column; }
-      .brand-title { font-size: .93rem; }
-    }
-    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; } }
-  </style>
-  <link rel="stylesheet" href="styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#12372a">
+    <meta name="description" content="Nibrete Buzuneh School Management System Dashboard">
+    <title>Dashboard | NIBRETE BUZUNEH School</title>
+
+    <style>
+        :root {
+            --green-900: #12372a;
+            --green-800: #176044;
+            --green-700: #16804a;
+            --green-100: #e7f6ed;
+            --ink: #15251d;
+            --muted: #64746b;
+            --line: #d9e4dc;
+            --page: #f3f7f4;
+            --white: #ffffff;
+            --danger: #b42318;
+            --shadow: 0 8px 28px rgba(18, 55, 42, 0.07);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            font-family: Inter, "Segoe UI", Arial, sans-serif;
+            line-height: 1.5;
+            color: var(--ink);
+            background: var(--page);
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        button,
+        input {
+            font: inherit;
+        }
+
+        /* ======================================
+           HEADER AND SCHOOL BRAND
+        ====================================== */
+
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 22px;
+            padding: 16px clamp(18px, 5vw, 72px);
+            background: var(--green-900);
+            color: var(--white);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+            min-width: 0;
+        }
+
+        .brand-mark {
+            display: grid;
+            place-items: center;
+            flex: 0 0 44px;
+            width: 44px;
+            height: 44px;
+            border-radius: 13px;
+            background: #d9fbe5;
+            color: var(--green-900);
+            font-size: 1.1rem;
+            font-weight: 900;
+        }
+
+        .brand-title {
+            font-weight: 800;
+            letter-spacing: 0.02em;
+            line-height: 1.25;
+        }
+
+        .brand-subtitle {
+            color: #c5ddd0;
+            font-size: 0.8rem;
+            margin-top: 3px;
+        }
+
+        .topbar nav {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .topbar nav a {
+            padding: 9px 12px;
+            border-radius: 9px;
+            color: #e5f2e9;
+            font-weight: 650;
+            font-size: 0.9rem;
+            transition: background 0.2s;
+        }
+
+        .topbar nav a:hover,
+        .topbar nav a:focus-visible {
+            background: rgba(255, 255, 255, 0.13);
+            outline: none;
+        }
+
+        .topbar nav a.active {
+            background: #e0f6e8;
+            color: var(--green-900);
+        }
+
+        /* ======================================
+           MAIN CONTENT
+        ====================================== */
+
+        main {
+            flex: 1;
+            width: 100%;
+            padding: 35px clamp(16px, 4vw, 55px);
+            background:
+                radial-gradient(
+                    circle at 12% 10%,
+                    rgba(198, 237, 210, 0.35),
+                    transparent 30%
+                ),
+                var(--page);
+        }
+
+        .container {
+            max-width: 1450px;
+            margin: 0 auto;
+        }
+
+        .welcome-section {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-bottom: 26px;
+        }
+
+        .welcome-section h1 {
+            margin: 0 0 7px;
+            color: var(--green-900);
+            font-size: clamp(1.6rem, 3vw, 2.2rem);
+            line-height: 1.2;
+        }
+
+        .welcome-section p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 0.95rem;
+        }
+
+        .date-badge {
+            padding: 10px 14px;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            background: var(--white);
+            color: var(--green-800);
+            font-size: 0.85rem;
+            font-weight: 700;
+        }
+
+        /* ======================================
+           NOTIFICATION MESSAGE
+        ====================================== */
+
+        .dashboard-message {
+            display: none;
+            margin-bottom: 22px;
+            padding: 13px 16px;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            overflow-wrap: anywhere;
+        }
+
+        .dashboard-message.visible {
+            display: block;
+        }
+
+        .dashboard-message.info {
+            color: #1d4ed8;
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+        }
+
+        .dashboard-message.error {
+            color: var(--danger);
+            background: #fff0ee;
+            border: 1px solid #f2c4bf;
+        }
+
+        .dashboard-message.success {
+            color: var(--green-800);
+            background: var(--green-100);
+            border: 1px solid #b9e5c8;
+        }
+
+        /* ======================================
+           STATISTICS CARDS
+        ====================================== */
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 18px;
+            margin-bottom: 28px;
+        }
+
+        .stat-card {
+            background: var(--white);
+            border: 1px solid var(--line);
+            border-radius: 15px;
+            padding: 22px;
+            box-shadow: var(--shadow);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(18, 55, 42, 0.11);
+        }
+
+        .stat-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 19px;
+        }
+
+        .stat-title {
+            color: var(--muted);
+            font-size: 0.85rem;
+            font-weight: 650;
+        }
+
+        .stat-icon {
+            display: grid;
+            place-items: center;
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background: var(--green-100);
+            font-size: 1.35rem;
+        }
+
+        .stat-value {
+            margin-bottom: 7px;
+            color: var(--green-900);
+            font-size: clamp(1.6rem, 2.5vw, 2rem);
+            font-weight: 850;
+            overflow-wrap: anywhere;
+        }
+
+        .stat-description {
+            color: var(--muted);
+            font-size: 0.78rem;
+        }
+
+        /* ======================================
+           CONTENT GRID AND PANELS
+        ====================================== */
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1.7fr) minmax(270px, 1fr);
+            gap: 22px;
+            align-items: start;
+        }
+
+        .panel {
+            margin-bottom: 22px;
+            overflow: hidden;
+            background: var(--white);
+            border: 1px solid var(--line);
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+        }
+
+        .panel-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            padding: 20px;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .panel-header h2,
+        .panel-header h3 {
+            margin: 0;
+            color: var(--green-900);
+            font-size: 1.05rem;
+        }
+
+        .panel-header p {
+            margin: 5px 0 0;
+            color: var(--muted);
+            font-size: 0.8rem;
+        }
+
+        .panel-body {
+            padding: 20px;
+        }
+
+        /* ======================================
+           BUTTONS AND SEARCH
+        ====================================== */
+
+        .button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            border: 0;
+            border-radius: 9px;
+            padding: 10px 15px;
+            background: var(--green-800);
+            color: var(--white);
+            font-size: 0.82rem;
+            font-weight: 750;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .button:hover {
+            background: var(--green-900);
+        }
+
+        .button:focus-visible {
+            outline: 3px solid rgba(22, 128, 74, 0.25);
+            outline-offset: 3px;
+        }
+
+        .search-label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--ink);
+            font-size: 0.85rem;
+            font-weight: 700;
+        }
+
+        .search-input {
+            width: 100%;
+            min-height: 45px;
+            padding: 11px 13px;
+            border: 1px solid #cbd9cf;
+            border-radius: 9px;
+            outline: none;
+            background: var(--white);
+            color: var(--ink);
+            font-size: 0.9rem;
+        }
+
+        .search-input:focus {
+            border-color: var(--green-700);
+            box-shadow: 0 0 0 3px rgba(22, 128, 74, 0.13);
+        }
+
+        /* ======================================
+           STUDENT TABLE
+        ====================================== */
+
+        .table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            white-space: nowrap;
+        }
+
+        th,
+        td {
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--line);
+            font-size: 0.83rem;
+        }
+
+        th {
+            background: #f5faf6;
+            color: var(--muted);
+            font-size: 0.72rem;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+
+        tbody tr:hover {
+            background: #f7fbf8;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
+            background: var(--green-100);
+            color: var(--green-800);
+            font-size: 0.73rem;
+            font-weight: 800;
+        }
+
+        .empty-state {
+            padding: 30px 15px;
+            text-align: center;
+            white-space: normal;
+            color: var(--muted);
+            line-height: 1.7;
+        }
+
+        /* ======================================
+           QUICK ACTIONS
+        ====================================== */
+
+        .quick-links {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+        }
+
+        .quick-link {
+            display: flex;
+            min-height: 105px;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            padding: 15px 10px;
+            border: 1px solid var(--line);
+            border-radius: 11px;
+            background: #fff;
+            text-align: center;
+            transition: border-color 0.2s, background 0.2s, transform 0.2s;
+        }
+
+        .quick-link:hover {
+            border-color: var(--green-700);
+            background: #f0fdf4;
+            transform: translateY(-2px);
+        }
+
+        .quick-link-icon {
+            font-size: 1.6rem;
+        }
+
+        .quick-link strong {
+            color: var(--green-900);
+            font-size: 0.82rem;
+        }
+
+        /* ======================================
+           ACTIVITY LIST
+        ====================================== */
+
+        .activity-list {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 13px 0;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .activity-item:first-child {
+            padding-top: 0;
+        }
+
+        .activity-item:last-child {
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+
+        .activity-dot {
+            flex: 0 0 9px;
+            width: 9px;
+            height: 9px;
+            margin-top: 6px;
+            border-radius: 50%;
+            background: var(--green-700);
+        }
+
+        .activity-item p {
+            margin: 0;
+            font-size: 0.84rem;
+            line-height: 1.6;
+        }
+
+        .activity-item small {
+            display: block;
+            margin-top: 4px;
+            color: var(--muted);
+            font-size: 0.75rem;
+        }
+
+        /* ======================================
+           FOOTER - MATCHES LOGIN PAGE
+        ====================================== */
+
+        .site-footer {
+            margin-top: auto;
+            padding: 19px 16px;
+            background: var(--green-900);
+            color: #d6e5dc;
+            text-align: center;
+            font-size: 0.88rem;
+        }
+
+        .site-footer span {
+            display: block;
+            margin-top: 4px;
+            color: #a9c5b5;
+            font-size: 0.8rem;
+        }
+
+        /* ======================================
+           RESPONSIVE DESIGN
+        ====================================== */
+
+        @media (max-width: 1100px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 760px) {
+            .topbar {
+                align-items: flex-start;
+                flex-direction: column;
+                padding: 16px 20px;
+            }
+
+            .topbar nav {
+                width: 100%;
+            }
+
+            .topbar nav a {
+                padding: 8px 10px;
+                font-size: 0.83rem;
+            }
+
+            main {
+                padding: 25px 15px;
+            }
+
+            .welcome-section {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .stats-grid {
+                gap: 12px;
+            }
+
+            .stat-card {
+                padding: 17px;
+            }
+
+            .panel-header {
+                align-items: flex-start;
+                flex-wrap: wrap;
+            }
+        }
+
+        @media (max-width: 430px) {
+            .brand-title {
+                font-size: 0.9rem;
+            }
+
+            .brand-subtitle {
+                font-size: 0.73rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .quick-links {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .date-badge {
+                font-size: 0.78rem;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                scroll-behavior: auto !important;
+                transition: none !important;
+            }
+        }
+    </style>
 </head>
+
 <body>
-  <header class="topbar">
-    <div class="brand">
-      <div class="brand-mark" aria-hidden="true">NB</div>
-      <div>
-        <div class="brand-title">NIBRETE BUZUNEH SCHOOL</div>
-        <div class="brand-subtitle">Secondary and Preparatory School</div>
-      </div>
-    </div>
-    <nav aria-label="Main navigation">
-      <a href="indx.html">Home</a>
-      <a href="login.html" class="active" aria-current="page">Login</a>
-      <a href="signup.html">Sign Up</a>
-    </nav>
-  </header>
 
-  <main>
-    <div class="login-layout">
-      <section class="welcome-panel" aria-label="School portal welcome">
-        <div class="welcome-badge"><span aria-hidden="true">●</span> School management portal</div>
-        <h1>Welcome back.</h1>
-        <p>Sign in to access the tools and information for your school role.</p>
-        <ul class="benefits">
-          <li><span class="check" aria-hidden="true">✓</span><span>One portal for school activities</span></li>
-          <li><span class="check" aria-hidden="true">✓</span><span>Access based on your assigned role</span></li>
-          <li><span class="check" aria-hidden="true">✓</span><span>Keep your account details private</span></li>
-        </ul>
-      </section>
+    <!-- ======================================
+         HEADER
+         Same brand and colors as login.html
+    ====================================== -->
 
-      <section class="login-panel">
-        <h2>Sign in</h2>
-        <p class="subheading">Enter your username or email and password.</p>
-        <div id="loginMessage" class="message" role="alert" aria-live="polite"></div>
+    <header class="topbar">
+        <div class="brand">
+            <div class="brand-mark" aria-hidden="true">NB</div>
 
-        <form id="loginForm">
-          <div class="field">
-            <label for="identifier">Username or email</label>
-            <input type="text" id="identifier" name="identifier"
-                   placeholder="Enter username or email" autocomplete="username"
-                   autocapitalize="none" spellcheck="false" required>
-          </div>
-
-          <div class="field">
-            <label for="password">Password</label>
-            <div class="password-wrap">
-              <input type="password" id="password" name="password"
-                     placeholder="Enter your password" autocomplete="current-password" required>
-              <button type="button" class="toggle-password" id="togglePassword"
-                      aria-controls="password" aria-pressed="false">Show</button>
+            <div>
+                <div class="brand-title">NIBRETE BUZUNEH SCHOOL</div>
+                <div class="brand-subtitle">
+                    Secondary and Preparatory School
+                </div>
             </div>
-          </div>
+        </div>
 
-          <div class="form-options">
-            <label class="remember" for="remember">
-              <input type="checkbox" id="remember" name="remember">
-              Remember me
-            </label>
-            <span>Use your school account</span>
-          </div>
+        <nav aria-label="Main navigation">
+            <a href="indx.html">Home</a>
 
-          <button type="submit" class="login-btn" id="loginBtn">Sign in</button>
-        </form>
+            <a
+                href="dashboard.html"
+                class="active"
+                aria-current="page">
+                Dashboard
+            </a>
 
-        <p class="help-text">Need an account? <a href="signup.html">Create one</a></p>
-      </section>
-    </div>
-  </main>
+            <a href="registrationform.html">Registration</a>
+            <a href="login.html" id="logoutLink">Logout</a>
+        </nav>
+    </header>
 
-  <footer>
-    NIBRETE BUZUNEH Secondary and Preparatory School © 2026
-    <span>Authorized school access only</span>
-  </footer>
+    <!-- ======================================
+         MAIN DASHBOARD
+    ====================================== -->
 
-  <script src="app.js"></script>
-  <script>
+    <main>
+        <div class="container">
+
+            <!-- Welcome section -->
+            <section class="welcome-section">
+                <div>
+                    <h1 id="welcomeTitle">Welcome, Administrator!</h1>
+
+                    <p id="welcomeText">
+                        Here is an overview of your school's information
+                        and activities.
+                    </p>
+                </div>
+
+                <div class="date-badge" id="currentDate">
+                    Loading date...
+                </div>
+            </section>
+
+            <!-- Status messages -->
+            <div
+                id="dashboardMessage"
+                class="dashboard-message"
+                role="status"
+                aria-live="polite">
+            </div>
+
+            <!-- ======================================
+                 STATISTICS
+            ====================================== -->
+
+            <section class="stats-grid" aria-label="School statistics">
+
+                <article class="stat-card">
+                    <div class="stat-top">
+                        <span class="stat-title">Total Students</span>
+                        <span class="stat-icon" aria-hidden="true">🎓</span>
+                    </div>
+
+                    <div class="stat-value" id="studentCount">—</div>
+
+                    <div class="stat-description">
+                        Registered students
+                    </div>
+                </article>
+
+                <article class="stat-card">
+                    <div class="stat-top">
+                        <span class="stat-title">Total Teachers</span>
+                        <span class="stat-icon" aria-hidden="true">👩‍🏫</span>
+                    </div>
+
+                    <div class="stat-value" id="teacherCount">—</div>
+
+                    <div class="stat-description">
+                        Teacher accounts
+                    </div>
+                </article>
+
+                <article class="stat-card">
+                    <div class="stat-top">
+                        <span class="stat-title">Attendance Rate</span>
+                        <span class="stat-icon" aria-hidden="true">📋</span>
+                    </div>
+
+                    <div class="stat-value" id="attendanceRate">—</div>
+
+                    <div class="stat-description">
+                        Based on recorded attendance
+                    </div>
+                </article>
+
+                <article class="stat-card">
+                    <div class="stat-top">
+                        <span class="stat-title">Fees Collected</span>
+                        <span class="stat-icon" aria-hidden="true">💰</span>
+                    </div>
+
+                    <div class="stat-value" id="monthlyFee">—</div>
+
+                    <div class="stat-description">
+                        Based on available fee records
+                    </div>
+                </article>
+
+            </section>
+
+            <!-- ======================================
+                 STUDENT TABLE AND QUICK ACTIONS
+            ====================================== -->
+
+            <div class="content-grid">
+
+                <!-- Student records -->
+                <section class="panel">
+
+                    <div class="panel-header">
+                        <div>
+                            <h2>Recent Students</h2>
+                            <p>View and search student records.</p>
+                        </div>
+
+                        <button
+                            class="button"
+                            id="refreshButton"
+                            type="button">
+                            ↻ Refresh
+                        </button>
+                    </div>
+
+                    <div class="panel-body">
+
+                        <label class="search-label" for="studentSearch">
+                            Search students
+                        </label>
+
+                        <input
+                            class="search-input"
+                            type="search"
+                            id="studentSearch"
+                            placeholder="Search by student name, ID, or grade..."
+                            autocomplete="off">
+
+                    </div>
+
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Student ID</th>
+                                    <th>Student Name</th>
+                                    <th>Grade</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+
+                            <tbody id="studentTableBody">
+                                <tr>
+                                    <td colspan="4" class="empty-state">
+                                        Student records will appear here
+                                        when data is available.
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                </section>
+
+                <!-- Right-side panels -->
+                <div>
+
+                    <!-- Quick actions -->
+                    <section class="panel">
+
+                        <div class="panel-header">
+                            <div>
+                                <h3>Quick Actions</h3>
+                                <p>Open frequently used school pages.</p>
+                            </div>
+                        </div>
+
+                        <div class="panel-body">
+                            <div class="quick-links">
+
+                                <a
+                                    class="quick-link"
+                                    href="registrationform.html">
+                                    <span class="quick-link-icon" aria-hidden="true">📝</span>
+                                    <strong>Student Registration</strong>
+                                </a>
+
+                                <a
+                                    class="quick-link"
+                                    href="teacher-portal.html">
+                                    <span class="quick-link-icon" aria-hidden="true">👩‍🏫</span>
+                                    <strong>Teacher Portal</strong>
+                                </a>
+
+                                <a
+                                    class="quick-link"
+                                    href="attendance.html">
+                                    <span class="quick-link-icon" aria-hidden="true">📅</span>
+                                    <strong>Attendance</strong>
+                                </a>
+
+                                <a
+                                    class="quick-link"
+                                    href="fees.html">
+                                    <span class="quick-link-icon" aria-hidden="true">💳</span>
+                                    <strong>School Fees</strong>
+                                </a>
+
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- School overview -->
+                    <section class="panel">
+
+                        <div class="panel-header">
+                            <div>
+                                <h3>School Overview</h3>
+                                <p>Dashboard information.</p>
+                            </div>
+                        </div>
+
+                        <div class="panel-body">
+                            <ul class="activity-list" id="activityList">
+
+                                <li class="activity-item">
+                                    <span class="activity-dot"></span>
+
+                                    <div>
+                                        <p>School dashboard opened successfully.</p>
+                                        <small id="activityDate">Today</small>
+                                    </div>
+                                </li>
+
+                                <li class="activity-item">
+                                    <span class="activity-dot"></span>
+
+                                    <div>
+                                        <p>
+                                            Use the navigation menu to access
+                                            school management pages.
+                                        </p>
+                                        <small>Navigation</small>
+                                    </div>
+                                </li>
+
+                                <li class="activity-item">
+                                    <span class="activity-dot"></span>
+
+                                    <div>
+                                        <p>
+                                            Connect the backend when you are
+                                            ready to load real school records.
+                                        </p>
+                                        <small>Development status</small>
+                                    </div>
+                                </li>
+
+                            </ul>
+                        </div>
+                    </section>
+
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- ======================================
+         FOOTER
+         Same style and wording as login.html
+    ====================================== -->
+
+    <footer class="site-footer">
+        NIBRETE BUZUNEH Secondary and Preparatory School
+        &copy; <span id="currentYear">2026</span>
+
+        <span>Authorized school access only</span>
+    </footer>
+
+    <!-- Load your existing frontend JavaScript -->
+    <script src="app.js"></script>
+
+    <!-- ======================================
+         DASHBOARD JAVASCRIPT
+    ====================================== -->
+
+    <script>
     (() => {
-      'use strict';
+        "use strict";
 
-      const form = document.getElementById('loginForm');
-      const message = document.getElementById('loginMessage');
-      const passwordInput = document.getElementById('password');
-      const togglePassword = document.getElementById('togglePassword');
-      const loginBtn = document.getElementById('loginBtn');
+        const $ = (id) => document.getElementById(id);
 
-      function showMessage(text, type) {
-        message.textContent = text;
-        message.className = 'message visible ' + type;
-      }
+        const state = {
+            students: []
+        };
 
-      togglePassword.addEventListener('click', () => {
-        const willShow = passwordInput.type === 'password';
-        passwordInput.type = willShow ? 'text' : 'password';
-        togglePassword.textContent = willShow ? 'Hide' : 'Show';
-        togglePassword.setAttribute('aria-pressed', String(willShow));
-      });
+        /* Display current date and year */
+        function initializeDate() {
+            const now = new Date();
 
-      form.addEventListener('input', () => {
-        message.textContent = '';
-        message.className = 'message';
-      });
+            $("currentDate").textContent = now.toLocaleDateString(
+                "en-GB",
+                {
+                    weekday: "short",
+                    day: "numeric",
+                    month: "short",
+                    year: "numeric"
+                }
+            );
 
-      form.addEventListener('submit', async event => {
-        event.preventDefault();
-        if (!form.reportValidity()) return;
+            $("activityDate").textContent =
+                now.toLocaleDateString();
 
-        const identifier = document.getElementById('identifier').value.trim();
-        const password = passwordInput.value;
-
-        if (!identifier || !password) {
-          showMessage('Enter both your username/email and password.', 'error');
-          return;
+            $("currentYear").textContent =
+                String(now.getFullYear());
         }
 
-        if (!window.SchoolApp || typeof SchoolApp.loginUser !== 'function') {
-          showMessage('Login service is unavailable. Check that app.js is loaded and SchoolApp.loginUser() exists.', 'error');
-          return;
+        /* Safely escape text before inserting it into HTML */
+        function escapeHTML(value) {
+            return String(value ?? "").replace(/[&<>"']/g, character => {
+                const entities = {
+                    "&": "&amp;",
+                    "<": "&lt;",
+                    ">": "&gt;",
+                    '"': "&quot;",
+                    "'": "&#39;"
+                };
+
+                return entities[character];
+            });
         }
 
-        loginBtn.disabled = true;
-        loginBtn.textContent = 'Signing in…';
+        /* Show a dashboard notification */
+        function showMessage(message, type = "info") {
+            const element = $("dashboardMessage");
 
-        try {
-          const result = await SchoolApp.loginUser(identifier, password);
-          if (!result || !result.success || !result.user) {
-            showMessage(result?.message || 'Login failed. Check your credentials and try again.', 'error');
-            return;
-          }
-
-          const user = result.user;
-          const role = String(user.role || '').toLowerCase();
-          const rolePages = {
-            admin: 'dashboard.html',
-            principal: 'dashboard.html',
-            teacher: 'teacher-portal.html',
-            student: 'student-portal.html',
-            parent: 'parent-portal.html',
-            registrar: 'registrar-portal.html',
-            hr: 'hr-portal.html',
-            accountant: 'accountant-portal.html'
-          };
-
-          const destination = rolePages[role];
-          if (!destination) {
-            showMessage('Your account role is not configured for portal access. Contact the school administrator.', 'error');
-            return;
-          }
-
-          showMessage('Login successful. Opening your portal…', 'success');
-          window.location.href = destination;
-        } catch (error) {
-          showMessage(error.message || 'An unexpected error occurred during login. Please try again.', 'error');
-        } finally {
-          loginBtn.disabled = false;
-          loginBtn.textContent = 'Sign in';
+            element.textContent = message;
+            element.className =
+                "dashboard-message visible " + type;
         }
-      });
+
+        function clearMessage() {
+            const element = $("dashboardMessage");
+
+            element.textContent = "";
+            element.className = "dashboard-message";
+        }
+
+        /* Handle common API response formats */
+        function unwrapList(result) {
+            if (Array.isArray(result)) {
+                return result;
+            }
+
+            if (result && Array.isArray(result.data)) {
+                return result.data;
+            }
+
+            if (result && Array.isArray(result.students)) {
+                return result.students;
+            }
+
+            if (result && Array.isArray(result.users)) {
+                return result.users;
+            }
+
+            if (result && Array.isArray(result.records)) {
+                return result.records;
+            }
+
+            return [];
+        }
+
+        function getStudentName(student) {
+            if (student.name) {
+                return student.name;
+            }
+
+            return [
+                student.firstName,
+                student.middleName,
+                student.lastName
+            ].filter(Boolean).join(" ") || "Name not provided";
+        }
+
+        function getStudentId(student) {
+            return student.studentId ?? student.id ?? "Not assigned";
+        }
+
+        function getStudentGrade(student) {
+            return student.grade ?? student.class ?? "Not assigned";
+        }
+
+        /* Render student records */
+        function renderStudents() {
+            const tbody = $("studentTableBody");
+
+            const searchText = $("studentSearch")
+                .value
+                .trim()
+                .toLowerCase();
+
+            const filtered = state.students.filter(student => {
+                const searchableText = [
+                    getStudentName(student),
+                    getStudentId(student),
+                    getStudentGrade(student)
+                ].join(" ").toLowerCase();
+
+                return searchableText.includes(searchText);
+            });
+
+            if (filtered.length === 0) {
+                const message = state.students.length === 0
+                    ? "No student records are available yet."
+                    : "No students match your search.";
+
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="4" class="empty-state">
+                            ${escapeHTML(message)}
+                        </td>
+                    </tr>
+                `;
+
+                return;
+            }
+
+            tbody.innerHTML = filtered.slice(0, 10).map(student => {
+                const status = student.status || "Registered";
+
+                return `
+                    <tr>
+                        <td>${escapeHTML(getStudentId(student))}</td>
+                        <td>${escapeHTML(getStudentName(student))}</td>
+                        <td>${escapeHTML(getStudentGrade(student))}</td>
+                        <td>
+                            <span class="status-badge">
+                                ${escapeHTML(status)}
+                            </span>
+                        </td>
+                    </tr>
+                `;
+            }).join("");
+        }
+
+        /* Calculate attendance from the available records */
+        function calculateAttendance(records) {
+            if (!records.length) {
+                return "—";
+            }
+
+            const presentCount = records.filter(record => {
+                const status = String(
+                    record.status || ""
+                ).toLowerCase();
+
+                return status === "present" || status === "late";
+            }).length;
+
+            return Math.round(
+                (presentCount / records.length) * 100
+            ) + "%";
+        }
+
+        /* Format money in Ethiopian birr */
+        function formatMoney(amount) {
+            const value = Number(amount);
+
+            if (!Number.isFinite(value)) {
+                return "ETB 0.00";
+            }
+
+            return "ETB " + value.toLocaleString("en-US", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+        }
+
+        /* Calculate recorded fees */
+        function calculateFees(records) {
+            return records.reduce((total, fee) => {
+                const status = String(
+                    fee.status || ""
+                ).toLowerCase();
+
+                const amountPaid =
+                    fee.amountPaid ??
+                    fee.paidAmount ??
+                    (status === "paid" ? fee.amount : 0) ??
+                    0;
+
+                const amount = Number(amountPaid);
+
+                if (Number.isFinite(amount)) {
+                    return total + amount;
+                }
+
+                return total;
+            }, 0);
+        }
+
+        /* Load dashboard data through the existing app.js helper */
+        async function loadDashboard() {
+            clearMessage();
+
+            const app = window.SchoolApp;
+
+            if (!app) {
+                state.students = [];
+                renderStudents();
+
+                showMessage(
+                    "The dashboard design is ready. SchoolApp was not found. Check that app.js is in the same folder and that it loads correctly. Real statistics require the existing data services and backend.",
+                    "info"
+                );
+
+                return;
+            }
+
+            const tasks = [
+                {
+                    key: "students",
+                    load: app.getStudents
+                },
+                {
+                    key: "users",
+                    load: app.getUsers
+                },
+                {
+                    key: "attendance",
+                    load: app.getAttendance
+                },
+                {
+                    key: "fees",
+                    load: app.getFees
+                }
+            ];
+
+            const availableTasks = tasks.filter(
+                task => typeof task.load === "function"
+            );
+
+            if (availableTasks.length === 0) {
+                state.students = [];
+                renderStudents();
+
+                showMessage(
+                    "Dashboard preview mode: data-loading functions are not available yet.",
+                    "info"
+                );
+
+                return;
+            }
+
+            const results = await Promise.allSettled(
+                availableTasks.map(task => task.load.call(app))
+            );
+
+            const data = {};
+            let failedCount = 0;
+
+            results.forEach((result, index) => {
+                const key = availableTasks[index].key;
+
+                if (result.status === "fulfilled") {
+                    data[key] = unwrapList(result.value);
+                } else {
+                    console.error(
+                        "Could not load " + key + ":",
+                        result.reason
+                    );
+
+                    data[key] = [];
+                    failedCount++;
+                }
+            });
+
+            state.students = data.students || [];
+
+            $("studentCount").textContent =
+                String(state.students.length);
+
+            const users = data.users || [];
+
+            const teacherCount = users.filter(user => {
+                return String(user.role || "").toLowerCase()
+                    === "teacher";
+            }).length;
+
+            $("teacherCount").textContent =
+                String(teacherCount);
+
+            $("attendanceRate").textContent =
+                calculateAttendance(data.attendance || []);
+
+            $("monthlyFee").textContent =
+                formatMoney(calculateFees(data.fees || []));
+
+            renderStudents();
+
+            if (failedCount > 0) {
+                showMessage(
+                    "Some data could not be loaded. This can happen while the backend or API endpoints are being developed. You can continue testing the dashboard design.",
+                    "info"
+                );
+            }
+        }
+
+        /* Log out through the existing helper, if available */
+        function initializeLogout() {
+            const logoutLink = $("logoutLink");
+
+            logoutLink.addEventListener("click", async event => {
+                event.preventDefault();
+
+                const confirmed = window.confirm(
+                    "Are you sure you want to log out?"
+                );
+
+                if (!confirmed) {
+                    return;
+                }
+
+                try {
+                    if (
+                        window.SchoolApp &&
+                        typeof window.SchoolApp.logoutUser === "function"
+                    ) {
+                        await window.SchoolApp.logoutUser();
+                    } else {
+                        localStorage.removeItem("current_user");
+                        sessionStorage.removeItem("current_user");
+                    }
+                } catch (error) {
+                    console.error("Logout error:", error);
+                }
+
+                window.location.href = "login.html";
+            });
+        }
+
+        /* Start the dashboard */
+        document.addEventListener("DOMContentLoaded", () => {
+            initializeDate();
+
+            $("studentSearch").addEventListener(
+                "input",
+                renderStudents
+            );
+
+            $("refreshButton").addEventListener(
+                "click",
+                () => {
+                    loadDashboard().catch(error => {
+                        console.error(
+                            "Dashboard loading error:",
+                            error
+                        );
+
+                        showMessage(
+                            "Unable to refresh dashboard data. Check app.js and the configured API endpoints.",
+                            "error"
+                        );
+                    });
+                }
+            );
+
+            initializeLogout();
+
+            /*
+             * Keep the existing admin check if app.js provides it.
+             * Server-side authorization will also be required when
+             * the backend is implemented.
+             */
+            if (
+                window.SchoolApp &&
+                typeof window.SchoolApp.requireAuth === "function"
+            ) {
+                try {
+                    window.SchoolApp.requireAuth("admin");
+                } catch (error) {
+                    console.error(
+                        "Admin authentication check failed:",
+                        error
+                    );
+
+                    showMessage(
+                        "The administrator session could not be verified. Please log in using an administrator account.",
+                        "error"
+                    );
+
+                    return;
+                }
+            }
+
+            loadDashboard().catch(error => {
+                console.error(
+                    "Dashboard initialization error:",
+                    error
+                );
+
+                showMessage(
+                    "The dashboard opened, but its data could not be loaded. Check the browser console and your API configuration.",
+                    "error"
+                );
+            });
+        });
     })();
-  </script>
+    </script>
+
 </body>
 </html>
+
+
