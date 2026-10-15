@@ -2,257 +2,537 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- Basic information about this webpage -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#12372a">
+    <meta name="description" content="NIBRETE BUZUNEH Secondary and Preparatory School digital services.">
+    <title>NIBRETE BUZUNEH | School Management System</title>
 
-    <meta
-        name="description"
-        content="Welcome to NIBRETE BUZUNEH Secondary and Preparatory School. Explore our school information and student services."
-    >
+    <style>
+        /* 1. GENERAL PAGE SETTINGS */
+        * {
+            box-sizing: border-box;
+        }
 
-    <meta name="theme-color" content="#0f172a">
+        html {
+            scroll-behavior: smooth;
+        }
 
-    <link
-        rel="icon"
-        href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230f172a'/%3E%3Ctext x='50%25' y='55%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial' font-size='28' font-weight='700' fill='white'%3ENB%3C/text%3E%3C/svg%3E"
-    >
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #17231d;
+            background: #fbfdfb;
+        }
 
-    <title>Nibrete Buzuneh Secondary School</title>
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
 
-    <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="home.css">
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* 2. BUTTONS */
+        .button {
+            display: inline-block;
+            padding: 11px 17px;
+            border: 1px solid transparent;
+            border-radius: 8px;
+            font-weight: bold;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .button-green {
+            color: white;
+            background: #1f6b49;
+        }
+
+        .button-green:hover {
+            background: #174b37;
+        }
+
+        .button-white {
+            color: #12372a;
+            background: white;
+        }
+
+        .button-outline {
+            color: white;
+            border-color: #9bb8a5;
+        }
+
+        .button-soft {
+            color: #12372a;
+            background: #e7f4ec;
+        }
+
+        /* 3. HEADER AND NAVIGATION */
+        .site-header {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            color: white;
+            background: #12372a;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            padding: 16px 0;
+        }
+
+        .school-name {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: bold;
+        }
+
+        .school-logo {
+            display: grid;
+            place-items: center;
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            color: #12372a;
+            background: #d8efdf;
+        }
+
+        .school-name small {
+            display: block;
+            color: #c9ded0;
+            font-size: 12px;
+            font-weight: normal;
+        }
+
+        .navigation {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            flex-wrap: wrap;
+        }
+
+        .navigation a:hover {
+            color: #a9e4bc;
+        }
+
+        /* 4. WELCOME SECTION */
+        .hero {
+            padding: 65px 0;
+            background: #f0f8f2;
+        }
+
+        .hero-content {
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            align-items: center;
+            gap: 35px;
+        }
+
+        .small-heading {
+            color: #1f6b49;
+            font-weight: bold;
+        }
+
+        .hero h1 {
+            margin: 15px 0;
+            color: #0b241b;
+            font-size: 42px;
+            line-height: 1.2;
+        }
+
+        .hero h1 span {
+            color: #1f6b49;
+        }
+
+        .hero-description {
+            color: #5c6c63;
+            font-size: 17px;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 22px;
+        }
+
+        .welcome-card {
+            padding: 25px;
+            border: 1px solid #dce7df;
+            border-radius: 18px;
+            background: white;
+        }
+
+        .welcome-card h2 {
+            margin-top: 0;
+            color: #12372a;
+        }
+
+        .welcome-card ul {
+            padding-left: 22px;
+        }
+
+        .welcome-card li {
+            margin-bottom: 10px;
+        }
+
+        /* 5. COMMON SECTION STYLE */
+        .section {
+            padding: 60px 0;
+        }
+
+        .section-heading {
+            max-width: 700px;
+            margin: 0 auto 30px;
+            text-align: center;
+        }
+
+        .section-heading h2 {
+            margin-bottom: 10px;
+            color: #12372a;
+            font-size: 30px;
+        }
+
+        .section-heading p {
+            color: #5c6c63;
+        }
+
+        /* 6. SERVICE CARDS */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+        }
+
+        .card {
+            padding: 22px;
+            border: 1px solid #dce7df;
+            border-radius: 14px;
+            background: white;
+        }
+
+        .card-icon {
+            font-size: 28px;
+        }
+
+        .card h3 {
+            margin-bottom: 8px;
+            color: #12372a;
+        }
+
+        .card p {
+            margin-bottom: 0;
+            color: #5c6c63;
+        }
+
+        /* 7. USER ROLES */
+        .roles-section {
+            background: #f4faf6;
+            border-top: 1px solid #dce7df;
+            border-bottom: 1px solid #dce7df;
+        }
+
+        .role-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 14px;
+        }
+
+        .role-card {
+            padding: 18px;
+            border: 1px solid #dce7df;
+            border-radius: 10px;
+            background: white;
+        }
+
+        .role-card strong {
+            color: #12372a;
+        }
+
+        .role-card p {
+            margin-bottom: 0;
+            color: #5c6c63;
+            font-size: 14px;
+        }
+
+        /* 8. CONTACT SECTION */
+        .contact-box {
+            display: grid;
+            grid-template-columns: 0.9fr 1.1fr;
+            overflow: hidden;
+            border: 1px solid #dce7df;
+            border-radius: 18px;
+            background: white;
+        }
+
+        .contact-information {
+            padding: 28px;
+            color: white;
+            background: #12372a;
+        }
+
+        .contact-information h2 {
+            margin-top: 0;
+        }
+
+        .contact-information p {
+            color: #d5e6db;
+        }
+
+        .contact-form {
+            padding: 28px;
+        }
+
+        .contact-form h2 {
+            margin-top: 0;
+        }
+
+        .form-field {
+            margin-bottom: 15px;
+        }
+
+        .form-field label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: bold;
+        }
+
+        .form-field input,
+        .form-field textarea {
+            width: 100%;
+            padding: 11px;
+            border: 1px solid #cbd8ce;
+            border-radius: 7px;
+            font: inherit;
+        }
+
+        .form-field textarea {
+            min-height: 110px;
+            resize: vertical;
+        }
+
+        .form-message {
+            min-height: 24px;
+            color: #1f6b49;
+        }
+
+        /* 9. FOOTER */
+        .site-footer {
+            padding: 25px 0;
+            color: white;
+            background: #0b241b;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a:hover {
+            color: #a9e4bc;
+        }
+
+        /* 10. MOBILE SCREEN SETTINGS */
+        @media (max-width: 850px) {
+            .header-content {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .hero-content,
+            .contact-box {
+                grid-template-columns: 1fr;
+            }
+
+            .card-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .role-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 550px) {
+            .hero h1 {
+                font-size: 32px;
+            }
+
+            .navigation {
+                gap: 12px;
+            }
+
+            .card-grid,
+            .role-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .hero-buttons .button {
+                width: 100%;
+            }
+
+            .section {
+                padding: 40px 0;
+            }
+        }
+    </style>
 </head>
 
 <body>
 
-    <!-- HEADER AND NAVIGATION -->
-    <header class="header">
-        <div class="container navbar">
+    <!-- HEADER: shows the school name and navigation links -->
+    <header class="site-header">
+        <div class="container header-content">
 
-            <a class="brand" href="index.html" aria-label="School homepage">
-                <span class="brand-logo" aria-hidden="true">NB</span>
-
-                <span class="brand-text">
-                    <strong>NIBRETE BUZUNEH</strong>
-                    <span>Secondary and Preparatory School</span>
+            <a class="school-name" href="indx.html">
+                <span class="school-logo">NB</span>
+                <span>
+                    NIBRETE BUZUNEH
+                    <small>Secondary and Preparatory School</small>
                 </span>
             </a>
 
-            <nav class="nav-links" aria-label="Main navigation">
+            <nav class="navigation" aria-label="Main navigation">
                 <a href="#home">Home</a>
-                <a href="#about">About</a>
                 <a href="#services">Services</a>
-                <a href="#portals">Student Portal</a>
-                <a href="login.html" class="nav-button">Sign In</a>
+                <a href="#roles">System Users</a>
+                <a href="#contact">Contact</a>
+                <a class="button button-outline" href="login.html">Log In</a>
+                <a class="button button-white" href="signup.html">Create Account</a>
             </nav>
 
         </div>
     </header>
 
+    <!-- MAIN: contains the main parts of the homepage -->
     <main>
 
-        <!-- HERO SECTION -->
+        <!-- WELCOME: introduces the school management system -->
         <section class="hero" id="home">
-            <div class="container">
-                <div class="hero-content">
+            <div class="container hero-content">
 
-                    <span class="hero-label">
-                        Learning Today, Leading Tomorrow
-                    </span>
+                <div>
+                    <p class="small-heading">Digital School Management</p>
 
                     <h1>
-                        Welcome to <span>NIBRETE BUZUNEH</span>
-                        Secondary and Preparatory School
+                        One Platform for
+                        <span>Better School Management</span>
                     </h1>
 
-                    <p>
-                        Our school management portal provides a central place
-                        for students, teachers, and authorized school staff
-                        to access educational services and school information.
+                    <p class="hero-description">
+                        The NIBRETE BUZUNEH School Management System is designed
+                        to organize student records, registration, attendance,
+                        exam results, fee records, and school communication.
                     </p>
 
-                    <div class="hero-actions">
-                        <a href="login.html" class="button button-primary">
-                            Access Your Portal
+                    <div class="hero-buttons">
+                        <a class="button button-green" href="login.html">
+                            Log In to the System
                         </a>
 
-                        <a href="#about" class="button button-secondary">
-                            Learn About Our School
+                        <a class="button button-soft" href="#services">
+                            Explore Services
                         </a>
                     </div>
-
-                    <div class="hero-note">
-                        A digital platform for a more organized school experience.
-                    </div>
-
                 </div>
+
+                <!-- A small summary card beside the welcome text -->
+                <div class="welcome-card">
+                    <h2>School Services</h2>
+                    <p>Important school information in one place.</p>
+
+                    <ul>
+                        <li>Student registration and records</li>
+                        <li>Attendance and academic results</li>
+                        <li>Fee and payment records</li>
+                    </ul>
+                </div>
+
             </div>
         </section>
 
-        <!-- QUICK INFORMATION -->
-        <section class="quick-info" aria-label="School portal benefits">
-            <div class="container">
-                <div class="info-grid">
-
-                    <article class="info-card">
-                        <div class="info-icon" aria-hidden="true">🎓</div>
-                        <h3>Student Services</h3>
-                        <p>
-                            Access student information, academic results,
-                            attendance records, and fee information through
-                            the appropriate portal.
-                        </p>
-                    </article>
-
-                    <article class="info-card">
-                        <div class="info-icon" aria-hidden="true">📚</div>
-                        <h3>Academic Management</h3>
-                        <p>
-                            Support organized academic activities and help
-                            authorized staff manage school records.
-                        </p>
-                    </article>
-
-                    <article class="info-card">
-                        <div class="info-icon" aria-hidden="true">🔐</div>
-                        <h3>Role-Based Access</h3>
-                        <p>
-                            Provide different interfaces for students,
-                            teachers, and authorized school personnel.
-                        </p>
-                    </article>
-
-                </div>
-            </div>
-        </section>
-
-        <!-- ABOUT THE SCHOOL -->
-        <section class="section" id="about">
-            <div class="container">
-                <div class="about-grid">
-
-                    <div class="about-panel">
-                        <div class="large-symbol" aria-hidden="true">🏫</div>
-                        <h2>Education and Organization</h2>
-                        <p>
-                            Supporting the school community through
-                            accessible information and organized services.
-                        </p>
-                    </div>
-
-                    <div class="about-content">
-                        <span class="hero-label" style="color:#166534;background:#dcfce7;border-color:#bbf7d0;">
-                            About Our Portal
-                        </span>
-
-                        <h2>A More Organized School Experience</h2>
-
-                        <p>
-                            The NIBRETE BUZUNEH School Management System
-                            is designed to bring important school activities
-                            together in one web-based platform.
-                        </p>
-
-                        <p>
-                            The goal is to make school information easier
-                            to manage and access while helping authorized
-                            users perform their responsibilities efficiently.
-                        </p>
-
-                        <ul class="check-list">
-                            <li>
-                                <span class="check-mark">✓</span>
-                                <span>Organized student information</span>
-                            </li>
-                            <li>
-                                <span class="check-mark">✓</span>
-                                <span>Academic results and attendance interfaces</span>
-                            </li>
-                            <li>
-                                <span class="check-mark">✓</span>
-                                <span>Fee information and administrative tools</span>
-                            </li>
-                            <li>
-                                <span class="check-mark">✓</span>
-                                <span>Separate access for different user roles</span>
-                            </li>
-                        </ul>
-
-                        <a href="login.html" class="button button-primary">
-                            Enter the School Portal
-                        </a>
-                    </div>
-
-                </div>
-            </div>
-        </section>
-
-        <!-- SCHOOL SERVICES -->
-        <section class="section services-section" id="services">
+        <!-- SERVICES: shows the main features of the system -->
+        <section class="section" id="services">
             <div class="container">
 
                 <div class="section-heading">
-                    <span class="eyebrow">Our Services</span>
                     <h2>School Management Services</h2>
                     <p>
-                        Explore the main areas supported by the school
-                        management platform. Access depends on your
-                        assigned role and permissions.
+                        These are the main services planned for the school
+                        management system. Some services need a working backend
+                        before they can save or display real information.
                     </p>
                 </div>
 
-                <div class="services-grid">
+                <div class="card-grid">
 
-                    <article class="service-card">
-                        <div class="info-icon" aria-hidden="true">👨‍🎓</div>
-                        <h3>Student Management</h3>
+                    <article class="card">
+                        <div class="card-icon">🎓</div>
+                        <h3>Student Registration</h3>
                         <p>
-                            Support student registration and the organization
-                            of student information.
+                            Store student details, admission information,
+                            grade, and school records.
                         </p>
                     </article>
 
-                    <article class="service-card">
-                        <div class="info-icon" aria-hidden="true">🧑‍🏫</div>
-                        <h3>Teacher Services</h3>
+                    <article class="card">
+                        <div class="card-icon">👩‍🏫</div>
+                        <h3>Teacher and Staff</h3>
                         <p>
-                            Provide teachers with an interface for their
-                            authorized academic responsibilities.
+                            Organize teacher and staff information and their
+                            assigned responsibilities.
                         </p>
                     </article>
 
-                    <article class="service-card">
-                        <div class="info-icon" aria-hidden="true">📅</div>
-                        <h3>Attendance Management</h3>
+                    <article class="card">
+                        <div class="card-icon">📅</div>
+                        <h3>Attendance</h3>
                         <p>
-                            Support recording and reviewing student attendance.
+                            Record and review student attendance.
                         </p>
                     </article>
 
-                    <article class="service-card">
-                        <div class="info-icon" aria-hidden="true">📝</div>
-                        <h3>Exam Results</h3>
+                    <article class="card">
+                        <div class="card-icon">📘</div>
+                        <h3>Exams and Results</h3>
                         <p>
-                            Organize academic result information for
-                            authorized teachers and students.
+                            Record exam marks, grades, and academic progress.
                         </p>
                     </article>
 
-                    <article class="service-card">
-                        <div class="info-icon" aria-hidden="true">💳</div>
-                        <h3>Fee Management</h3>
+                    <article class="card">
+                        <div class="card-icon">💰</div>
+                        <h3>Fees and Payments</h3>
                         <p>
-                            Support the recording and review of student
-                            payment and outstanding balance information.
+                            Track student fees, payments, and unpaid balances.
                         </p>
                     </article>
 
-                    <article class="service-card">
-                        <div class="info-icon" aria-hidden="true">📊</div>
-                        <h3>Administration</h3>
+                    <article class="card">
+                        <div class="card-icon">📢</div>
+                        <h3>Communication and Reports</h3>
                         <p>
-                            Provide authorized school administrators with
-                            tools for monitoring school activities.
+                            Support school announcements, parent communication,
+                            and management reports.
                         </p>
                     </article>
 
@@ -260,88 +540,189 @@
             </div>
         </section>
 
-        <!-- PORTAL ACCESS -->
-        <section class="portal-section" id="portals">
-            <div class="container">
-                <div class="portal-box">
+        <!-- USER ROLES: explains who can use the system -->
+        <section class="roles-section" id="roles">
+            <div class="container section">
 
-                    <div>
-                        <h2>Ready to Access Your Portal?</h2>
-                        <p>
-                            Sign in using your authorized account to access
-                            the services available for your role.
-                        </p>
+                <div class="section-heading">
+                    <h2>System Users and Their Roles</h2>
+                    <p>
+                        Each user should only see information and tools
+                        allowed for their role. The backend must enforce
+                        these permissions.
+                    </p>
+                </div>
+
+                <div class="role-grid">
+
+                    <div class="role-card">
+                        <strong>Super Admin</strong>
+                        <p>Manages system settings and user roles.</p>
                     </div>
 
-                    <div class="portal-actions">
-                        <a href="login.html" class="button button-primary">
-                            Sign In
-                        </a>
+                    <div class="role-card">
+                        <strong>School Admin / Principal</strong>
+                        <p>Oversees school activities and reports.</p>
+                    </div>
 
-                        <a href="signup.html" class="button button-secondary">
-                            Create an Account
-                        </a>
+                    <div class="role-card">
+                        <strong>Registrar</strong>
+                        <p>Manages admissions and student records.</p>
+                    </div>
+
+                    <div class="role-card">
+                        <strong>Teacher</strong>
+                        <p>Works with attendance, grades, and classes.</p>
+                    </div>
+
+                    <div class="role-card">
+                        <strong>Student</strong>
+                        <p>Views permitted academic information.</p>
+                    </div>
+
+                    <div class="role-card">
+                        <strong>Parent / Guardian</strong>
+                        <p>Views information about their linked child.</p>
+                    </div>
+
+                    <div class="role-card">
+                        <strong>Accountant</strong>
+                        <p>Manages fee and payment records.</p>
+                    </div>
+
+                    <div class="role-card">
+                        <strong>HR Officer</strong>
+                        <p>Manages staff records and approved HR tasks.</p>
                     </div>
 
                 </div>
+            </div>
+        </section>
+
+        <!-- CONTACT: school contact information and enquiry form -->
+        <section class="section" id="contact">
+            <div class="container contact-box">
+
+                <div class="contact-information">
+                    <h2>Contact the School</h2>
+                    <p>
+                        Add the school's official contact information here
+                        after it has been confirmed by the administration.
+                    </p>
+
+                    <p><strong>Location:</strong> Ethiopia</p>
+                    <p><strong>Email:</strong> To be confirmed by the school</p>
+                    <p><strong>Telephone:</strong> To be confirmed by the school</p>
+                </div>
+
+                <div class="contact-form">
+                    <h2>Send an Enquiry</h2>
+                    <p>
+                        This is currently a demonstration form. It checks
+                        the fields but does not send or save messages.
+                    </p>
+
+                    <form id="contactForm">
+
+                        <div class="form-field">
+                            <label for="name">Full Name</label>
+                            <input
+                                type="text"
+                                id="name"
+                                name="name"
+                                maxlength="100"
+                                required
+                            >
+                        </div>
+
+                        <div class="form-field">
+                            <label for="email">Email Address</label>
+                            <input
+                                type="email"
+                                id="email"
+                                name="email"
+                                maxlength="254"
+                                required
+                            >
+                        </div>
+
+                        <div class="form-field">
+                            <label for="subject">Subject</label>
+                            <input
+                                type="text"
+                                id="subject"
+                                name="subject"
+                                maxlength="120"
+                                required
+                            >
+                        </div>
+
+                        <div class="form-field">
+                            <label for="message">Message</label>
+                            <textarea
+                                id="message"
+                                name="message"
+                                maxlength="2000"
+                                required
+                            ></textarea>
+                        </div>
+
+                        <button class="button button-green" type="submit">
+                            Check Form
+                        </button>
+
+                        <p class="form-message" id="formMessage" role="status"></p>
+                    </form>
+                </div>
+
             </div>
         </section>
 
     </main>
 
-    <!-- FOOTER -->
-    <footer class="footer">
-        <div class="container">
+    <!-- FOOTER: appears at the bottom of the page -->
+    <footer class="site-footer">
+        <div class="container footer-content">
 
-            <div class="footer-grid">
-
-                <div>
-                    <h3>NIBRETE BUZUNEH</h3>
-                    <p>
-                        Secondary and Preparatory School.
-                        A web-based platform designed to support
-                        organized school services.
-                    </p>
-                </div>
-
-                <div>
-                    <h4>Quick Links</h4>
-
-                    <div class="footer-links">
-                        <a href="#home">Home</a>
-                        <a href="#about">About the School</a>
-                        <a href="#services">Services</a>
-                        <a href="login.html">Sign In</a>
-                    </div>
-                </div>
-
-                <div>
-                    <h4>School Portal</h4>
-
-                    <div class="footer-links">
-                        <a href="login.html">User Login</a>
-                        <a href="signup.html">Create an Account</a>
-                    </div>
-                </div>
-
-            </div>
-
-            <div class="footer-bottom">
+            <p>
                 &copy; <span id="currentYear"></span>
                 NIBRETE BUZUNEH Secondary and Preparatory School.
-                All rights reserved.
+            </p>
+
+            <div class="footer-links">
+                <a href="login.html">Log In</a>
+                <a href="#services">Services</a>
+                <a href="#contact">Contact</a>
             </div>
 
         </div>
     </footer>
 
+    <!-- JAVASCRIPT: updates the year and checks the contact form -->
     <script>
-        'use strict';
+        // Show the current year in the footer.
+        const yearElement = document.getElementById("currentYear");
+        yearElement.textContent = new Date().getFullYear();
 
-        // Update the copyright year automatically.
-        document.getElementById('currentYear').textContent =
-            new Date().getFullYear();
+        // Get the contact form and the place where a message will appear.
+        const contactForm = document.getElementById("contactForm");
+        const formMessage = document.getElementById("formMessage");
 
+        // Run this code when the visitor submits the form.
+        contactForm.addEventListener("submit", function (event) {
+            // Stop the browser from reloading the page.
+            event.preventDefault();
+
+            // Check that all required fields are filled correctly.
+            if (!contactForm.checkValidity()) {
+                contactForm.reportValidity();
+                return;
+            }
+
+            // Tell the visitor that the form is valid, but not connected to a backend.
+            formMessage.textContent =
+                "Your form is valid, but no message was sent. Backend connection is still needed.";
+        });
     </script>
 
 </body>
