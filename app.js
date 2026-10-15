@@ -1,4 +1,3 @@
-```javascript
 (function () {
     'use strict';
 
@@ -40,7 +39,12 @@
         };
 
         if (options.body !== undefined) {
+            const isFormData =
+                typeof FormData !== 'undefined' &&
+                options.body instanceof FormData;
+
             if (
+                !isFormData &&
                 !headers['Content-Type'] &&
                 !headers['content-type']
             ) {
@@ -244,6 +248,91 @@
             '/students/' + encodeURIComponent(studentId),
             {
                 method: 'DELETE'
+            }
+        );
+    }
+
+    // =====================================================
+    // ONLINE STUDENT REGISTRATION
+    // =====================================================
+
+    // Backend contract: POST /registrations accepts multipart data and
+    // creates Pending applications; GET returns pending applications;
+    // PATCH /registrations/:id edits an application; PATCH
+    // /registrations/:id/review applies a decision and creates an account
+    // on approval. These endpoints must enforce authorization and validation.
+
+    function submitStudentRegistration(formData) {
+        if (
+            typeof FormData === 'undefined' ||
+            !(formData instanceof FormData)
+        ) {
+            throw new TypeError('Registration data must be submitted as FormData.');
+        }
+
+        return request('/registrations', {
+            method: 'POST',
+            body: formData
+        });
+    }
+
+    async function getPendingRegistrations() {
+        const result = await request('/registrations?status=Pending');
+        const registrations = Array.isArray(result)
+            ? result
+            : result?.registrations;
+
+        if (!Array.isArray(registrations)) {
+            throw new Error(
+                'The server returned an invalid registration list.'
+            );
+        }
+
+        return registrations;
+    }
+
+    function updatePendingRegistration(registrationId, changes) {
+        if (
+            typeof registrationId !== 'string' &&
+            typeof registrationId !== 'number'
+        ) {
+            throw new TypeError('A valid registration ID is required.');
+        }
+
+        if (!changes || typeof changes !== 'object') {
+            throw new TypeError('Registration changes are required.');
+        }
+
+        return request(
+            '/registrations/' + encodeURIComponent(String(registrationId)),
+            {
+                method: 'PATCH',
+                body: JSON.stringify(changes)
+            }
+        );
+    }
+
+    function reviewStudentRegistration(registrationId, review) {
+        if (
+            typeof registrationId !== 'string' &&
+            typeof registrationId !== 'number'
+        ) {
+            throw new TypeError('A valid registration ID is required.');
+        }
+
+        if (!review || !['Approved', 'Rejected'].includes(review.status)) {
+            throw new TypeError(
+                'Registration status must be Approved or Rejected.'
+            );
+        }
+
+        return request(
+            '/registrations/' +
+                encodeURIComponent(String(registrationId)) +
+                '/review',
+            {
+                method: 'PATCH',
+                body: JSON.stringify(review)
             }
         );
     }
@@ -513,6 +602,7 @@
 
         const rolePages = {
             admin: 'dashboard.html',
+            registrar: 'registration-review.html',
             principal: 'principal-dashboard.html',
             teacher: 'teacher-portal.html',
             student: 'student-portal.html',
@@ -585,6 +675,11 @@
         updateStudent,
         deleteStudent,
 
+        submitStudentRegistration,
+        getPendingRegistrations,
+        updatePendingRegistration,
+        reviewStudentRegistration,
+
         getAttendance,
         addAttendance,
 
@@ -608,6 +703,3 @@
     };
 
 })();
-```
-
-

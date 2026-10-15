@@ -38,58 +38,24 @@
         <nav>
             <a href="index.html">Home</a>
             <a href="login.html">Login</a>
-            <a href="signup.html">Sign Up</a>
+            <a href="online-registration.html">Apply for Admission</a>
         </nav>
     </header>
 
     <main class="page">
         <div class="signup-box">
-            <h2>Create Account</h2>
-            <p>Register a new student, teacher, or admin.</p>
-            <div id="signupError" class="error-message"></div>
-
-            <form id="signupForm">
-                <div class="form-grid">
-                    <div class="field">
-                        <label for="fullname">Full Name</label>
-                        <input type="text" id="fullname" name="fullname" placeholder="Enter your full name" required>
-                    </div>
-
-                    <div class="field">
-                        <label for="username">Username</label>
-                        <input type="text" id="username" name="username" placeholder="Choose username" required>
-                    </div>
-
-                    <div class="field full-width">
-                        <label for="role">Role</label>
-                        <select id="role" name="role">
-                            <option value="student">Student</option>
-                            <option value="teacher">Teacher</option>
-                            <option value="admin">Admin</option>
-                        </select>
-                    </div>
-
-                    <div class="field full-width">
-                        <label for="email">Email</label>
-                        <input type="email" id="email" name="email" placeholder="Enter email address" required>
-                    </div>
-
-                    <div class="field">
-                        <label for="password">Password</label>
-                        <input type="password" id="password" name="password" placeholder="Create password" required>
-                    </div>
-
-                    <div class="field">
-                        <label for="confirm">Confirm Password</label>
-                        <input type="password" id="confirm" name="confirm" placeholder="Repeat password" required>
-                    </div>
-                </div>
-
-                <button type="submit" class="signup-btn">Sign Up</button>
-            </form>
+            <h2>Student Accounts</h2>
+            <p>
+                Student accounts are created by the school after an online
+                registration is reviewed and approved. Submit an application
+                first, then use the username and temporary password provided
+                by the school to log in.
+            </p>
 
             <div class="help-text">
-                Already have an account? <a href="login.html">Login</a>
+                <a href="online-registration.html">Apply for admission</a>
+                &nbsp;|&nbsp;
+                <a href="login.html">Already have an account? Login</a>
             </div>
         </div>
     </main>
@@ -98,42 +64,5 @@
         NIBRETE BUZUNEH SECONDARY AND PREPARATORY SCHOOL © 2026
     </footer>
 
-    <script src="app.js"></script>
-    <script>
-        const signupForm = document.getElementById('signupForm');
-        const signupError = document.getElementById('signupError');
-
-        signupForm.addEventListener('submit', async function (event) {
-            event.preventDefault();
-
-            const fullName = document.getElementById('fullname').value.trim();
-            const username = document.getElementById('username').value.trim();
-            const role = document.getElementById('role').value;
-            const email = document.getElementById('email').value.trim();
-            const password = document.getElementById('password').value;
-            const confirmPassword = document.getElementById('confirm').value;
-
-            if (password !== confirmPassword) {
-                signupError.textContent = 'Passwords do not match.';
-                signupError.classList.add('visible');
-                return;
-            }
-
-            const result = await SchoolApp.signupUser({ fullName, username, email, password, role });
-            if (!result.success) {
-                signupError.textContent = result.message;
-                signupError.classList.add('visible');
-                return;
-            }
-
-            if (role === 'admin') {
-                window.location.href = 'dashboard.html';
-            } else if (role === 'teacher') {
-                window.location.href = 'teacher-portal.html';
-            } else {
-                window.location.href = 'student-portal.html';
-            }
-        });
-    </script>
 </body>
 </html>

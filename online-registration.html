@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Student Registration | NIBRETE BUZUNEH School</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        * { box-sizing: border-box; }
+        body { margin: 0; font-family: Arial, sans-serif; background: #f3f7f4; color: #1f2937; }
+        .topbar { display: flex; justify-content: space-between; align-items: center; gap: 20px; padding: 18px 6%; background: #12372a; color: #fff; }
+        .school-name { font-weight: 700; }
+        [hidden] { display: none !important; }
+        nav { display: flex; flex-wrap: wrap; gap: 20px; }
+        nav a { color: #fff; text-decoration: none; font-weight: 600; }
+        main { padding: 36px 18px; }
+        .registration-card { width: min(100%, 760px); margin: 0 auto; padding: 30px; border: 1px solid #dbe4dc; border-radius: 16px; background: #fff; box-shadow: 0 12px 35px rgba(15, 23, 42, .08); }
+        h1 { margin-top: 0; color: #12372a; text-align: center; }
+        .intro { margin-bottom: 26px; color: #526156; line-height: 1.6; text-align: center; }
+        .form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+        .field { display: flex; flex-direction: column; gap: 7px; }
+        .full { grid-column: 1 / -1; }
+        fieldset.field { min-width: 0; margin: 0; padding: 0; border: 0; }
+        .radio-options { display: flex; flex-wrap: wrap; gap: 18px; }
+        .radio-options label { display: inline-flex; align-items: center; gap: 7px; font-weight: 400; }
+        .radio-options input { width: auto; }
+        label { font-weight: 700; }
+        input, select, textarea { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font: inherit; }
+        input:focus, select:focus, textarea:focus { outline: 2px solid #198754; outline-offset: 1px; }
+        small { color: #526156; line-height: 1.5; }
+        button { display: block; width: 100%; margin-top: 24px; padding: 13px; border: 0; border-radius: 8px; background: #198754; color: white; font: inherit; font-weight: 700; cursor: pointer; }
+        button:hover:not(:disabled) { background: #146c43; }
+        button:disabled { opacity: .65; cursor: wait; }
+        .message { display: none; margin-top: 18px; padding: 12px; border-radius: 8px; line-height: 1.5; }
+        .message.visible { display: block; }
+        .message.success { background: #dcfce7; color: #166534; }
+        .message.error { background: #fee2e2; color: #991b1b; }
+        footer { padding: 18px; background: #12372a; color: #e2e8f0; text-align: center; }
+        @media (max-width: 600px) {
+            .topbar { flex-direction: column; text-align: center; }
+            .form-grid { grid-template-columns: 1fr; }
+            .full { grid-column: auto; }
+            .registration-card { padding: 22px 18px; }
+        }
+    </style>
+</head>
+<body>
+    <header class="topbar">
+        <div class="school-name">NIBRETE BUZUNEH SCHOOL</div>
+        <nav aria-label="Main navigation">
+            <a href="index.html">Home</a>
+            <a href="login.html">Login</a>
+        </nav>
+    </header>
+
+    <main>
+        <section class="registration-card" aria-labelledby="registrationTitle">
+            <h1 id="registrationTitle">Online Student Registration</h1>
+            <p class="intro">
+                Submit your application for Grades 9–12. The school will review
+                it and contact you after a decision. Student accounts are
+                created only after an application is approved.
+            </p>
+
+            <form id="onlineRegistrationForm">
+                <div class="form-grid">
+                    <div class="field">
+                        <label for="fullName">Full Name</label>
+                        <input id="fullName" name="fullName" autocomplete="name" maxlength="120" required>
+                    </div>
+
+                    <div class="field">
+                        <label for="grade">Grade</label>
+                        <select id="grade" name="grade" required>
+                            <option value="">Select grade</option>
+                            <option value="Grade 9">Grade 9</option>
+                            <option value="Grade 10">Grade 10</option>
+                            <option value="Grade 11">Grade 11</option>
+                            <option value="Grade 12">Grade 12</option>
+                        </select>
+                    </div>
+
+                    <div class="field" id="studentIdField" hidden>
+                        <label for="studentId">Generated Student ID (Grade 9)</label>
+                        <input id="studentId" name="studentId" readonly>
+                        <small>Generated from the registration year. Example: 2019 → 19001.</small>
+                    </div>
+
+                    <div class="field" id="streamField" hidden>
+                        <label for="stream">Stream</label>
+                        <select id="stream" name="stream" disabled>
+                            <option value="">Select stream</option>
+                            <option value="Natural Science">Natural Science</option>
+                            <option value="Social Science">Social Science</option>
+                        </select>
+                    </div>
+
+                    <fieldset class="field">
+                        <legend>Gender</legend>
+                        <div class="radio-options">
+                            <label><input type="radio" name="gender" value="Male" required> Male</label>
+                            <label><input type="radio" name="gender" value="Female" required> Female</label>
+                        </div>
+                    </fieldset>
+
+                    <fieldset class="field">
+                        <legend>Does the student have a disability?</legend>
+                        <div class="radio-options">
+                            <label><input type="radio" name="hasDisability" value="Yes" required> Yes</label>
+                            <label><input type="radio" name="hasDisability" value="No" required> No</label>
+                        </div>
+                    </fieldset>
+
+                    <div class="field full" id="disabilityTypeField" hidden>
+                        <label for="disabilityType">Select disability type</label>
+                        <select id="disabilityType" name="disabilityType" disabled>
+                            <option value="">Select disability type</option>
+                            <option value="Physical">Physical disability</option>
+                            <option value="Visual">Visual impairment</option>
+                            <option value="Hearing">Hearing impairment</option>
+                            <option value="Speech">Speech or communication disability</option>
+                            <option value="Learning">Learning disability</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="field">
+                        <label for="phone">Phone Number</label>
+                        <input id="phone" name="phone" type="tel" autocomplete="tel" maxlength="32" required>
+                    </div>
+
+                    <div class="field">
+                        <label for="email">Email (optional)</label>
+                        <input id="email" name="email" type="email" autocomplete="email" maxlength="254">
+                    </div>
+
+                    <div class="field">
+                        <label for="previousStudentId">Previous Student ID (if applicable)</label>
+                        <input id="previousStudentId" name="previousStudentId" maxlength="64">
+                    </div>
+
+                    <div class="field">
+                        <label for="guardianPhone">Parent/Guardian Phone</label>
+                        <input id="guardianPhone" name="guardianPhone" type="tel" maxlength="32">
+                    </div>
+
+                    <div class="field full">
+                        <label for="address">Address</label>
+                        <textarea id="address" name="address" rows="3" maxlength="500" required></textarea>
+                    </div>
+
+                    <div class="field full">
+                        <label for="documents">Required Documents</label>
+                        <input
+                            id="documents"
+                            name="documents"
+                            type="file"
+                            accept=".pdf,.jpg,.jpeg,.png"
+                            multiple
+                            required
+                        >
+                        <small>Attach the documents required for admission (PDF, JPG, or PNG).</small>
+                    </div>
+                </div>
+
+                <button id="submitRegistration" type="submit">Submit Registration</button>
+                <div id="registrationMessage" class="message" role="status" aria-live="polite"></div>
+            </form>
+        </section>
+    </main>
+
+    <footer>NIBRETE BUZUNEH SECONDARY AND PREPARATORY SCHOOL © 2026</footer>
+
+    <script src="app.js"></script>
+    <script>
+        "use strict";
+
+        const registrationForm = document.getElementById("onlineRegistrationForm");
+        const gradeInput = document.getElementById("grade");
+        const streamField = document.getElementById("streamField");
+        const streamInput = document.getElementById("stream");
+        const studentIdField = document.getElementById("studentIdField");
+        const studentIdInput = document.getElementById("studentId");
+        const disabilityTypeField = document.getElementById("disabilityTypeField");
+        const disabilityTypeInput = document.getElementById("disabilityType");
+        const submitButton = document.getElementById("submitRegistration");
+        const message = document.getElementById("registrationMessage");
+        const grade9IdSequenceKey = "nbs_online_grade9_last_sequence_";
+
+        function generateGrade9StudentId() {
+            const year = new Date().getFullYear();
+            const storageKey = grade9IdSequenceKey + year;
+            const previousSequence = Number(localStorage.getItem(storageKey) || 0);
+
+            if (!Number.isSafeInteger(previousSequence) || previousSequence < 0) {
+                throw new Error("The saved Grade 9 student ID sequence is invalid.");
+            }
+
+            const nextSequence = previousSequence + 1;
+            if (nextSequence > 999) {
+                throw new Error("The Grade 9 student ID limit for this year has been reached.");
+            }
+
+            localStorage.setItem(storageKey, String(nextSequence));
+            return String(year).slice(-2) + String(nextSequence).padStart(3, "0");
+        }
+
+        gradeInput.addEventListener("change", function () {
+            const isGrade9 = gradeInput.value === "Grade 9";
+            const needsStream =
+                gradeInput.value === "Grade 11" ||
+                gradeInput.value === "Grade 12";
+
+            studentIdField.hidden = !isGrade9;
+            streamField.hidden = !needsStream;
+            streamInput.disabled = !needsStream;
+            streamInput.required = needsStream;
+
+            if (isGrade9 && !studentIdInput.value) {
+                try {
+                    studentIdInput.value = generateGrade9StudentId();
+                } catch (error) {
+                    message.textContent = error.message;
+                    message.className = "message visible error";
+                }
+            } else if (!isGrade9) {
+                studentIdInput.value = "";
+            }
+
+            if (!needsStream) {
+                streamInput.value = "";
+            }
+        });
+
+        registrationForm.querySelectorAll('input[name="hasDisability"]')
+            .forEach(function (radio) {
+                radio.addEventListener("change", function () {
+                    const hasDisability =
+                        registrationForm.querySelector(
+                            'input[name="hasDisability"]:checked'
+                        ).value === "Yes";
+
+                    disabilityTypeField.hidden = !hasDisability;
+                    disabilityTypeInput.disabled = !hasDisability;
+                    disabilityTypeInput.required = hasDisability;
+                    if (!hasDisability) {
+                        disabilityTypeInput.value = "";
+                    }
+                });
+            });
+
+        registrationForm.addEventListener("submit", async function (event) {
+            event.preventDefault();
+            message.textContent = "";
+            message.className = "message";
+
+            if (!registrationForm.reportValidity()) {
+                return;
+            }
+
+            if (
+                !window.SchoolApp ||
+                typeof window.SchoolApp.submitStudentRegistration !== "function"
+            ) {
+                message.textContent = "The registration service is unavailable. Please check app.js.";
+                message.className = "message visible error";
+                return;
+            }
+
+            submitButton.disabled = true;
+            submitButton.textContent = "Submitting...";
+
+            try {
+                if (gradeInput.value === "Grade 9" && !studentIdInput.value) {
+                    throw new Error("A Grade 9 student ID could not be generated. Change the grade and try again.");
+                }
+
+                const result = await window.SchoolApp.submitStudentRegistration(
+                    new FormData(registrationForm)
+                );
+
+                if (!result || result.success !== true) {
+                    throw new Error(
+                        result?.message ||
+                        "The server did not confirm that your application was saved."
+                    );
+                }
+
+                registrationForm.reset();
+                studentIdInput.value = "";
+                studentIdField.hidden = true;
+                streamField.hidden = true;
+                streamInput.disabled = true;
+                streamInput.required = false;
+                disabilityTypeField.hidden = true;
+                disabilityTypeInput.disabled = true;
+                disabilityTypeInput.required = false;
+                message.textContent =
+                    "Your application was submitted successfully and is Pending review. The school will contact you after a decision.";
+                message.className = "message visible success";
+            } catch (error) {
+                console.error("Student registration submission failed:", error);
+                message.textContent = error.message || "Could not submit the application. Please try again.";
+                message.className = "message visible error";
+            } finally {
+                submitButton.disabled = false;
+                submitButton.textContent = "Submit Registration";
+            }
+        });
+    </script>
+</body>
+</html>

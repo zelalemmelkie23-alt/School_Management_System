@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Review Student Applications | NIBRETE BUZUNEH School</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        * { box-sizing: border-box; }
+        body { margin: 0; font-family: Arial, sans-serif; background: #f3f7f4; color: #1f2937; }
+        .topbar { display: flex; justify-content: space-between; align-items: center; gap: 20px; padding: 18px 6%; background: #12372a; color: #fff; }
+        .school-name { font-weight: 700; }
+        [hidden] { display: none !important; }
+        nav { display: flex; gap: 20px; }
+        nav a { color: #fff; text-decoration: none; font-weight: 600; }
+        main { width: min(100% - 36px, 1100px); margin: 34px auto; }
+        .heading { display: flex; justify-content: space-between; align-items: center; gap: 18px; margin-bottom: 22px; }
+        h1 { margin: 0; color: #12372a; }
+        .refresh, .action { padding: 10px 16px; border: 0; border-radius: 7px; background: #198754; color: #fff; font: inherit; font-weight: 700; cursor: pointer; }
+        .refresh:disabled, .action:disabled { opacity: .65; cursor: wait; }
+        .message { display: none; margin: 16px 0; padding: 12px; border-radius: 8px; line-height: 1.5; }
+        .message.visible { display: block; }
+        .message.success { background: #dcfce7; color: #166534; }
+        .message.error { background: #fee2e2; color: #991b1b; }
+        .registration-list { display: grid; gap: 18px; }
+        .registration-card { padding: 22px; border: 1px solid #dbe4dc; border-radius: 12px; background: #fff; box-shadow: 0 8px 24px rgba(15, 23, 42, .06); }
+        .registration-card h2 { margin: 0 0 14px; color: #12372a; }
+        .details { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px 22px; margin: 0 0 20px; }
+        .details div { overflow-wrap: anywhere; }
+        .details dt { font-weight: 700; }
+        .details dd { margin: 3px 0 0; }
+        .document-list { margin: 0; padding-left: 20px; }
+        .review-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+        .field { display: flex; flex-direction: column; gap: 6px; }
+        .full { grid-column: 1 / -1; }
+        label { font-weight: 700; }
+        input, textarea { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 7px; font: inherit; }
+        .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+        .reject { background: #b91c1c; }
+        .empty { padding: 24px; border-radius: 10px; background: #fff; color: #526156; text-align: center; }
+        footer { padding: 18px; background: #12372a; color: #e2e8f0; text-align: center; }
+        @media (max-width: 650px) {
+            .topbar, .heading { flex-direction: column; text-align: center; }
+            .details, .review-fields { grid-template-columns: 1fr; }
+            .full { grid-column: auto; }
+        }
+    </style>
+</head>
+<body>
+    <header class="topbar">
+        <div class="school-name">NIBRETE BUZUNEH SCHOOL</div>
+        <nav aria-label="Main navigation">
+            <a href="dashboard.html">Dashboard</a>
+            <a href="login.html" id="logoutLink">Logout</a>
+        </nav>
+    </header>
+
+    <main>
+        <div class="heading">
+            <div>
+                <h1>Pending Student Applications</h1>
+                <p>Review applicant details and attached documents before making a decision.</p>
+            </div>
+            <button class="refresh" id="refreshApplications" type="button">Refresh</button>
+        </div>
+        <div id="reviewMessage" class="message" role="status" aria-live="polite"></div>
+        <section id="registrationList" class="registration-list" aria-live="polite">
+            <p class="empty">Loading pending applications...</p>
+        </section>
+    </main>
+
+    <footer>NIBRETE BUZUNEH SECONDARY AND PREPARATORY SCHOOL © 2026</footer>
+
+    <script src="app.js"></script>
+    <script>
+        "use strict";
+
+        const registrationList = document.getElementById("registrationList");
+        const reviewMessage = document.getElementById("reviewMessage");
+        const refreshButton = document.getElementById("refreshApplications");
+
+        function showMessage(text, type) {
+            reviewMessage.textContent = text;
+            reviewMessage.className = "message visible " + type;
+        }
+
+        function makeElement(tag, className, text) {
+            const element = document.createElement(tag);
+            if (className) {
+                element.className = className;
+            }
+            if (text !== undefined && text !== null && text !== "") {
+                element.textContent = String(text);
+            }
+            return element;
+        }
+
+        function addDetail(details, label, value) {
+            if (value === undefined || value === null || value === "") {
+                return;
+            }
+
+            const wrapper = document.createElement("div");
+            wrapper.append(
+                makeElement("dt", "", label),
+                makeElement("dd", "", value)
+            );
+            details.append(wrapper);
+        }
+
+        function addEditorField(form, labelText, name, value, options) {
+            const settings = options || {};
+            const wrapper = makeElement(
+                "div",
+                settings.full ? "field full" : "field"
+            );
+            const label = makeElement("label", "", labelText);
+            const control = document.createElement(
+                settings.multiline ? "textarea" : "input"
+            );
+
+            control.name = name;
+            control.value = value || "";
+            control.required = Boolean(settings.required);
+            if (settings.multiline) {
+                control.rows = 3;
+                control.maxLength = 500;
+            } else {
+                control.type = settings.type || "text";
+                control.maxLength = settings.maxLength || 254;
+            }
+
+            label.htmlFor = "edit-" + name;
+            control.id = label.htmlFor;
+            wrapper.append(label, control);
+            form.append(wrapper);
+        }
+
+        function addDocuments(card, documents) {
+            if (!Array.isArray(documents) || documents.length === 0) {
+                return;
+            }
+
+            const heading = makeElement("h3", "", "Attached documents");
+            const list = makeElement("ul", "document-list");
+
+            documents.forEach(function (documentInfo) {
+                const item = document.createElement("li");
+                const name = typeof documentInfo === "string"
+                    ? documentInfo
+                    : documentInfo.name || "Document";
+
+                if (documentInfo && typeof documentInfo === "object" && documentInfo.url) {
+                    try {
+                        const url = new URL(documentInfo.url, window.location.origin);
+                        if (url.origin === window.location.origin) {
+                            const link = makeElement("a", "", name);
+                            link.href = url.href;
+                            link.target = "_blank";
+                            link.rel = "noopener noreferrer";
+                            item.append(link);
+                        } else {
+                            item.textContent = name;
+                        }
+                    } catch (error) {
+                        item.textContent = name;
+                    }
+                } else {
+                    item.textContent = name;
+                }
+
+                list.append(item);
+            });
+
+            card.append(heading, list);
+        }
+
+        function createRegistrationCard(registration) {
+            if (
+                !registration ||
+                (typeof registration.id !== "string" &&
+                    typeof registration.id !== "number")
+            ) {
+                throw new Error(
+                    "A pending registration is missing its identifier."
+                );
+            }
+
+            const card = makeElement("article", "registration-card");
+            const fullName = registration.fullName ||
+                [registration.firstName, registration.lastName].filter(Boolean).join(" ") ||
+                "Applicant";
+            const title = makeElement("h2", "", fullName);
+            const details = makeElement("dl", "details");
+
+            addDetail(details, "Grade", registration.grade);
+            addDetail(details, "Stream", registration.stream);
+            addDetail(details, "Student ID", registration.studentId);
+            addDetail(details, "Gender", registration.gender);
+            addDetail(details, "Phone", registration.phone);
+            addDetail(details, "Email", registration.email);
+            addDetail(details, "Address", registration.address);
+            addDetail(details, "Previous Student ID", registration.previousStudentId);
+            addDetail(details, "Parent/Guardian Phone", registration.guardianPhone || registration.guardian);
+            addDetail(details, "Has Disability", registration.hasDisability);
+            addDetail(details, "Disability Type", registration.disabilityType);
+            addDetail(details, "Submitted", registration.createdAt || registration.submittedAt);
+
+            card.append(title, details);
+            addDocuments(card, registration.documents);
+
+            const editToggle = makeElement(
+                "button",
+                "action",
+                "Edit application details"
+            );
+            editToggle.type = "button";
+            editToggle.setAttribute("aria-expanded", "false");
+
+            const editForm = document.createElement("form");
+            editForm.className = "review-fields";
+            editForm.hidden = true;
+            [
+                ["Full Name", "fullName", fullName, { required: true, maxLength: 120 }],
+                ["Grade", "grade", registration.grade, { required: true, maxLength: 30 }],
+                ["Stream", "stream", registration.stream, { maxLength: 60 }],
+                ["Phone", "phone", registration.phone, { required: true, maxLength: 32 }],
+                ["Email", "email", registration.email, { type: "email" }],
+                ["Previous Student ID", "previousStudentId", registration.previousStudentId, { maxLength: 64 }],
+                ["Parent/Guardian Phone", "guardianPhone", registration.guardianPhone || registration.guardian, { maxLength: 32 }],
+                ["Address", "address", registration.address, { required: true, multiline: true, full: true }]
+            ].forEach(function (field) {
+                addEditorField(editForm, field[0], field[1], field[2], field[3]);
+            });
+
+            const saveEdits = makeElement("button", "action", "Save Changes");
+            saveEdits.type = "submit";
+            editForm.append(saveEdits);
+
+            editToggle.addEventListener("click", function () {
+                editForm.hidden = !editForm.hidden;
+                editToggle.setAttribute("aria-expanded", String(!editForm.hidden));
+                editToggle.textContent = editForm.hidden
+                    ? "Edit application details"
+                    : "Cancel editing";
+            });
+
+            editForm.addEventListener("submit", async function (event) {
+                event.preventDefault();
+                saveEdits.disabled = true;
+
+                const changes = {
+                    fullName: editForm.elements.fullName.value.trim(),
+                    grade: editForm.elements.grade.value.trim(),
+                    stream: editForm.elements.stream.value.trim(),
+                    phone: editForm.elements.phone.value.trim(),
+                    email: editForm.elements.email.value.trim(),
+                    previousStudentId: editForm.elements.previousStudentId.value.trim(),
+                    guardianPhone: editForm.elements.guardianPhone.value.trim(),
+                    address: editForm.elements.address.value.trim()
+                };
+
+                try {
+                    const result =
+                        await window.SchoolApp.updatePendingRegistration(
+                            registration.id,
+                            changes
+                        );
+
+                    if (!result || result.success !== true) {
+                        throw new Error(
+                            result?.message ||
+                            "The server did not confirm the application changes."
+                        );
+                    }
+
+                    showMessage("Application details updated.", "success");
+                    await loadApplications();
+                } catch (error) {
+                    console.error("Could not update pending application:", error);
+                    showMessage(error.message || "Could not save application changes.", "error");
+                    saveEdits.disabled = false;
+                }
+            });
+
+            card.append(editToggle, editForm);
+
+            const form = document.createElement("form");
+            form.className = "review-form";
+            form.dataset.registrationId = registration.id;
+            form.innerHTML = `
+                <div class="review-fields">
+                    <div class="field">
+                        <label>Username for approved student</label>
+                        <input name="username" autocomplete="off" minlength="3" maxlength="30"
+                               pattern="[A-Za-z0-9._-]{3,30}" required>
+                    </div>
+                    <div class="field">
+                        <label>Temporary password</label>
+                        <input name="temporaryPassword" type="password" autocomplete="new-password"
+                               minlength="8" maxlength="128" required>
+                    </div>
+                    <div class="field">
+                        <label>Confirm temporary password</label>
+                        <input name="confirmPassword" type="password" autocomplete="new-password"
+                               minlength="8" maxlength="128" required>
+                    </div>
+                    <div class="field full">
+                        <label>Reason (required when rejecting)</label>
+                        <textarea name="reason" rows="2" maxlength="500"></textarea>
+                    </div>
+                </div>
+                <div class="actions">
+                    <button class="action approve" type="submit">Approve and Create Account</button>
+                    <button class="action reject" type="button">Reject Application</button>
+                </div>
+            `;
+
+            form.addEventListener("submit", async function (event) {
+                event.preventDefault();
+                const username = form.elements.username.value.trim();
+                const temporaryPassword = form.elements.temporaryPassword.value;
+                const confirmPassword = form.elements.confirmPassword.value;
+
+                if (temporaryPassword !== confirmPassword) {
+                    showMessage("The temporary passwords do not match.", "error");
+                    form.elements.confirmPassword.focus();
+                    return;
+                }
+
+                await decideRegistration(
+                    form,
+                    "Approved",
+                    { username, temporaryPassword }
+                );
+            });
+
+            form.querySelector(".reject").addEventListener("click", function () {
+                const reason = form.elements.reason.value.trim();
+                if (!reason) {
+                    showMessage("Enter a reason before rejecting this application.", "error");
+                    form.elements.reason.focus();
+                    return;
+                }
+
+                if (!window.confirm("Reject this student application?")) {
+                    return;
+                }
+
+                decideRegistration(form, "Rejected", { reason });
+            });
+
+            card.append(form);
+            return card;
+        }
+
+        async function decideRegistration(form, status, details) {
+            const buttons = form.querySelectorAll("button");
+            buttons.forEach(button => { button.disabled = true; });
+
+            try {
+                const result = await window.SchoolApp.reviewStudentRegistration(
+                    form.dataset.registrationId,
+                    { status, ...details }
+                );
+
+                if (!result || result.success !== true) {
+                    throw new Error(
+                        result?.message ||
+                        "The server did not confirm the application decision."
+                    );
+                }
+
+                showMessage(
+                    status === "Approved"
+                        ? "Application approved and student account created. Provide the username and temporary password to the student securely."
+                        : "Application rejected.",
+                    "success"
+                );
+                await loadApplications();
+            } catch (error) {
+                console.error("Could not review student application:", error);
+                showMessage(error.message || "Could not save the decision.", "error");
+                buttons.forEach(button => { button.disabled = false; });
+            }
+        }
+
+        async function loadApplications() {
+            refreshButton.disabled = true;
+            registrationList.replaceChildren(
+                makeElement("p", "empty", "Loading pending applications...")
+            );
+
+            try {
+                const registrations =
+                    await window.SchoolApp.getPendingRegistrations();
+
+                registrationList.replaceChildren();
+                if (registrations.length === 0) {
+                    registrationList.append(
+                        makeElement("p", "empty", "There are no pending applications.")
+                    );
+                    return;
+                }
+
+                registrations.forEach(registration => {
+                    registrationList.append(createRegistrationCard(registration));
+                });
+            } catch (error) {
+                console.error("Could not load pending applications:", error);
+                registrationList.replaceChildren(
+                    makeElement("p", "empty", error.message || "Could not load applications.")
+                );
+            } finally {
+                refreshButton.disabled = false;
+            }
+        }
+
+        if (window.SchoolApp && typeof window.SchoolApp.requireAuth === "function") {
+            const reviewer = window.SchoolApp.requireAuth([
+                "admin",
+                "registrar",
+                "school_admin"
+            ]);
+
+            if (!reviewer) {
+                registrationList.replaceChildren();
+            } else {
+                document.getElementById("logoutLink").addEventListener("click", function (event) {
+                    event.preventDefault();
+                    window.SchoolApp.logoutUser();
+                });
+                refreshButton.addEventListener("click", loadApplications);
+                loadApplications();
+            }
+        } else {
+            showMessage("Authentication is unavailable. Please check app.js.", "error");
+        }
+    </script>
+</body>
+</html>
