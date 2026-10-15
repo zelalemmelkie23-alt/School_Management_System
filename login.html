@@ -1,50 +1,45 @@
-
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#12372a">
-    <meta name="description" content="Nibrete Buzuneh School Management System Dashboard">
-    <title>Dashboard | NIBRETE BUZUNEH School</title>
+
+    <title>Login | NIBRETE BUZUNEH School</title>
 
     <style>
-        :root {
-            --green-900: #12372a;
-            --green-800: #176044;
-            --green-700: #16804a;
-            --green-100: #e7f6ed;
-            --ink: #15251d;
-            --muted: #64746b;
-            --line: #d9e4dc;
-            --page: #f3f7f4;
-            --white: #ffffff;
-            --danger: #b42318;
-            --shadow: 0 8px 28px rgba(18, 55, 42, 0.07);
-        }
+        /* 1. GENERAL SETTINGS */
 
         * {
             box-sizing: border-box;
         }
 
-        html {
-            scroll-behavior: smooth;
+        :root {
+            --green-dark: #12372a;
+            --green-main: #198754;
+            --green-hover: #146c43;
+            --background: #f3f7f4;
+            --white: #ffffff;
+            --text-dark: #1f2937;
+            --text-muted: #64748b;
+            --border: #d1d5db;
+            --error-bg: #fef2f2;
+            --error-text: #b91c1c;
         }
 
         body {
             margin: 0;
             min-height: 100vh;
+            font-family: Arial, Helvetica, sans-serif;
+            background: var(--background);
+            color: var(--text-dark);
             display: flex;
             flex-direction: column;
-            font-family: Inter, "Segoe UI", Arial, sans-serif;
-            line-height: 1.5;
-            color: var(--ink);
-            background: var(--page);
         }
 
         a {
-            color: inherit;
-            text-decoration: none;
+            color: var(--green-main);
         }
 
         button,
@@ -52,573 +47,244 @@
             font: inherit;
         }
 
-        /* ======================================
-           HEADER AND SCHOOL BRAND
-        ====================================== */
+
+        /* 2. HEADER */
 
         .topbar {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 22px;
-            padding: 16px clamp(18px, 5vw, 72px);
-            background: var(--green-900);
+            background: var(--green-dark);
             color: var(--white);
-        }
-
-        .brand {
+            padding: 18px 6%;
             display: flex;
-            align-items: center;
-            gap: 13px;
-            min-width: 0;
-        }
-
-        .brand-mark {
-            display: grid;
-            place-items: center;
-            flex: 0 0 44px;
-            width: 44px;
-            height: 44px;
-            border-radius: 13px;
-            background: #d9fbe5;
-            color: var(--green-900);
-            font-size: 1.1rem;
-            font-weight: 900;
-        }
-
-        .brand-title {
-            font-weight: 800;
-            letter-spacing: 0.02em;
-            line-height: 1.25;
-        }
-
-        .brand-subtitle {
-            color: #c5ddd0;
-            font-size: 0.8rem;
-            margin-top: 3px;
-        }
-
-        .topbar nav {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-
-        .topbar nav a {
-            padding: 9px 12px;
-            border-radius: 9px;
-            color: #e5f2e9;
-            font-weight: 650;
-            font-size: 0.9rem;
-            transition: background 0.2s;
-        }
-
-        .topbar nav a:hover,
-        .topbar nav a:focus-visible {
-            background: rgba(255, 255, 255, 0.13);
-            outline: none;
-        }
-
-        .topbar nav a.active {
-            background: #e0f6e8;
-            color: var(--green-900);
-        }
-
-        /* ======================================
-           MAIN CONTENT
-        ====================================== */
-
-        main {
-            flex: 1;
-            width: 100%;
-            padding: 35px clamp(16px, 4vw, 55px);
-            background:
-                radial-gradient(
-                    circle at 12% 10%,
-                    rgba(198, 237, 210, 0.35),
-                    transparent 30%
-                ),
-                var(--page);
-        }
-
-        .container {
-            max-width: 1450px;
-            margin: 0 auto;
-        }
-
-        .welcome-section {
-            display: flex;
-            align-items: center;
             justify-content: space-between;
+            align-items: center;
             gap: 20px;
-            flex-wrap: wrap;
-            margin-bottom: 26px;
         }
 
-        .welcome-section h1 {
-            margin: 0 0 7px;
-            color: var(--green-900);
-            font-size: clamp(1.6rem, 3vw, 2.2rem);
-            line-height: 1.2;
+        .school-name {
+            font-size: 1.2rem;
+            font-weight: bold;
+            line-height: 1.5;
         }
 
-        .welcome-section p {
-            margin: 0;
-            color: var(--muted);
-            font-size: 0.95rem;
-        }
-
-        .date-badge {
-            padding: 10px 14px;
-            border: 1px solid var(--line);
-            border-radius: 10px;
-            background: var(--white);
-            color: var(--green-800);
-            font-size: 0.85rem;
-            font-weight: 700;
-        }
-
-        /* ======================================
-           NOTIFICATION MESSAGE
-        ====================================== */
-
-        .dashboard-message {
-            display: none;
-            margin-bottom: 22px;
-            padding: 13px 16px;
-            border-radius: 10px;
-            font-size: 0.9rem;
-            overflow-wrap: anywhere;
-        }
-
-        .dashboard-message.visible {
+        .school-subtitle {
             display: block;
-        }
-
-        .dashboard-message.info {
-            color: #1d4ed8;
-            background: #eff6ff;
-            border: 1px solid #bfdbfe;
-        }
-
-        .dashboard-message.error {
-            color: var(--danger);
-            background: #fff0ee;
-            border: 1px solid #f2c4bf;
-        }
-
-        .dashboard-message.success {
-            color: var(--green-800);
-            background: var(--green-100);
-            border: 1px solid #b9e5c8;
-        }
-
-        /* ======================================
-           STATISTICS CARDS
-        ====================================== */
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(4, minmax(0, 1fr));
-            gap: 18px;
-            margin-bottom: 28px;
-        }
-
-        .stat-card {
-            background: var(--white);
-            border: 1px solid var(--line);
-            border-radius: 15px;
-            padding: 22px;
-            box-shadow: var(--shadow);
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 12px 30px rgba(18, 55, 42, 0.11);
-        }
-
-        .stat-top {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 19px;
-        }
-
-        .stat-title {
-            color: var(--muted);
-            font-size: 0.85rem;
-            font-weight: 650;
-        }
-
-        .stat-icon {
-            display: grid;
-            place-items: center;
-            width: 44px;
-            height: 44px;
-            border-radius: 12px;
-            background: var(--green-100);
-            font-size: 1.35rem;
-        }
-
-        .stat-value {
-            margin-bottom: 7px;
-            color: var(--green-900);
-            font-size: clamp(1.6rem, 2.5vw, 2rem);
-            font-weight: 850;
-            overflow-wrap: anywhere;
-        }
-
-        .stat-description {
-            color: var(--muted);
-            font-size: 0.78rem;
-        }
-
-        /* ======================================
-           CONTENT GRID AND PANELS
-        ====================================== */
-
-        .content-grid {
-            display: grid;
-            grid-template-columns: minmax(0, 1.7fr) minmax(270px, 1fr);
-            gap: 22px;
-            align-items: start;
-        }
-
-        .panel {
-            margin-bottom: 22px;
-            overflow: hidden;
-            background: var(--white);
-            border: 1px solid var(--line);
-            border-radius: 15px;
-            box-shadow: var(--shadow);
-        }
-
-        .panel-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 14px;
-            padding: 20px;
-            border-bottom: 1px solid var(--line);
-        }
-
-        .panel-header h2,
-        .panel-header h3 {
-            margin: 0;
-            color: var(--green-900);
-            font-size: 1.05rem;
-        }
-
-        .panel-header p {
-            margin: 5px 0 0;
-            color: var(--muted);
             font-size: 0.8rem;
+            font-weight: normal;
+            color: #d1fae5;
         }
 
-        .panel-body {
-            padding: 20px;
-        }
-
-        /* ======================================
-           BUTTONS AND SEARCH
-        ====================================== */
-
-        .button {
-            display: inline-flex;
+        .navigation {
+            display: flex;
             align-items: center;
+            gap: 22px;
+        }
+
+        .navigation a {
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .navigation a:hover {
+            text-decoration: underline;
+        }
+
+
+        /* 3. MAIN CONTENT */
+
+        .page {
+            flex: 1;
+            display: flex;
             justify-content: center;
-            gap: 7px;
-            border: 0;
-            border-radius: 9px;
-            padding: 10px 15px;
-            background: var(--green-800);
-            color: var(--white);
-            font-size: 0.82rem;
-            font-weight: 750;
-            cursor: pointer;
-            transition: background 0.2s;
+            align-items: center;
+            padding: 40px 20px;
         }
 
-        .button:hover {
-            background: var(--green-900);
+        .login-card {
+            width: 100%;
+            max-width: 440px;
+            padding: 35px;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 18px;
+            box-shadow: 0 12px 35px rgba(15, 23, 42, 0.08);
         }
 
-        .button:focus-visible {
-            outline: 3px solid rgba(22, 128, 74, 0.25);
-            outline-offset: 3px;
+        .school-icon {
+            width: 65px;
+            height: 65px;
+            margin: 0 auto 18px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 50%;
+            background: #dcfce7;
+            color: var(--green-dark);
+            font-size: 1.8rem;
+            font-weight: bold;
         }
 
-        .search-label {
+        .login-card h1 {
+            margin: 0 0 10px;
+            text-align: center;
+            font-size: 1.8rem;
+            color: var(--green-dark);
+        }
+
+        .description {
+            margin: 0 0 25px;
+            text-align: center;
+            line-height: 1.6;
+            color: var(--text-muted);
+        }
+
+
+        /* 4. FORM FIELDS */
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
             display: block;
             margin-bottom: 8px;
-            color: var(--ink);
-            font-size: 0.85rem;
-            font-weight: 700;
+            font-weight: 600;
         }
 
-        .search-input {
+        .form-group input {
             width: 100%;
-            min-height: 45px;
-            padding: 11px 13px;
-            border: 1px solid #cbd9cf;
+            padding: 13px 14px;
+            border: 1px solid var(--border);
             border-radius: 9px;
             outline: none;
-            background: var(--white);
-            color: var(--ink);
+        }
+
+        .form-group input:focus {
+            border-color: var(--green-main);
+            box-shadow: 0 0 0 3px rgba(25, 135, 84, 0.15);
+        }
+
+
+        /* 5. PASSWORD VISIBILITY */
+
+        .password-wrapper {
+            display: flex;
+            border: 1px solid var(--border);
+            border-radius: 9px;
+            overflow: hidden;
+        }
+
+        .password-wrapper:focus-within {
+            border-color: var(--green-main);
+            box-shadow: 0 0 0 3px rgba(25, 135, 84, 0.15);
+        }
+
+        .password-wrapper input {
+            flex: 1;
+            min-width: 0;
+            border: none;
+            border-radius: 0;
+            box-shadow: none;
+        }
+
+        .password-wrapper input:focus {
+            box-shadow: none;
+        }
+
+        /* 6. LOGIN BUTTON */
+
+        .login-button {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 9px;
+            background: var(--green-main);
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .login-button:hover:not(:disabled) {
+            background: var(--green-hover);
+        }
+
+        .login-button:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+
+        /* 7. ERROR MESSAGES */
+
+        .message {
+            display: none;
+            margin-bottom: 20px;
+            padding: 12px 14px;
+            border-radius: 9px;
+            font-size: 0.92rem;
+            line-height: 1.5;
+        }
+
+        .message.visible {
+            display: block;
+        }
+
+        .error-message {
+            background: var(--error-bg);
+            color: var(--error-text);
+            border: 1px solid #fecaca;
+        }
+
+        .help-text {
+            margin-top: 22px;
+            text-align: center;
+            line-height: 1.7;
+            color: var(--text-muted);
+            font-size: 0.92rem;
+        }
+
+        .help-text a {
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+
+        /* 8. FOOTER */
+
+        .footer {
+            padding: 20px;
+            background: var(--green-dark);
+            color: #e2e8f0;
+            text-align: center;
             font-size: 0.9rem;
         }
 
-        .search-input:focus {
-            border-color: var(--green-700);
-            box-shadow: 0 0 0 3px rgba(22, 128, 74, 0.13);
-        }
 
-        /* ======================================
-           STUDENT TABLE
-        ====================================== */
+        /* 9. MOBILE RESPONSIVENESS */
 
-        .table-wrapper {
-            width: 100%;
-            overflow-x: auto;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: left;
-            white-space: nowrap;
-        }
-
-        th,
-        td {
-            padding: 14px 16px;
-            border-bottom: 1px solid var(--line);
-            font-size: 0.83rem;
-        }
-
-        th {
-            background: #f5faf6;
-            color: var(--muted);
-            font-size: 0.72rem;
-            letter-spacing: 0.04em;
-            text-transform: uppercase;
-        }
-
-        tbody tr:hover {
-            background: #f7fbf8;
-        }
-
-        .status-badge {
-            display: inline-block;
-            padding: 5px 10px;
-            border-radius: 20px;
-            background: var(--green-100);
-            color: var(--green-800);
-            font-size: 0.73rem;
-            font-weight: 800;
-        }
-
-        .empty-state {
-            padding: 30px 15px;
-            text-align: center;
-            white-space: normal;
-            color: var(--muted);
-            line-height: 1.7;
-        }
-
-        /* ======================================
-           QUICK ACTIONS
-        ====================================== */
-
-        .quick-links {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 12px;
-        }
-
-        .quick-link {
-            display: flex;
-            min-height: 105px;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
-            padding: 15px 10px;
-            border: 1px solid var(--line);
-            border-radius: 11px;
-            background: #fff;
-            text-align: center;
-            transition: border-color 0.2s, background 0.2s, transform 0.2s;
-        }
-
-        .quick-link:hover {
-            border-color: var(--green-700);
-            background: #f0fdf4;
-            transform: translateY(-2px);
-        }
-
-        .quick-link-icon {
-            font-size: 1.6rem;
-        }
-
-        .quick-link strong {
-            color: var(--green-900);
-            font-size: 0.82rem;
-        }
-
-        /* ======================================
-           ACTIVITY LIST
-        ====================================== */
-
-        .activity-list {
-            margin: 0;
-            padding: 0;
-            list-style: none;
-        }
-
-        .activity-item {
-            display: flex;
-            align-items: flex-start;
-            gap: 12px;
-            padding: 13px 0;
-            border-bottom: 1px solid var(--line);
-        }
-
-        .activity-item:first-child {
-            padding-top: 0;
-        }
-
-        .activity-item:last-child {
-            padding-bottom: 0;
-            border-bottom: none;
-        }
-
-        .activity-dot {
-            flex: 0 0 9px;
-            width: 9px;
-            height: 9px;
-            margin-top: 6px;
-            border-radius: 50%;
-            background: var(--green-700);
-        }
-
-        .activity-item p {
-            margin: 0;
-            font-size: 0.84rem;
-            line-height: 1.6;
-        }
-
-        .activity-item small {
-            display: block;
-            margin-top: 4px;
-            color: var(--muted);
-            font-size: 0.75rem;
-        }
-
-        /* ======================================
-           FOOTER - MATCHES LOGIN PAGE
-        ====================================== */
-
-        .site-footer {
-            margin-top: auto;
-            padding: 19px 16px;
-            background: var(--green-900);
-            color: #d6e5dc;
-            text-align: center;
-            font-size: 0.88rem;
-        }
-
-        .site-footer span {
-            display: block;
-            margin-top: 4px;
-            color: #a9c5b5;
-            font-size: 0.8rem;
-        }
-
-        /* ======================================
-           RESPONSIVE DESIGN
-        ====================================== */
-
-        @media (max-width: 1100px) {
-            .stats-grid {
-                grid-template-columns: repeat(2, minmax(0, 1fr));
-            }
-
-            .content-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        @media (max-width: 760px) {
+        @media (max-width: 600px) {
             .topbar {
-                align-items: flex-start;
                 flex-direction: column;
-                padding: 16px 20px;
+                text-align: center;
+                padding: 18px;
             }
 
-            .topbar nav {
-                width: 100%;
+            .navigation {
+                justify-content: center;
+                flex-wrap: wrap;
+                gap: 18px;
             }
 
-            .topbar nav a {
-                padding: 8px 10px;
-                font-size: 0.83rem;
-            }
-
-            main {
+            .page {
                 padding: 25px 15px;
             }
 
-            .welcome-section {
-                align-items: flex-start;
-                flex-direction: column;
+            .login-card {
+                padding: 25px 20px;
             }
 
-            .stats-grid {
-                gap: 12px;
-            }
-
-            .stat-card {
-                padding: 17px;
-            }
-
-            .panel-header {
-                align-items: flex-start;
-                flex-wrap: wrap;
-            }
-        }
-
-        @media (max-width: 430px) {
-            .brand-title {
-                font-size: 0.9rem;
-            }
-
-            .brand-subtitle {
-                font-size: 0.73rem;
-            }
-
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .quick-links {
-                grid-template-columns: repeat(2, minmax(0, 1fr));
-            }
-
-            .date-badge {
-                font-size: 0.78rem;
-            }
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-            *,
-            *::before,
-            *::after {
-                scroll-behavior: auto !important;
-                transition: none !important;
+            .login-card h1 {
+                font-size: 1.55rem;
             }
         }
     </style>
@@ -626,739 +292,481 @@
 
 <body>
 
-    <!-- ======================================
-         HEADER
-         Same brand and colors as login.html
-    ====================================== -->
+    <!-- HEADER -->
 
     <header class="topbar">
-        <div class="brand">
-            <div class="brand-mark" aria-hidden="true">NB</div>
 
-            <div>
-                <div class="brand-title">NIBRETE BUZUNEH SCHOOL</div>
-                <div class="brand-subtitle">
-                    Secondary and Preparatory School
-                </div>
-            </div>
+        <div class="school-name">
+            NIBRETE BUZUNEH SCHOOL
+
+            <span class="school-subtitle">
+                Secondary and Preparatory School
+            </span>
         </div>
 
-        <nav aria-label="Main navigation">
+        <nav class="navigation" aria-label="Main navigation">
+
             <a href="index.html">Home</a>
 
-            <a
-                href="dashboard.html"
-                class="active"
-                aria-current="page">
-                Dashboard
+            <a href="login.html" aria-current="page">
+                Login
             </a>
 
-            <a href="registrationform.html">Registration</a>
-            <a href="login.html" id="logoutLink">Logout</a>
+            <a href="registrationform.html">
+                Student Registration
+            </a>
+
         </nav>
+
     </header>
 
-    <!-- ======================================
-         MAIN DASHBOARD
-    ====================================== -->
 
-    <main>
-        <div class="container">
+    <!-- LOGIN FORM -->
 
-            <!-- Welcome section -->
-            <section class="welcome-section">
-                <div>
-                    <h1 id="welcomeTitle">Welcome, Administrator!</h1>
+    <main class="page">
 
-                    <p id="welcomeText">
-                        Here is an overview of your school's information
-                        and activities.
-                    </p>
-                </div>
+        <section class="login-card" aria-labelledby="loginTitle">
 
-                <div class="date-badge" id="currentDate">
-                    Loading date...
-                </div>
-            </section>
-
-            <!-- Status messages -->
-            <div
-                id="dashboardMessage"
-                class="dashboard-message"
-                role="status"
-                aria-live="polite">
+            <div class="school-icon" aria-hidden="true">
+                N
             </div>
 
-            <!-- ======================================
-                 STATISTICS
-            ====================================== -->
+            <h1 id="loginTitle">Welcome Back</h1>
 
-            <section class="stats-grid" aria-label="School statistics">
+            <p class="description">
+                Sign in to access your school account.
+            </p>
 
-                <article class="stat-card">
-                    <div class="stat-top">
-                        <span class="stat-title">Total Students</span>
-                        <span class="stat-icon" aria-hidden="true">🎓</span>
-                    </div>
 
-                    <div class="stat-value" id="studentCount">—</div>
+            <!-- Error message -->
 
-                    <div class="stat-description">
-                        Registered students
-                    </div>
-                </article>
+            <div
+                id="loginMessage"
+                class="message error-message"
+                role="alert"
+                aria-live="assertive"
+            ></div>
 
-                <article class="stat-card">
-                    <div class="stat-top">
-                        <span class="stat-title">Total Teachers</span>
-                        <span class="stat-icon" aria-hidden="true">👩‍🏫</span>
-                    </div>
 
-                    <div class="stat-value" id="teacherCount">—</div>
+            <form id="loginForm" novalidate>
 
-                    <div class="stat-description">
-                        Teacher accounts
-                    </div>
-                </article>
+                <!-- Username or email -->
 
-                <article class="stat-card">
-                    <div class="stat-top">
-                        <span class="stat-title">Attendance Rate</span>
-                        <span class="stat-icon" aria-hidden="true">📋</span>
-                    </div>
+                <div class="form-group">
 
-                    <div class="stat-value" id="attendanceRate">—</div>
+                    <label for="identifier">
+                        Username or Email
+                    </label>
 
-                    <div class="stat-description">
-                        Based on recorded attendance
-                    </div>
-                </article>
+                    <input
+                        type="text"
+                        id="identifier"
+                        name="identifier"
+                        placeholder="Enter your username or email"
+                        autocomplete="username"
+                        autocapitalize="none"
+                        spellcheck="false"
+                        maxlength="254"
+                        required
+                    >
 
-                <article class="stat-card">
-                    <div class="stat-top">
-                        <span class="stat-title">Fees Collected</span>
-                        <span class="stat-icon" aria-hidden="true">💰</span>
-                    </div>
+                </div>
 
-                    <div class="stat-value" id="monthlyFee">—</div>
 
-                    <div class="stat-description">
-                        Based on available fee records
-                    </div>
-                </article>
+                <!-- Password -->
 
-            </section>
+                <div class="form-group">
 
-            <!-- ======================================
-                 STUDENT TABLE AND QUICK ACTIONS
-            ====================================== -->
+                    <label for="password">Password</label>
 
-            <div class="content-grid">
-
-                <!-- Student records -->
-                <section class="panel">
-
-                    <div class="panel-header">
-                        <div>
-                            <h2>Recent Students</h2>
-                            <p>View and search student records.</p>
-                        </div>
-
-                        <button
-                            class="button"
-                            id="refreshButton"
-                            type="button">
-                            ↻ Refresh
-                        </button>
-                    </div>
-
-                    <div class="panel-body">
-
-                        <label class="search-label" for="studentSearch">
-                            Search students
-                        </label>
+                    <div class="password-wrapper">
 
                         <input
-                            class="search-input"
-                            type="search"
-                            id="studentSearch"
-                            placeholder="Search by student name, ID, or grade..."
-                            autocomplete="off">
+                            type="password"
+                            id="password"
+                            name="password"
+                            placeholder="Enter your password"
+                            autocomplete="current-password"
+                            required
+                        >
 
                     </div>
-
-                    <div class="table-wrapper">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Student ID</th>
-                                    <th>Student Name</th>
-                                    <th>Grade</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-
-                            <tbody id="studentTableBody">
-                                <tr>
-                                    <td colspan="4" class="empty-state">
-                                        Student records will appear here
-                                        when data is available.
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-
-                </section>
-
-                <!-- Right-side panels -->
-                <div>
-
-                    <!-- Quick actions -->
-                    <section class="panel">
-
-                        <div class="panel-header">
-                            <div>
-                                <h3>Quick Actions</h3>
-                                <p>Open frequently used school pages.</p>
-                            </div>
-                        </div>
-
-                        <div class="panel-body">
-                            <div class="quick-links">
-
-                                <a
-                                    class="quick-link"
-                                    href="registrationform.html">
-                                    <span class="quick-link-icon" aria-hidden="true">📝</span>
-                                    <strong>Student Registration</strong>
-                                </a>
-
-                                <a
-                                    class="quick-link"
-                                    href="teacher-portal.html">
-                                    <span class="quick-link-icon" aria-hidden="true">👩‍🏫</span>
-                                    <strong>Teacher Portal</strong>
-                                </a>
-
-                                <a
-                                    class="quick-link"
-                                    href="attendance.html">
-                                    <span class="quick-link-icon" aria-hidden="true">📅</span>
-                                    <strong>Attendance</strong>
-                                </a>
-
-                                <a
-                                    class="quick-link"
-                                    href="fees.html">
-                                    <span class="quick-link-icon" aria-hidden="true">💳</span>
-                                    <strong>School Fees</strong>
-                                </a>
-
-                            </div>
-                        </div>
-                    </section>
-
-                    <!-- School overview -->
-                    <section class="panel">
-
-                        <div class="panel-header">
-                            <div>
-                                <h3>School Overview</h3>
-                                <p>Dashboard information.</p>
-                            </div>
-                        </div>
-
-                        <div class="panel-body">
-                            <ul class="activity-list" id="activityList">
-
-                                <li class="activity-item">
-                                    <span class="activity-dot"></span>
-
-                                    <div>
-                                        <p>School dashboard opened successfully.</p>
-                                        <small id="activityDate">Today</small>
-                                    </div>
-                                </li>
-
-                                <li class="activity-item">
-                                    <span class="activity-dot"></span>
-
-                                    <div>
-                                        <p>
-                                            Use the navigation menu to access
-                                            school management pages.
-                                        </p>
-                                        <small>Navigation</small>
-                                    </div>
-                                </li>
-
-                                <li class="activity-item">
-                                    <span class="activity-dot"></span>
-
-                                    <div>
-                                        <p>
-                                            Connect the backend when you are
-                                            ready to load real school records.
-                                        </p>
-                                        <small>Development status</small>
-                                    </div>
-                                </li>
-
-                            </ul>
-                        </div>
-                    </section>
 
                 </div>
+
+                <div class="form-group">
+
+                    <label for="confirmPassword">Confirm Password</label>
+
+                    <div class="password-wrapper">
+
+                        <input
+                            type="password"
+                            id="confirmPassword"
+                            name="confirmPassword"
+                            placeholder="Re-enter your password"
+                            autocomplete="current-password"
+                            aria-describedby="passwordMatchMessage"
+                            required
+                        >
+
+                    </div>
+
+                    <small id="passwordMatchMessage" aria-live="polite"></small>
+
+                </div>
+
+                <!-- Login button -->
+
+                <button
+                    type="submit"
+                    id="loginButton"
+                    class="login-button"
+                >
+                    Login
+                </button>
+
+            </form>
+
+
+            <!-- Additional information -->
+
+            <div class="help-text">
+
+                <p>
+                    Need to register as a student?
+                    <a href="registrationform.html">
+                        Apply for admission
+                    </a>
+                </p>
+
+                <p>
+                    Having trouble signing in?
+                    Contact your school administrator.
+                </p>
+
             </div>
 
-        </div>
+        </section>
+
     </main>
 
-    <!-- ======================================
-         FOOTER
-         Same style and wording as login.html
-    ====================================== -->
 
-    <footer class="site-footer">
-        NIBRETE BUZUNEH Secondary and Preparatory School
-        &copy; <span id="currentYear">2026</span>
+    <!-- FOOTER -->
 
-        <span>Authorized school access only</span>
+    <footer class="footer">
+
+        <p>
+            &copy; <span id="currentYear"></span>
+            NIBRETE BUZUNEH School.
+        </p>
+
+        <p>School Management System</p>
+
     </footer>
 
-    <!-- Load your existing frontend JavaScript -->
+
+    <!-- LOAD EXISTING APPLICATION CODE -->
+
     <script src="app.js"></script>
 
-    <!-- ======================================
-         DASHBOARD JAVASCRIPT
-    ====================================== -->
+
+    <!-- LOGIN PAGE JAVASCRIPT -->
 
     <script>
-    (() => {
         "use strict";
 
-        const $ = (id) => document.getElementById(id);
 
-        const state = {
-            students: []
-        };
+        // 1. GET HTML ELEMENTS
 
-        /* Display current date and year */
-        function initializeDate() {
-            const now = new Date();
+        const loginForm = document.getElementById("loginForm");
 
-            $("currentDate").textContent = now.toLocaleDateString(
-                "en-GB",
-                {
-                    weekday: "short",
-                    day: "numeric",
-                    month: "short",
-                    year: "numeric"
-                }
-            );
+        const identifierInput = document.getElementById("identifier");
 
-            $("activityDate").textContent =
-                now.toLocaleDateString();
+        const passwordInput = document.getElementById("password");
 
-            $("currentYear").textContent =
-                String(now.getFullYear());
+        const confirmPasswordInput =
+            document.getElementById("confirmPassword");
+
+        const loginButton = document.getElementById("loginButton");
+
+        const loginMessage = document.getElementById("loginMessage");
+
+        const passwordMatchMessage =
+            document.getElementById("passwordMatchMessage");
+
+        const currentYear = document.getElementById("currentYear");
+
+
+        // 2. DISPLAY THE CURRENT YEAR
+
+        currentYear.textContent = new Date().getFullYear();
+
+
+        // 3. DISPLAY A MESSAGE
+
+        function showMessage(message) {
+
+            loginMessage.textContent = message;
+
+            loginMessage.className = "message visible error-message";
         }
 
-        /* Safely escape text before inserting it into HTML */
-        function escapeHTML(value) {
-            return String(value ?? "").replace(/[&<>"']/g, character => {
-                const entities = {
-                    "&": "&amp;",
-                    "<": "&lt;",
-                    ">": "&gt;",
-                    '"': "&quot;",
-                    "'": "&#39;"
-                };
 
-                return entities[character];
-            });
-        }
-
-        /* Show a dashboard notification */
-        function showMessage(message, type = "info") {
-            const element = $("dashboardMessage");
-
-            element.textContent = message;
-            element.className =
-                "dashboard-message visible " + type;
-        }
+        // 4. CLEAR THE MESSAGE
 
         function clearMessage() {
-            const element = $("dashboardMessage");
 
-            element.textContent = "";
-            element.className = "dashboard-message";
+            loginMessage.textContent = "";
+
+            loginMessage.className = "message error-message";
         }
 
-        /* Handle common API response formats */
-        function unwrapList(result) {
-            if (Array.isArray(result)) {
-                return result;
-            }
+        function validatePasswordConfirmation() {
+            const passwordsMatch =
+                passwordInput.value === confirmPasswordInput.value;
 
-            if (result && Array.isArray(result.data)) {
-                return result.data;
-            }
+            confirmPasswordInput.setCustomValidity(
+                passwordsMatch ? "" : "Passwords do not match."
+            );
 
-            if (result && Array.isArray(result.students)) {
-                return result.students;
-            }
+            passwordMatchMessage.textContent =
+                confirmPasswordInput.value && !passwordsMatch
+                    ? "Passwords do not match."
+                    : "";
 
-            if (result && Array.isArray(result.users)) {
-                return result.users;
-            }
-
-            if (result && Array.isArray(result.records)) {
-                return result.records;
-            }
-
-            return [];
+            return passwordsMatch;
         }
 
-        function getStudentName(student) {
-            if (student.name) {
-                return student.name;
-            }
+        // 5. REDIRECT USERS ACCORDING TO THEIR ROLE
 
-            return [
-                student.firstName,
-                student.middleName,
-                student.lastName
-            ].filter(Boolean).join(" ") || "Name not provided";
-        }
+        function redirectUserByRole(user) {
 
-        function getStudentId(student) {
-            return student.studentId ?? student.id ?? "Not assigned";
-        }
-
-        function getStudentGrade(student) {
-            return student.grade ?? student.class ?? "Not assigned";
-        }
-
-        /* Render student records */
-        function renderStudents() {
-            const tbody = $("studentTableBody");
-
-            const searchText = $("studentSearch")
-                .value
+            const role = String(user.role || "")
                 .trim()
-                .toLowerCase();
+                .toLowerCase()
+                .replace(/[\s-]+/g, "_");
 
-            const filtered = state.students.filter(student => {
-                const searchableText = [
-                    getStudentName(student),
-                    getStudentId(student),
-                    getStudentGrade(student)
-                ].join(" ").toLowerCase();
 
-                return searchableText.includes(searchText);
-            });
+            // Only include portal files that exist.
 
-            if (filtered.length === 0) {
-                const message = state.students.length === 0
-                    ? "No student records are available yet."
-                    : "No students match your search.";
+            const portals = {
 
-                tbody.innerHTML = `
-                    <tr>
-                        <td colspan="4" class="empty-state">
-                            ${escapeHTML(message)}
-                        </td>
-                    </tr>
-                `;
+                admin: "dashboard.html",
+
+                super_admin: "dashboard.html",
+
+                school_admin: "dashboard.html",
+
+                principal: "dashboard.html",
+
+                teacher: "teacher-portal.html",
+
+                student: "student-portal.html"
+
+            };
+
+
+            const destination = portals[role];
+
+
+            // Do not redirect unknown roles to another user's portal.
+
+            if (!destination) {
+
+                if (typeof SchoolApp.clearCurrentUser === "function") {
+                    SchoolApp.clearCurrentUser();
+                }
+
+                showMessage(
+                    "Your role does not have an available portal yet. " +
+                    "Please contact the school administrator."
+                );
 
                 return;
             }
 
-            tbody.innerHTML = filtered.slice(0, 10).map(student => {
-                const status = student.status || "Registered";
 
-                return `
-                    <tr>
-                        <td>${escapeHTML(getStudentId(student))}</td>
-                        <td>${escapeHTML(getStudentName(student))}</td>
-                        <td>${escapeHTML(getStudentGrade(student))}</td>
-                        <td>
-                            <span class="status-badge">
-                                ${escapeHTML(status)}
-                            </span>
-                        </td>
-                    </tr>
-                `;
-            }).join("");
+            // Open the correct page.
+
+            window.location.assign(destination);
         }
 
-        /* Calculate attendance from the available records */
-        function calculateAttendance(records) {
-            if (!records.length) {
-                return "—";
-            }
 
-            const presentCount = records.filter(record => {
-                const status = String(
-                    record.status || ""
-                ).toLowerCase();
+        // 7. HANDLE THE LOGIN FORM
 
-                return status === "present" || status === "late";
-            }).length;
+        loginForm.addEventListener("submit", async function (event) {
 
-            return Math.round(
-                (presentCount / records.length) * 100
-            ) + "%";
-        }
+            event.preventDefault();
 
-        /* Format money in Ethiopian birr */
-        function formatMoney(amount) {
-            const value = Number(amount);
-
-            if (!Number.isFinite(value)) {
-                return "ETB 0.00";
-            }
-
-            return "ETB " + value.toLocaleString("en-US", {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2
-            });
-        }
-
-        /* Calculate recorded fees */
-        function calculateFees(records) {
-            return records.reduce((total, fee) => {
-                const status = String(
-                    fee.status || ""
-                ).toLowerCase();
-
-                const amountPaid =
-                    fee.amountPaid ??
-                    fee.paidAmount ??
-                    (status === "paid" ? fee.amount : 0) ??
-                    0;
-
-                const amount = Number(amountPaid);
-
-                if (Number.isFinite(amount)) {
-                    return total + amount;
-                }
-
-                return total;
-            }, 0);
-        }
-
-        /* Load dashboard data through the existing app.js helper */
-        async function loadDashboard() {
             clearMessage();
 
-            const app = window.SchoolApp;
 
-            if (!app) {
-                state.students = [];
-                renderStudents();
+            // Read the entered information.
 
-                showMessage(
-                    "The dashboard design is ready. SchoolApp was not found. Check that app.js is in the same folder and that it loads correctly. Real statistics require the existing data services and backend.",
-                    "info"
-                );
+            const identifier = identifierInput.value.trim();
 
-                return;
-            }
+            const password = passwordInput.value;
 
-            const tasks = [
-                {
-                    key: "students",
-                    load: app.getStudents
-                },
-                {
-                    key: "users",
-                    load: app.getUsers
-                },
-                {
-                    key: "attendance",
-                    load: app.getAttendance
-                },
-                {
-                    key: "fees",
-                    load: app.getFees
-                }
-            ];
+            const confirmPassword = confirmPasswordInput.value;
 
-            const availableTasks = tasks.filter(
-                task => typeof task.load === "function"
-            );
 
-            if (availableTasks.length === 0) {
-                state.students = [];
-                renderStudents();
+            // Check required fields.
+
+            if (!identifier || !password || !confirmPassword) {
 
                 showMessage(
-                    "Dashboard preview mode: data-loading functions are not available yet.",
-                    "info"
+                    "Please enter your username or email, password, and password confirmation."
                 );
 
-                return;
-            }
-
-            const results = await Promise.allSettled(
-                availableTasks.map(task => task.load.call(app))
-            );
-
-            const data = {};
-            let failedCount = 0;
-
-            results.forEach((result, index) => {
-                const key = availableTasks[index].key;
-
-                if (result.status === "fulfilled") {
-                    data[key] = unwrapList(result.value);
+                if (!identifier) {
+                    identifierInput.focus();
+                } else if (!password) {
+                    passwordInput.focus();
                 } else {
-                    console.error(
-                        "Could not load " + key + ":",
-                        result.reason
-                    );
-
-                    data[key] = [];
-                    failedCount++;
+                    confirmPasswordInput.focus();
                 }
-            });
 
-            state.students = data.students || [];
-
-            $("studentCount").textContent =
-                String(state.students.length);
-
-            const users = data.users || [];
-
-            const teacherCount = users.filter(user => {
-                return String(user.role || "").toLowerCase()
-                    === "teacher";
-            }).length;
-
-            $("teacherCount").textContent =
-                String(teacherCount);
-
-            $("attendanceRate").textContent =
-                calculateAttendance(data.attendance || []);
-
-            $("monthlyFee").textContent =
-                formatMoney(calculateFees(data.fees || []));
-
-            renderStudents();
-
-            if (failedCount > 0) {
-                showMessage(
-                    "Some data could not be loaded. This can happen while the backend or API endpoints are being developed. You can continue testing the dashboard design.",
-                    "info"
-                );
+                return;
             }
-        }
 
-        /* Log out through the existing helper, if available */
-        function initializeLogout() {
-            const logoutLink = $("logoutLink");
+            if (!validatePasswordConfirmation()) {
+                showMessage("Passwords do not match.");
+                confirmPasswordInput.focus();
+                return;
+            }
 
-            logoutLink.addEventListener("click", async event => {
-                event.preventDefault();
 
-                const confirmed = window.confirm(
-                    "Are you sure you want to log out?"
+            // Check whether the application code is available.
+
+            if (
+                typeof SchoolApp === "undefined" ||
+                typeof SchoolApp.loginUser !== "function"
+            ) {
+
+                showMessage(
+                    "The login service is unavailable. " +
+                    "Please check app.js and restart the server."
                 );
 
-                if (!confirmed) {
-                    return;
-                }
+                console.error(
+                    "SchoolApp.loginUser() is not available."
+                );
 
-                try {
-                    if (
-                        window.SchoolApp &&
-                        typeof window.SchoolApp.logoutUser === "function"
-                    ) {
-                        await window.SchoolApp.logoutUser();
-                    } else {
-                        localStorage.removeItem("current_user");
-                        sessionStorage.removeItem("current_user");
-                    }
-                } catch (error) {
-                    console.error("Logout error:", error);
-                }
+                return;
+            }
 
-                window.location.href = "login.html";
-            });
-        }
 
-        /* Start the dashboard */
-        document.addEventListener("DOMContentLoaded", () => {
-            initializeDate();
+            // Show the loading state.
 
-            $("studentSearch").addEventListener(
-                "input",
-                renderStudents
-            );
+            loginButton.disabled = true;
 
-            $("refreshButton").addEventListener(
-                "click",
-                () => {
-                    loadDashboard().catch(error => {
-                        console.error(
-                            "Dashboard loading error:",
-                            error
-                        );
+            identifierInput.disabled = true;
 
-                        showMessage(
-                            "Unable to refresh dashboard data. Check app.js and the configured API endpoints.",
-                            "error"
-                        );
-                    });
-                }
-            );
+            passwordInput.disabled = true;
 
-            initializeLogout();
+            confirmPasswordInput.disabled = true;
 
-            /*
-             * Keep the existing admin check if app.js provides it.
-             * Server-side authorization will also be required when
-             * the backend is implemented.
-             */
-            if (
-                window.SchoolApp &&
-                typeof window.SchoolApp.requireAuth === "function"
-            ) {
-                try {
-                    window.SchoolApp.requireAuth("admin");
-                } catch (error) {
-                    console.error(
-                        "Admin authentication check failed:",
-                        error
-                    );
+            loginButton.textContent = "Signing in...";
+
+
+            try {
+
+                // Authenticate using the existing application.
+
+                const result = await SchoolApp.loginUser(
+                    identifier,
+                    password
+                );
+
+
+                // Handle incorrect credentials.
+
+                if (!result || !result.success) {
 
                     showMessage(
-                        "The administrator session could not be verified. Please log in using an administrator account.",
-                        "error"
+                        result?.message ||
+                        "Login failed. Please check your details."
+                    );
+
+                    passwordInput.value = "";
+
+                    confirmPasswordInput.value = "";
+                    validatePasswordConfirmation();
+
+                    passwordInput.focus();
+
+                    return;
+                }
+
+                // Confirm that the authenticated user has a role.
+
+                if (!result.user || !result.user.role) {
+
+                    SchoolApp.clearCurrentUser();
+
+                    showMessage(
+                        "The account information is incomplete. " +
+                        "Please contact the administrator."
                     );
 
                     return;
                 }
-            }
 
-            loadDashboard().catch(error => {
-                console.error(
-                    "Dashboard initialization error:",
-                    error
-                );
+
+                // Redirect to the appropriate portal.
+
+                redirectUserByRole(result.user);
+
+
+            } catch (error) {
+
+                console.error("Login error:", error);
 
                 showMessage(
-                    "The dashboard opened, but its data could not be loaded. Check the browser console and your API configuration.",
-                    "error"
+                    "An unexpected error occurred. Please try again."
                 );
-            });
+
+            } finally {
+
+                // Restore the form.
+
+                loginButton.disabled = false;
+
+                identifierInput.disabled = false;
+
+                passwordInput.disabled = false;
+
+                confirmPasswordInput.disabled = false;
+
+                loginButton.textContent = "Login";
+
+            }
+
         });
-    })();
+
+
+        // 8. CLEAR OLD ERRORS WHEN THE USER TYPES
+
+        identifierInput.addEventListener("input", clearMessage);
+
+        passwordInput.addEventListener("input", function () {
+            clearMessage();
+            validatePasswordConfirmation();
+        });
+
+        confirmPasswordInput.addEventListener("input", function () {
+            clearMessage();
+            validatePasswordConfirmation();
+        });
+
+
+        // 9. FOCUS ON THE USERNAME FIELD WHEN THE PAGE OPENS
+
+        identifierInput.focus();
+
     </script>
 
 </body>
-</html>
 
+</html>
