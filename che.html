@@ -1,0 +1,1662 @@
+```html
+```html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="theme-color" content="#12372a">
+
+    <title>Registrar Dashboard | NIBRETE BUZUNEH School</title>
+
+    <style>
+        /* ========================================
+           1. GENERAL SETTINGS
+        ======================================== */
+
+        :root {
+            --green-dark: #12372a;
+            --green-main: #198754;
+            --green-light: #e8f5ed;
+            --white: #ffffff;
+            --background: #f5f7f9;
+            --text: #1f2937;
+            --muted: #64748b;
+            --border: #e2e8f0;
+            --red: #dc2626;
+            --orange: #d97706;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: var(--background);
+            color: var(--text);
+            line-height: 1.5;
+        }
+
+        button,
+        input,
+        select {
+            font: inherit;
+        }
+
+        button {
+            cursor: pointer;
+        }
+
+        button:focus-visible,
+        input:focus-visible,
+        select:focus-visible {
+            outline: 2px solid var(--green-main);
+            outline-offset: 2px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* ========================================
+           2. LEFT SIDEBAR
+        ======================================== */
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 250px;
+            height: 100vh;
+            overflow-y: auto;
+            background: var(--green-dark);
+            color: var(--white);
+            padding: 22px 15px;
+            z-index: 100;
+        }
+
+        .school-name {
+            padding: 5px 10px 25px;
+            border-bottom: 1px solid #ffffff30;
+        }
+
+        .school-name h2 {
+            font-size: 18px;
+            margin-bottom: 8px;
+        }
+
+        .school-name p {
+            color: #cbd5e1;
+            font-size: 12px;
+        }
+
+        .menu-heading {
+            margin: 25px 10px 10px;
+            color: #a7c5b5;
+            font-size: 11px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .menu-link {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 5px;
+            text-align: left;
+            color: #e5e7eb;
+            background: transparent;
+            border: none;
+            border-radius: 7px;
+            font-size: 14px;
+        }
+
+        .menu-link:hover,
+        .menu-link.active {
+            background: var(--green-main);
+            color: var(--white);
+        }
+
+        /* ========================================
+           3. MAIN CONTENT
+        ======================================== */
+
+        .main {
+            margin-left: 250px;
+            min-height: 100vh;
+        }
+
+        .topbar {
+            min-height: 78px;
+            padding: 15px 28px;
+            background: var(--white);
+            border-bottom: 1px solid var(--border);
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .topbar h1 {
+            font-size: 22px;
+        }
+
+        .content {
+            padding: 28px;
+        }
+
+        .page-description {
+            margin: 8px 0 25px;
+            color: var(--muted);
+        }
+
+        /* ========================================
+           4. TOP-RIGHT USER MENU
+        ======================================== */
+
+        .user-menu-container {
+            position: relative;
+        }
+
+        .user-menu-button {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 12px;
+            color: var(--text);
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+        }
+
+        .user-menu-button:hover {
+            background: #f8fafc;
+        }
+
+        .user-avatar {
+            width: 38px;
+            height: 38px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 50%;
+            background: var(--green-main);
+            color: var(--white);
+            font-weight: bold;
+        }
+
+        .user-details {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .user-details strong {
+            font-size: 13px;
+        }
+
+        .user-details small {
+            color: var(--muted);
+            font-size: 11px;
+        }
+
+        .dropdown-arrow {
+            font-size: 10px;
+        }
+
+        .user-dropdown {
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            width: 220px;
+            padding: 8px;
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            box-shadow: 0 8px 25px #00000015;
+            z-index: 200;
+        }
+
+        .user-dropdown button {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            text-align: left;
+            color: var(--text);
+            background: var(--white);
+            border: none;
+            border-radius: 6px;
+        }
+
+        .user-dropdown button:hover {
+            background: #f1f5f9;
+        }
+
+        .user-dropdown hr {
+            margin: 6px 0;
+            border: none;
+            border-top: 1px solid var(--border);
+        }
+
+        .user-dropdown .logout-button {
+            color: var(--red);
+        }
+
+        /* ========================================
+           5. DASHBOARD STATISTICS
+        ======================================== */
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 18px;
+            margin: 24px 0 28px;
+        }
+
+        .stat-card {
+            padding: 20px;
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+        }
+
+        .stat-card p {
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .stat-card h3 {
+            margin-top: 10px;
+            font-size: 28px;
+        }
+
+        .stat-card small {
+            display: block;
+            margin-top: 8px;
+            color: var(--muted);
+        }
+
+        /* ========================================
+           6. PANELS AND TABLES
+        ======================================== */
+
+        .panel {
+            padding: 22px;
+            margin-bottom: 24px;
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .panel-header h2 {
+            font-size: 18px;
+        }
+
+        .toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 18px;
+        }
+
+        input,
+        select {
+            width: 100%;
+            min-width: 0;
+            padding: 10px 12px;
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+        }
+
+        .toolbar input,
+        .toolbar select {
+            width: auto;
+            min-width: 180px;
+        }
+
+        .btn {
+            padding: 10px 14px;
+            color: var(--white);
+            background: var(--green-main);
+            border: none;
+            border-radius: 6px;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+        }
+
+        .btn-secondary {
+            color: var(--text);
+            background: #e2e8f0;
+        }
+
+        .btn-danger {
+            background: var(--red);
+        }
+
+        .table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            min-width: 620px;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            padding: 13px 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+            font-size: 13px;
+        }
+
+        th {
+            background: #f8fafc;
+            color: var(--muted);
+        }
+
+        .status {
+            display: inline-block;
+            padding: 5px 9px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        .pending {
+            color: #92400e;
+            background: #fef3c7;
+        }
+
+        .approved {
+            color: #166534;
+            background: #dcfce7;
+        }
+
+        .rejected {
+            color: #991b1b;
+            background: #fee2e2;
+        }
+
+        .empty-message {
+            padding: 20px;
+            text-align: center;
+            color: var(--muted);
+        }
+
+        /* ========================================
+           7. FORMS
+        ======================================== */
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 18px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-group label {
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .form-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 22px;
+        }
+
+        .message {
+            margin-top: 15px;
+            font-size: 14px;
+        }
+
+        /* ========================================
+           8. RESPONSIVE DESIGN
+        ======================================== */
+
+        @media (max-width: 1100px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 700px) {
+            .sidebar {
+                position: static;
+                width: 100%;
+                height: auto;
+                max-height: none;
+            }
+
+            .main {
+                margin-left: 0;
+            }
+
+            .topbar {
+                padding: 16px;
+                align-items: flex-start;
+                flex-wrap: wrap;
+            }
+
+            .content {
+                padding: 16px;
+            }
+
+            .stats-grid,
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .toolbar input,
+            .toolbar select {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ========================================
+         LEFT SIDEBAR
+    ======================================== -->
+
+    <aside class="sidebar">
+
+        <div class="school-name">
+            <h2>NIBRETE BUZUNEH</h2>
+            <p>Secondary and Preparatory School</p>
+        </div>
+
+        <p class="menu-heading">Main</p>
+
+        <button class="menu-link active"
+                data-page="dashboard"
+                onclick="showPage('dashboard', this)">
+            Dashboard
+        </button>
+
+        <p class="menu-heading">Admission</p>
+
+        <button class="menu-link"
+                data-page="applications"
+                onclick="showPage('applications', this)">
+            Student Applications
+        </button>
+
+        <p class="menu-heading">Student Registration</p>
+
+        <button class="menu-link"
+                data-page="register"
+                onclick="showPage('register', this)">
+            Register Student
+        </button>
+
+        <button class="menu-link"
+                data-page="students"
+                onclick="showPage('students', this)">
+            All Students
+        </button>
+
+        <p class="menu-heading">Reports</p>
+
+        <button class="menu-link"
+                data-page="reports"
+                onclick="showPage('reports', this)">
+            Registration Reports
+        </button>
+
+    </aside>
+
+    <!-- ========================================
+         MAIN CONTENT
+    ======================================== -->
+
+    <main class="main">
+
+        <!-- TOP NAVIGATION -->
+
+        <header class="topbar">
+
+            <h1 id="page-title">Registrar Dashboard</h1>
+
+            <!-- USER MENU -->
+
+            <div class="user-menu-container">
+
+                <button
+                    class="user-menu-button"
+                    id="user-menu-button"
+                    type="button"
+                    aria-expanded="false"
+                    aria-controls="user-dropdown">
+
+                    <span class="user-avatar">R</span>
+
+                    <span class="user-details">
+                        <strong>Registrar</strong>
+                        <small>School Staff</small>
+                    </span>
+
+                    <span class="dropdown-arrow">▼</span>
+
+                </button>
+
+                <div class="user-dropdown hidden"
+                     id="user-dropdown">
+
+                    <button type="button" onclick="openProfile()">
+                        My Profile
+                    </button>
+
+                    <button type="button"
+                            onclick="openChangePassword()">
+                        Change Password
+                    </button>
+
+                    <hr>
+
+                    <button type="button"
+                            class="logout-button"
+                            onclick="logout()">
+                        Logout
+                    </button>
+
+                </div>
+
+            </div>
+
+        </header>
+
+        <div class="content">
+
+            <!-- ========================================
+                 DASHBOARD PAGE
+            ======================================== -->
+
+            <section id="dashboard-page" class="page">
+
+                <h2>Dashboard Overview</h2>
+
+                <p class="page-description">
+                    Welcome to the Registrar Dashboard.
+                    Manage student admissions and registration.
+                </p>
+
+                <div class="stats-grid">
+
+                    <article class="stat-card">
+                        <p>Total Students</p>
+                        <h3 id="total-students">0</h3>
+                        <small>Registered students</small>
+                    </article>
+
+                    <article class="stat-card">
+                        <p>Total Applications</p>
+                        <h3 id="total-applications">0</h3>
+                        <small>Submitted applications</small>
+                    </article>
+
+                    <article class="stat-card">
+                        <p>Pending Applications</p>
+                        <h3 id="pending-applications">0</h3>
+                        <small>Waiting for review</small>
+                    </article>
+
+                    <article class="stat-card">
+                        <p>Approved Applications</p>
+                        <h3 id="approved-applications">0</h3>
+                        <small>Approved applications</small>
+                    </article>
+
+                </div>
+
+                <div class="panel">
+
+                    <div class="panel-header">
+                        <h2>Recent Applications</h2>
+
+                        <button class="btn"
+                                onclick="showPage('applications')">
+                            View Applications
+                        </button>
+                    </div>
+
+                    <div class="table-wrapper">
+
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Application ID</th>
+                                    <th>Student Name</th>
+                                    <th>Grade</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+
+                            <tbody id="recent-applications-body"></tbody>
+                        </table>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+            <!-- ========================================
+                 APPLICATIONS PAGE
+            ======================================== -->
+
+            <section id="applications-page" class="page hidden">
+
+                <h2>Student Applications</h2>
+
+                <p class="page-description">
+                    Search and review student applications.
+                </p>
+
+                <div class="panel">
+
+                    <div class="toolbar">
+
+                        <input
+                            type="search"
+                            id="application-search"
+                            placeholder="Search name or application ID"
+                            aria-label="Search applications">
+
+                        <select id="application-filter"
+                                aria-label="Filter applications">
+
+                            <option value="All">All Statuses</option>
+                            <option value="Pending">Pending</option>
+                            <option value="Approved">Approved</option>
+                            <option value="Rejected">Rejected</option>
+
+                        </select>
+
+                    </div>
+
+                    <div class="table-wrapper">
+
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Application ID</th>
+                                    <th>Student Name</th>
+                                    <th>Grade</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+
+                            <tbody id="applications-body"></tbody>
+
+                        </table>
+
+                    </div>
+
+                    <p id="application-message"
+                       class="message"
+                       role="status"></p>
+
+                </div>
+
+            </section>
+
+            <!-- ========================================
+                 REGISTER STUDENT PAGE
+            ======================================== -->
+
+            <section id="register-page" class="page hidden">
+
+                <h2>Register Student</h2>
+
+                <p class="page-description">
+                    Enter the information for an approved applicant.
+                    This page currently uses temporary demonstration data.
+                </p>
+
+                <div class="panel">
+
+                    <form id="registration-form">
+
+                        <div class="form-grid">
+
+                            <div class="form-group">
+                                <label for="student-name">
+                                    Full Name
+                                </label>
+
+                                <input
+                                    type="text"
+                                    id="student-name"
+                                    name="fullName"
+                                    maxlength="100"
+                                    required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="student-id">
+                                    Student ID
+                                </label>
+
+                                <input
+                                    type="text"
+                                    id="student-id"
+                                    name="studentId"
+                                    maxlength="30"
+                                    required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="student-grade">
+                                    Grade
+                                </label>
+
+                                <select id="student-grade"
+                                        name="grade"
+                                        required>
+
+                                    <option value="">Select Grade</option>
+                                    <option value="9">Grade 9</option>
+                                    <option value="10">Grade 10</option>
+                                    <option value="11">Grade 11</option>
+                                    <option value="12">Grade 12</option>
+
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="student-section">
+                                    Section
+                                </label>
+
+                                <select id="student-section"
+                                        name="section"
+                                        required>
+
+                                    <option value="">Select Section</option>
+                                    <option value="A">Section A</option>
+                                    <option value="B">Section B</option>
+                                    <option value="C">Section C</option>
+
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="academic-year">
+                                    Academic Year
+                                </label>
+
+                                <input
+                                    type="text"
+                                    id="academic-year"
+                                    name="academicYear"
+                                    placeholder="2026/2027"
+                                    maxlength="20"
+                                    required>
+                            </div>
+
+                        </div>
+
+                        <div class="form-actions">
+
+                            <button type="submit" class="btn">
+                                Register Student
+                            </button>
+
+                            <button type="reset"
+                                    class="btn btn-secondary">
+                                Clear Form
+                            </button>
+
+                        </div>
+
+                        <p id="registration-message"
+                           class="message"
+                           role="status"></p>
+
+                    </form>
+
+                </div>
+
+            </section>
+
+            <!-- ========================================
+                 ALL STUDENTS PAGE
+            ======================================== -->
+
+            <section id="students-page" class="page hidden">
+
+                <h2>All Students</h2>
+
+                <p class="page-description">
+                    Search student registration records.
+                </p>
+
+                <div class="panel">
+
+                    <div class="toolbar">
+
+                        <input
+                            type="search"
+                            id="student-search"
+                            placeholder="Search name or Student ID"
+                            aria-label="Search students">
+
+                    </div>
+
+                    <div class="table-wrapper">
+
+                        <table>
+
+                            <thead>
+                                <tr>
+                                    <th>Student ID</th>
+                                    <th>Full Name</th>
+                                    <th>Grade</th>
+                                    <th>Section</th>
+                                    <th>Academic Year</th>
+                                </tr>
+                            </thead>
+
+                            <tbody id="students-body"></tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+            <!-- ========================================
+                 REPORTS PAGE
+            ======================================== -->
+
+            <section id="reports-page" class="page hidden">
+
+                <h2>Registration Reports</h2>
+
+                <p class="page-description">
+                    View summary information about student enrollment.
+                </p>
+
+                <div class="panel">
+
+                    <h3>Enrollment Summary</h3>
+
+                    <p id="report-total" style="margin-top: 15px;"></p>
+
+                    <p id="report-grade-summary"
+                       style="margin-top: 10px;"></p>
+
+                    <button class="btn"
+                            style="margin-top: 20px;"
+                            onclick="exportStudents()">
+                        Export CSV
+                    </button>
+
+                </div>
+
+            </section>
+
+            <!-- ========================================
+                 PROFILE PAGE
+            ======================================== -->
+
+            <section id="profile-page" class="page hidden">
+
+                <h2>My Profile</h2>
+
+                <p class="page-description">
+                    View your account information.
+                </p>
+
+                <div class="panel">
+
+                    <p><strong>Name:</strong> Registrar</p>
+
+                    <p style="margin-top: 10px;">
+                        <strong>Role:</strong> Registrar
+                    </p>
+
+                    <p style="margin-top: 10px;">
+                        <strong>School:</strong>
+                        NIBRETE BUZUNEH Secondary and Preparatory School
+                    </p>
+
+                </div>
+
+            </section>
+
+            <!-- ========================================
+                 CHANGE PASSWORD PAGE
+            ======================================== -->
+
+            <section id="change-password-page" class="page hidden">
+
+                <h2>Change Password</h2>
+
+                <p class="page-description">
+                    Update your account password.
+                </p>
+
+                <div class="panel">
+
+                    <form id="change-password-form">
+
+                        <div class="form-grid">
+
+                            <div class="form-group">
+                                <label for="current-password">
+                                    Current Password
+                                </label>
+
+                                <input
+                                    type="password"
+                                    id="current-password"
+                                    name="currentPassword"
+                                    autocomplete="current-password"
+                                    required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="new-password">
+                                    New Password
+                                </label>
+
+                                <input
+                                    type="password"
+                                    id="new-password"
+                                    name="newPassword"
+                                    autocomplete="new-password"
+                                    minlength="8"
+                                    required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="confirm-password">
+                                    Confirm New Password
+                                </label>
+
+                                <input
+                                    type="password"
+                                    id="confirm-password"
+                                    name="confirmPassword"
+                                    autocomplete="new-password"
+                                    minlength="8"
+                                    required>
+                            </div>
+
+                        </div>
+
+                        <div class="form-actions">
+
+                            <button type="submit" class="btn">
+                                Update Password
+                            </button>
+
+                            <button type="button"
+                                    class="btn btn-secondary"
+                                    onclick="showPage('dashboard')">
+                                Cancel
+                            </button>
+
+                        </div>
+
+                        <p id="password-message"
+                           class="message"
+                           role="status"></p>
+
+                    </form>
+
+                </div>
+
+            </section>
+
+        </div>
+
+    </main>
+
+    <script>
+        "use strict";
+
+        /* ========================================
+           1. DEMONSTRATION DATA
+        ======================================== */
+
+        const applications = [
+            {
+                id: "APP-001",
+                name: "Example Student One",
+                grade: 9,
+                status: "Pending"
+            },
+            {
+                id: "APP-002",
+                name: "Example Student Two",
+                grade: 10,
+                status: "Approved"
+            },
+            {
+                id: "APP-003",
+                name: "Example Student Three",
+                grade: 9,
+                status: "Pending"
+            },
+            {
+                id: "APP-004",
+                name: "Example Student Four",
+                grade: 11,
+                status: "Rejected"
+            }
+        ];
+
+        const students = [];
+
+        const pageTitles = {
+            dashboard: "Registrar Dashboard",
+            applications: "Student Applications",
+            register: "Register Student",
+            students: "All Students",
+            reports: "Registration Reports",
+            profile: "My Profile",
+            "change-password": "Change Password"
+        };
+
+
+        /* ========================================
+           2. SAFE HTML DISPLAY
+        ======================================== */
+
+        function escapeHTML(value) {
+            return String(value).replace(/[&<>"']/g, function (char) {
+                const entities = {
+                    "&": "&amp;",
+                    "<": "&lt;",
+                    ">": "&gt;",
+                    '"': "&quot;",
+                    "'": "&#39;"
+                };
+
+                return entities[char];
+            });
+        }
+
+
+        /* ========================================
+           3. PAGE NAVIGATION
+        ======================================== */
+
+        function showPage(pageName, clickedButton) {
+            const selectedPage = document.getElementById(
+                pageName + "-page"
+            );
+
+            if (!selectedPage) {
+                return;
+            }
+
+            document.querySelectorAll(".page").forEach(function (page) {
+                page.classList.add("hidden");
+            });
+
+            selectedPage.classList.remove("hidden");
+
+            document.getElementById("page-title").textContent =
+                pageTitles[pageName];
+
+            document.querySelectorAll(".menu-link").forEach(function (link) {
+                link.classList.remove("active");
+            });
+
+            const menuButton = clickedButton ||
+                document.querySelector(
+                    '.menu-link[data-page="' + pageName + '"]'
+                );
+
+            if (menuButton) {
+                menuButton.classList.add("active");
+            }
+
+            closeUserMenu();
+            renderAll();
+        }
+
+
+        /* ========================================
+           4. TOP-RIGHT USER MENU
+        ======================================== */
+
+        const userMenuButton = document.getElementById(
+            "user-menu-button"
+        );
+
+        const userDropdown = document.getElementById(
+            "user-dropdown"
+        );
+
+        function closeUserMenu() {
+            userDropdown.classList.add("hidden");
+
+            userMenuButton.setAttribute(
+                "aria-expanded",
+                "false"
+            );
+        }
+
+        userMenuButton.addEventListener("click", function () {
+            const isClosed = userDropdown.classList.contains("hidden");
+
+            userDropdown.classList.toggle("hidden");
+
+            userMenuButton.setAttribute(
+                "aria-expanded",
+                String(isClosed)
+            );
+        });
+
+        document.addEventListener("click", function (event) {
+            if (!event.target.closest(".user-menu-container")) {
+                closeUserMenu();
+            }
+        });
+
+        function openProfile() {
+            showPage("profile");
+        }
+
+        function openChangePassword() {
+            showPage("change-password");
+        }
+
+
+        /* ========================================
+           5. LOGOUT
+        ======================================== */
+
+        function logout() {
+            const confirmed = confirm(
+                "Are you sure you want to log out?"
+            );
+
+            if (!confirmed) {
+                return;
+            }
+
+            /*
+             * DEMONSTRATION ONLY.
+             *
+             * A real application must call the backend logout endpoint
+             * and invalidate the user's session.
+             */
+
+            alert(
+                "Demo only: real logout has not been connected yet."
+            );
+
+            closeUserMenu();
+        }
+
+
+        /* ========================================
+           6. APPLICATION STATUS BADGE
+        ======================================== */
+
+        function statusBadge(status) {
+            let cssClass = "pending";
+
+            if (status === "Approved") {
+                cssClass = "approved";
+            } else if (status === "Rejected") {
+                cssClass = "rejected";
+            }
+
+            return '<span class="status ' + cssClass + '">' +
+                escapeHTML(status) +
+                "</span>";
+        }
+
+
+        /* ========================================
+           7. DASHBOARD STATISTICS
+        ======================================== */
+
+        function renderDashboard() {
+            document.getElementById("total-students").textContent =
+                students.length;
+
+            document.getElementById("total-applications").textContent =
+                applications.length;
+
+            document.getElementById("pending-applications").textContent =
+                applications.filter(function (application) {
+                    return application.status === "Pending";
+                }).length;
+
+            document.getElementById("approved-applications").textContent =
+                applications.filter(function (application) {
+                    return application.status === "Approved";
+                }).length;
+
+            document.getElementById("recent-applications-body").innerHTML =
+                applications.slice(0, 5).map(function (application) {
+                    return `
+                        <tr>
+                            <td>${escapeHTML(application.id)}</td>
+                            <td>${escapeHTML(application.name)}</td>
+                            <td>Grade ${escapeHTML(application.grade)}</td>
+                            <td>${statusBadge(application.status)}</td>
+                        </tr>
+                    `;
+                }).join("");
+        }
+
+
+        /* ========================================
+           8. APPLICATION SEARCH AND FILTER
+        ======================================== */
+
+        function renderApplications() {
+            const search = document.getElementById(
+                "application-search"
+            ).value.toLowerCase().trim();
+
+            const filter = document.getElementById(
+                "application-filter"
+            ).value;
+
+            const filtered = applications.filter(function (application) {
+                const matchesSearch =
+                    application.name.toLowerCase().includes(search) ||
+                    application.id.toLowerCase().includes(search);
+
+                const matchesStatus =
+                    filter === "All" || application.status === filter;
+
+                return matchesSearch && matchesStatus;
+            });
+
+            const body = document.getElementById("applications-body");
+
+            if (filtered.length === 0) {
+                body.innerHTML =
+                    '<tr><td colspan="5" class="empty-message">' +
+                    "No matching applications found." +
+                    "</td></tr>";
+
+                return;
+            }
+
+            body.innerHTML = filtered.map(function (application) {
+                let action = escapeHTML(application.status);
+
+                if (application.status === "Pending") {
+                    action = `
+                        <button
+                            type="button"
+                            class="btn"
+                            data-action="approve"
+                            data-id="${escapeHTML(application.id)}">
+                            Approve (Demo)
+                        </button>
+                    `;
+                }
+
+                return `
+                    <tr>
+                        <td>${escapeHTML(application.id)}</td>
+                        <td>${escapeHTML(application.name)}</td>
+                        <td>Grade ${escapeHTML(application.grade)}</td>
+                        <td>${statusBadge(application.status)}</td>
+                        <td>${action}</td>
+                    </tr>
+                `;
+            }).join("");
+        }
+
+
+        /* ========================================
+           9. REGISTER STUDENT
+        ======================================== */
+
+        document.getElementById("registration-form")
+            .addEventListener("submit", function (event) {
+                event.preventDefault();
+
+                const formData = new FormData(this);
+
+                const student = {
+                    studentId: formData.get("studentId").trim(),
+                    fullName: formData.get("fullName").trim(),
+                    grade: formData.get("grade"),
+                    section: formData.get("section"),
+                    academicYear: formData.get("academicYear").trim()
+                };
+
+                const message = document.getElementById(
+                    "registration-message"
+                );
+
+                const duplicateId = students.some(function (existing) {
+                    return existing.studentId.toLowerCase() ===
+                        student.studentId.toLowerCase();
+                });
+
+                if (duplicateId) {
+                    message.textContent =
+                        "This Student ID already exists in the demo list.";
+
+                    message.style.color = "red";
+                    return;
+                }
+
+                students.push(student);
+
+                message.textContent =
+                    "Student added to temporary demo data only. " +
+                    "The record has not been saved to a database.";
+
+                message.style.color = "green";
+
+                this.reset();
+
+                renderAll();
+            });
+
+
+        /* ========================================
+           10. SEARCH STUDENTS
+        ======================================== */
+
+        function renderStudents() {
+            const search = document.getElementById(
+                "student-search"
+            ).value.toLowerCase().trim();
+
+            const filtered = students.filter(function (student) {
+                return student.fullName.toLowerCase().includes(search) ||
+                    student.studentId.toLowerCase().includes(search);
+            });
+
+            const body = document.getElementById("students-body");
+
+            if (filtered.length === 0) {
+                body.innerHTML =
+                    '<tr><td colspan="5" class="empty-message">' +
+                    "No students found. Register a student first." +
+                    "</td></tr>";
+
+                return;
+            }
+
+            body.innerHTML = filtered.map(function (student) {
+                return `
+                    <tr>
+                        <td>${escapeHTML(student.studentId)}</td>
+                        <td>${escapeHTML(student.fullName)}</td>
+                        <td>Grade ${escapeHTML(student.grade)}</td>
+                        <td>Section ${escapeHTML(student.section)}</td>
+                        <td>${escapeHTML(student.academicYear)}</td>
+                    </tr>
+                `;
+            }).join("");
+        }
+
+
+        /* ========================================
+           11. REPORTS
+        ======================================== */
+
+        function renderReports() {
+            document.getElementById("report-total").textContent =
+                "Total students in demo data: " + students.length;
+
+            const gradeCounts = {};
+
+            students.forEach(function (student) {
+                gradeCounts[student.grade] =
+                    (gradeCounts[student.grade] || 0) + 1;
+            });
+
+            const summary = Object.keys(gradeCounts).length
+                ? Object.keys(gradeCounts).sort().map(function (grade) {
+                    return "Grade " + grade + ": " +
+                        gradeCounts[grade] + " student(s)";
+                }).join(" | ")
+                : "No student enrollment data available yet.";
+
+            document.getElementById("report-grade-summary").textContent =
+                summary;
+        }
+
+
+        /* ========================================
+           12. EXPORT CSV
+        ======================================== */
+
+        function exportStudents() {
+            if (students.length === 0) {
+                alert("There are no student records to export.");
+                return;
+            }
+
+            const columns = [
+                "Student ID",
+                "Full Name",
+                "Grade",
+                "Section",
+                "Academic Year"
+            ];
+
+            const rows = students.map(function (student) {
+                return [
+                    student.studentId,
+                    student.fullName,
+                    student.grade,
+                    student.section,
+                    student.academicYear
+                ];
+            });
+
+            function csvCell(value) {
+                return '"' + String(value).replace(/"/g, '""') + '"';
+            }
+
+            const csv = [columns, ...rows]
+                .map(function (row) {
+                    return row.map(csvCell).join(",");
+                })
+                .join("\r\n");
+
+            const blob = new Blob(["\uFEFF" + csv], {
+                type: "text/csv;charset=utf-8;"
+            });
+
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+
+            link.href = url;
+            link.download = "demo-student-registration.csv";
+
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+
+            URL.revokeObjectURL(url);
+        }
+
+
+        /* ========================================
+           13. CHANGE PASSWORD FORM
+        ======================================== */
+
+        document.getElementById("change-password-form")
+            .addEventListener("submit", async function (event) {
+                event.preventDefault();
+
+                const currentPassword = document.getElementById(
+                    "current-password"
+                ).value;
+
+                const newPassword = document.getElementById(
+                    "new-password"
+                ).value;
+
+                const confirmPassword = document.getElementById(
+                    "confirm-password"
+                ).value;
+
+                const message = document.getElementById(
+                    "password-message"
+                );
+
+                if (newPassword.length < 8) {
+                    message.textContent =
+                        "The new password must contain at least 8 characters.";
+
+                    message.style.color = "red";
+                    return;
+                }
+
+                if (newPassword !== confirmPassword) {
+                    message.textContent =
+                        "The new password and confirmation do not match.";
+
+                    message.style.color = "red";
+                    return;
+                }
+
+                if (currentPassword === newPassword) {
+                    message.textContent =
+                        "Choose a new password different from the current one.";
+
+                    message.style.color = "red";
+                    return;
+                }
+
+                /*
+                 * No password is changed here.
+                 *
+                 * The backend must verify the current password and securely
+                 * update the password hash before reporting success.
+                 */
+
+                message.textContent =
+                    "Form validation passed. Password updating is not " +
+                    "connected to the backend yet.";
+
+                message.style.color = "#b45309";
+            });
+
+
+        /* ========================================
+           14. CONNECT SEARCH AND FILTER EVENTS
+        ======================================== */
+
+        document.getElementById("application-search")
+            .addEventListener("input", renderApplications);
+
+        document.getElementById("application-filter")
+            .addEventListener("change", renderApplications);
+
+        document.getElementById("student-search")
+            .addEventListener("input", renderStudents);
+
+
+        /* ========================================
+           15. DEMONSTRATION APPLICATION APPROVAL
+        ======================================== */
+
+        document.getElementById("applications-body")
+            .addEventListener("click", function (event) {
+                const button = event.target.closest(
+                    'button[data-action="approve"]'
+                );
+
+                if (!button) {
+                    return;
+                }
+
+                const application = applications.find(function (item) {
+                    return item.id === button.dataset.id;
+                });
+
+                if (!application ||
+                    application.status !== "Pending") {
+                    return;
+                }
+
+                const confirmed = confirm(
+                    "Change this demo application's status to Approved?"
+                );
+
+                if (!confirmed) {
+                    return;
+                }
+
+                application.status = "Approved";
+
+                document.getElementById(
+                    "application-message"
+                ).textContent =
+                    "Demo status updated in browser memory only. " +
+                    "No official admission decision was saved.";
+
+                renderAll();
+            });
+
+
+        /* ========================================
+           16. REFRESH ALL DASHBOARD DATA
+        ======================================== */
+
+        function renderAll() {
+            renderDashboard();
+            renderApplications();
+            renderStudents();
+            renderReports();
+        }
+
+
+        /* ========================================
+           17. START THE DASHBOARD
+        ======================================== */
+
+        renderAll();
+
+    </script>
+
+</body>
+
+</html>
+```

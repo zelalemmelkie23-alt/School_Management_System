@@ -317,9 +317,9 @@
                     </div>
 
                     <div class="field full" id="grade8CertificateField" hidden>
-                        <label for="grade8Certificate">Grade 8 Certificate</label>
+                        <label for="grade8Certificate">Grade 8 Certificate (optional)</label>
                         <input type="file" id="grade8Certificate" name="grade8Certificate" accept=".pdf,.jpg,.jpeg,.png" disabled>
-                        <small>Attach the student’s Grade 8 certificate (PDF, JPG, or PNG).</small>
+                        <small>Attachments are not stored by this version. Submit a copy to the school.</small>
                     </div>
                 </div>
 
@@ -338,6 +338,7 @@
         NIBRETE BUZUNEH SECONDARY AND PREPARATORY SCHOOL © 2026
     </footer>
 
+    <script src="app.js"></script>
     <script>
         const form = document.getElementById('studentRegistrationForm');
         const updateBtn = document.querySelectorAll('button.secondary')[0];
@@ -405,7 +406,7 @@
 
             grade8CertificateField.hidden = !needsGrade8Certificate;
             grade8CertificateInput.disabled = !needsGrade8Certificate;
-            grade8CertificateInput.required = needsGrade8Certificate;
+            grade8CertificateInput.required = false;
             if (!needsGrade8Certificate) {
                 grade8CertificateInput.value = '';
             }
@@ -500,16 +501,20 @@
                 return;
             }
 
-            const students = await SchoolApp.getStudents();
-            const student = students.find(item => item.studentId.toLowerCase() === studentId.toLowerCase());
+            try {
+                const students = await SchoolApp.getStudents();
+                const student = students.find(item => item.studentId.toLowerCase() === studentId.toLowerCase());
 
-            if (!student) {
-                showMessage('Student not found.', 'error');
-                return;
+                if (!student) {
+                    showMessage('Student not found.', 'error');
+                    return;
+                }
+
+                populateForm(student);
+                showMessage('Student record found.', 'success');
+            } catch (error) {
+                showMessage(error.message || 'Could not search student records.', 'error');
             }
-
-            populateForm(student);
-            showMessage('Student record found.', 'success');
         });
 
         updateBtn.addEventListener('click', async function () {
@@ -538,7 +543,7 @@
             try {
                 await SchoolApp.deleteStudent(studentId);
                 form.reset();
-                showMessage('Student deleted successfully.', 'success');
+                showMessage('Student record archived successfully.', 'success');
             } catch (error) {
                 showMessage(error.message, 'error');
             }

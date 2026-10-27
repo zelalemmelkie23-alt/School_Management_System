@@ -755,7 +755,7 @@
                     <div class="panel-heading">
                         <div>
                             <h2>Academic Results</h2>
-                            <p>Find results using your student ID.</p>
+                            <p>Your records are linked to your student account.</p>
                         </div>
                     </div>
 
@@ -766,8 +766,8 @@
                             id="studentIdInput"
                             type="text"
                             maxlength="50"
-                            autocomplete="off"
-                            placeholder="Example: ST-2048"
+                            autocomplete="username"
+                            readonly
                         >
                     </div>
 
@@ -1043,6 +1043,7 @@
             let results = [];
             let attendance = [];
             let fees = [];
+            let currentStudentId = '';
 
             function showMessage(element, message, type = 'info') {
                 element.textContent = message;
@@ -1419,16 +1420,15 @@
             async function viewResults() {
                 hideMessage(elements.resultMessage);
 
-                const studentId = elements.studentIdInput.value.trim();
+                const studentId = currentStudentId;
 
                 if (!studentId) {
                     showMessage(
                         elements.resultMessage,
-                        'Please enter a student ID.',
+                        'Your student profile is not available. Please contact the school administrator.',
                         'error'
                     );
 
-                    elements.studentIdInput.focus();
                     return;
                 }
 
@@ -1465,10 +1465,9 @@
             }
 
             function clearResults() {
-                elements.studentIdInput.value = '';
                 elements.termFilter.value = 'all';
 
-                setEmptyResults('Enter your student ID to load results.');
+                setEmptyResults('Select View Results to load your records.');
 
                 hideMessage(elements.resultMessage);
 
@@ -1508,19 +1507,31 @@
 
                     students = Array.isArray(responses[0])
                         ? responses[0]
-                        : [];
+                        : null;
 
                     results = Array.isArray(responses[1])
                         ? responses[1]
-                        : [];
+                        : null;
 
                     attendance = Array.isArray(responses[2])
                         ? responses[2]
-                        : [];
+                        : null;
 
                     fees = Array.isArray(responses[3])
                         ? responses[3]
-                        : [];
+                        : null;
+
+                    if (!students || !results || !attendance || !fees) {
+                        throw new Error('The server returned an invalid student portal response.');
+                    }
+
+                    if (students.length !== 1) {
+                        throw new Error(
+                            students.length === 0
+                                ? 'No student profile is linked to this account. Please contact the school administrator.'
+                                : 'The server returned more than one student profile for this account.'
+                        );
+                    }
 
                     hideMessage(elements.pageMessage);
 
@@ -1533,19 +1544,15 @@
                                 'Student'
                             );
 
-                        // If the backend/user profile supplies a student ID,
-                        // use it to prefill the input. This is not itself
-                        // a security check or proof of authorization.
-                        const userStudentId =
-                            currentUser.studentId ??
-                            currentUser.student_id;
-
-                        if (userStudentId) {
-                            elements.studentIdInput.value =
-                                String(userStudentId);
-
-                            await viewResults();
+                        // The backend limits this response to the signed-in student's profile.
+                        currentStudentId = getStudentId(students[0]);
+                        if (!currentStudentId) {
+                            throw new Error('The linked student profile has no student ID.');
                         }
+
+                        elements.studentIdInput.value = currentStudentId;
+                        showProfile(students[0], currentStudentId);
+                        await viewResults();
                     }
 
                 } catch (error) {
@@ -1553,7 +1560,7 @@
 
                     showMessage(
                         elements.pageMessage,
-                        'Unable to load school data. Your backend may not be running or its API endpoints may not be implemented yet.',
+                        error.message || 'Unable to load your student records. Please try again or contact the school administrator.',
                         'error'
                     );
 

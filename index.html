@@ -403,7 +403,7 @@
     <header class="site-header">
         <div class="container header-content">
 
-            <a class="school-name" href="indx.html">
+            <a class="school-name" href="index.html">
                 <span class="school-logo">NB</span>
                 <span>
                     NIBRETE BUZUNEH
@@ -620,8 +620,8 @@
                 <div class="contact-form">
                     <h2>Send an Enquiry</h2>
                     <p>
-                        This is currently a demonstration form. It checks
-                        the fields but does not send or save messages.
+                        Send a message to the school. Your enquiry will be
+                        saved so the administration can follow up.
                     </p>
 
                     <form id="contactForm">
@@ -670,7 +670,7 @@
                         </div>
 
                         <button class="button button-green" type="submit">
-                            Check Form
+                            Send Enquiry
                         </button>
 
                         <p class="form-message" id="formMessage" role="status"></p>
@@ -700,7 +700,9 @@
         </div>
     </footer>
 
-    <!-- JAVASCRIPT: updates the year and checks the contact form -->
+    <script src="app.js"></script>
+
+    <!-- JAVASCRIPT: updates the year and handles the contact form -->
     <script>
         // Show the current year in the footer.
         const yearElement = document.getElementById("currentYear");
@@ -710,20 +712,47 @@
         const contactForm = document.getElementById("contactForm");
         const formMessage = document.getElementById("formMessage");
 
-        // Run this code when the visitor submits the form.
-        contactForm.addEventListener("submit", function (event) {
-            // Stop the browser from reloading the page.
+        contactForm.addEventListener("submit", async function (event) {
             event.preventDefault();
 
-            // Check that all required fields are filled correctly.
             if (!contactForm.checkValidity()) {
                 contactForm.reportValidity();
                 return;
             }
 
-            // Tell the visitor that the form is valid, but not connected to a backend.
-            formMessage.textContent =
-                "Your form is valid, but no message was sent. Backend connection is still needed.";
+            const submitButton = contactForm.querySelector('button[type="submit"]');
+            submitButton.disabled = true;
+            submitButton.textContent = "Sending...";
+            formMessage.textContent = "";
+
+            try {
+                const response = await fetch(window.SchoolApp.API_BASE + "/enquiries", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    credentials: "include",
+                    body: JSON.stringify({
+                        name: contactForm.elements.namedItem("name").value.trim(),
+                        email: contactForm.elements.namedItem("email").value.trim(),
+                        subject: contactForm.elements.namedItem("subject").value.trim(),
+                        message: contactForm.elements.namedItem("message").value.trim()
+                    })
+                });
+                const result = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(result.message || "Could not send your enquiry.");
+                }
+
+                contactForm.reset();
+                formMessage.textContent = result.message || "Your enquiry has been sent.";
+                formMessage.style.color = "#1f6b49";
+            } catch (error) {
+                formMessage.textContent = error.message || "Could not connect to the school server.";
+                formMessage.style.color = "#b91c1c";
+            } finally {
+                submitButton.disabled = false;
+                submitButton.textContent = "Send Enquiry";
+            }
         });
     </script>
 

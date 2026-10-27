@@ -152,8 +152,16 @@
 
                 if (documentInfo && typeof documentInfo === "object" && documentInfo.url) {
                     try {
-                        const url = new URL(documentInfo.url, window.location.origin);
-                        if (url.origin === window.location.origin) {
+                        const apiOrigin = new URL(
+                            window.SchoolApp?.API_BASE || "/api",
+                            window.location.origin
+                        ).origin;
+                        const url = new URL(documentInfo.url, apiOrigin);
+                        if (
+                            url.origin === apiOrigin &&
+                            url.pathname.startsWith("/api/registrations/") &&
+                            url.pathname.includes("/documents/")
+                        ) {
                             const link = makeElement("a", "", name);
                             link.href = url.href;
                             link.target = "_blank";

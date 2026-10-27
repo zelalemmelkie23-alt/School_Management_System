@@ -1,0 +1,1149 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Parent Dashboard | NIBRETE BUZUNEH School</title>
+
+  <style>
+    :root {
+      --green-dark: #12372a;
+      --green-main: #198754;
+      --green-light: #e8f5ec;
+      --background: #f4f7f5;
+      --white: #ffffff;
+      --text: #25352d;
+      --muted: #718078;
+      --border: #e1e9e3;
+      --red: #dc3545;
+      --orange: #f0a202;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: var(--background);
+      color: var(--text);
+    }
+
+    button, input, select {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    .layout {
+      min-height: 100vh;
+      display: flex;
+    }
+
+    /* LEFT SIDEBAR */
+
+    .sidebar {
+      width: 250px;
+      background: var(--green-dark);
+      color: white;
+      padding: 22px 15px;
+      flex-shrink: 0;
+    }
+
+    .school-brand {
+      padding: 5px 10px 25px;
+      border-bottom: 1px solid #ffffff25;
+    }
+
+    .school-brand h2 {
+      font-size: 19px;
+      line-height: 1.5;
+    }
+
+    .school-brand p {
+      font-size: 12px;
+      color: #c6ded0;
+      margin-top: 5px;
+    }
+
+    .sidebar-heading {
+      font-size: 11px;
+      color: #b9d2c3;
+      margin: 25px 10px 12px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .nav-link {
+      display: block;
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 5px;
+      color: #e7f3eb;
+      background: transparent;
+      border: none;
+      border-radius: 7px;
+      text-align: left;
+      font-size: 14px;
+    }
+
+    .nav-link:hover,
+    .nav-link.active {
+      background: var(--green-main);
+      color: white;
+    }
+
+    /* MAIN CONTENT */
+
+    .main {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .topbar {
+      min-height: 80px;
+      background: white;
+      border-bottom: 1px solid var(--border);
+      padding: 15px 25px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 15px;
+    }
+
+    .topbar h1 {
+      font-size: 23px;
+    }
+
+    .topbar p {
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 5px;
+    }
+
+    .user-menu {
+      position: relative;
+    }
+
+    .user-button {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px;
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 9px;
+    }
+
+    .avatar {
+      width: 38px;
+      height: 38px;
+      display: grid;
+      place-items: center;
+      background: var(--green-light);
+      color: var(--green-dark);
+      border-radius: 50%;
+      font-weight: bold;
+    }
+
+    .user-info {
+      text-align: left;
+    }
+
+    .user-info strong {
+      display: block;
+      font-size: 13px;
+    }
+
+    .user-info small {
+      color: var(--muted);
+    }
+
+    .dropdown {
+      position: absolute;
+      right: 0;
+      top: 55px;
+      width: 190px;
+      background: white;
+      border: 1px solid var(--border);
+      box-shadow: 0 8px 25px #00000012;
+      border-radius: 8px;
+      padding: 7px;
+      z-index: 10;
+    }
+
+    .dropdown button {
+      width: 100%;
+      border: none;
+      background: white;
+      text-align: left;
+      padding: 11px;
+      border-radius: 5px;
+    }
+
+    .dropdown button:hover {
+      background: var(--green-light);
+    }
+
+    .dropdown .logout {
+      color: var(--red);
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .content {
+      padding: 25px;
+      max-width: 1400px;
+      margin: auto;
+    }
+
+    .welcome {
+      background: linear-gradient(120deg, #12372a, #198754);
+      color: white;
+      padding: 25px;
+      border-radius: 12px;
+      margin-bottom: 24px;
+    }
+
+    .welcome h2 {
+      margin-bottom: 9px;
+      font-size: 23px;
+    }
+
+    .welcome p {
+      color: #e0f1e6;
+      line-height: 1.6;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 18px;
+      margin-bottom: 25px;
+    }
+
+    .card, .panel {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px;
+    }
+
+    .card .label {
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 12px;
+    }
+
+    .card .number {
+      font-size: 27px;
+      font-weight: bold;
+      color: var(--green-dark);
+    }
+
+    .card .note {
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 8px;
+    }
+
+    .section-title {
+      font-size: 19px;
+      margin-bottom: 15px;
+    }
+
+    .panel {
+      margin-bottom: 22px;
+      overflow-x: auto;
+    }
+
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 17px;
+    }
+
+    .btn {
+      background: var(--green-main);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 10px 14px;
+    }
+
+    .btn:hover {
+      background: var(--green-dark);
+    }
+
+    .btn-secondary {
+      background: #edf4ef;
+      color: var(--green-dark);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 500px;
+    }
+
+    th, td {
+      text-align: left;
+      padding: 13px 12px;
+      border-bottom: 1px solid var(--border);
+      font-size: 13px;
+    }
+
+    th {
+      background: #f6faf7;
+      color: var(--muted);
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 5px 9px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: bold;
+    }
+
+    .badge-green {
+      background: #e0f5e7;
+      color: #176b38;
+    }
+
+    .badge-orange {
+      background: #fff2d5;
+      color: #8a5a00;
+    }
+
+    .badge-red {
+      background: #ffe4e6;
+      color: #a91e2b;
+    }
+
+    .announcement {
+      border-left: 4px solid var(--green-main);
+      background: #f7faf8;
+      padding: 15px;
+      margin-bottom: 12px;
+      border-radius: 5px;
+    }
+
+    .announcement h4 {
+      margin-bottom: 7px;
+    }
+
+    .announcement p {
+      font-size: 13px;
+      line-height: 1.6;
+      color: var(--muted);
+    }
+
+    .announcement small {
+      display: block;
+      color: var(--muted);
+      margin-top: 8px;
+    }
+
+    .form-group {
+      margin-bottom: 17px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 13px;
+      font-weight: bold;
+      margin-bottom: 7px;
+    }
+
+    .form-group input,
+    .form-group select {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #cbd8ce;
+      border-radius: 6px;
+      background: white;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+      outline: 2px solid #b7e2c5;
+      border-color: var(--green-main);
+    }
+
+    .message {
+      margin-top: 12px;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .footer {
+      text-align: center;
+      padding: 20px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    @media (max-width: 1000px) {
+      .cards {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .sidebar {
+        width: 220px;
+      }
+    }
+
+    @media (max-width: 650px) {
+      .layout {
+        display: block;
+      }
+
+      .sidebar {
+        width: 100%;
+        padding: 15px;
+      }
+
+      .sidebar-heading {
+        margin-top: 15px;
+      }
+
+      .topbar {
+        padding: 15px;
+        align-items: flex-start;
+      }
+
+      .topbar h1 {
+        font-size: 19px;
+      }
+
+      .user-info {
+        display: none;
+      }
+
+      .content {
+        padding: 15px;
+      }
+
+      .cards {
+        grid-template-columns: 1fr;
+      }
+
+      .welcome h2 {
+        font-size: 20px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="layout">
+
+  <!-- LEFT SIDEBAR -->
+  <aside class="sidebar">
+
+    <div class="school-brand">
+      <h2>NIBRETE BUZUNEH</h2>
+      <p>Secondary and Preparatory School</p>
+    </div>
+
+    <p class="sidebar-heading">Parent Navigation</p>
+
+    <button class="nav-link active" data-page="dashboard">
+      🏠 Dashboard
+    </button>
+
+    <button class="nav-link" data-page="children">
+      👨‍👩‍👧 My Children
+    </button>
+
+    <button class="nav-link" data-page="attendance">
+      📅 Attendance
+    </button>
+
+    <button class="nav-link" data-page="results">
+      📊 Examination Results
+    </button>
+
+    <button class="nav-link" data-page="homework">
+      📝 Homework
+    </button>
+
+    <button class="nav-link" data-page="fees">
+      💳 Fees and Payments
+    </button>
+
+    <button class="nav-link" data-page="timetable">
+      🕒 Timetable
+    </button>
+
+    <button class="nav-link" data-page="announcements">
+      📢 Announcements
+    </button>
+
+    <button class="nav-link" data-page="messages">
+      ✉️ Messages
+    </button>
+
+  </aside>
+
+  <!-- MAIN AREA -->
+  <main class="main">
+
+    <header class="topbar">
+
+      <div>
+        <h1 id="page-title">Parent Dashboard</h1>
+        <p>NIBRETE BUZUNEH School Management System</p>
+      </div>
+
+      <!-- ACCOUNT MENU: TOP RIGHT -->
+      <div class="user-menu">
+
+        <button class="user-button" id="user-button"
+                aria-expanded="false" aria-controls="user-dropdown">
+
+          <span class="avatar">P</span>
+
+          <span class="user-info">
+            <strong id="parent-name">Parent Account</strong>
+            <small>Parent</small>
+          </span>
+
+          <span>▼</span>
+        </button>
+
+        <div class="dropdown hidden" id="user-dropdown">
+          <button data-page="profile">My Profile</button>
+          <button data-page="change-password">Change Password</button>
+          <hr>
+          <button class="logout" id="logout-button">Logout</button>
+        </div>
+
+      </div>
+
+    </header>
+
+    <div class="content">
+
+      <!-- DASHBOARD PAGE -->
+      <section id="page-dashboard" class="page">
+
+        <div class="welcome">
+          <h2>Welcome, Parent!</h2>
+          <p>
+            Welcome to your parent portal. You can monitor your children's
+            attendance, examination results, assignments, and school fees here.
+          </p>
+        </div>
+
+        <div class="cards">
+
+          <div class="card">
+            <p class="label">My Children</p>
+            <p class="number" id="children-count">1</p>
+            <p class="note">Linked to your account</p>
+          </div>
+
+          <div class="card">
+            <p class="label">Attendance</p>
+            <p class="number">95%</p>
+            <p class="note">Sample attendance percentage</p>
+          </div>
+
+          <div class="card">
+            <p class="label">Average Result</p>
+            <p class="number">82%</p>
+            <p class="note">Sample academic result</p>
+          </div>
+
+          <div class="card">
+            <p class="label">Outstanding Fees</p>
+            <p class="number">ETB 1,500</p>
+            <p class="note">Sample balance — not a real bill</p>
+          </div>
+
+        </div>
+
+        <div class="panel">
+
+          <div class="panel-header">
+            <h2 class="section-title">My Children</h2>
+            <button class="btn btn-secondary" data-page="children">
+              View Details
+            </button>
+          </div>
+
+          <table>
+            <thead>
+              <tr>
+                <th>Student Name</th>
+                <th>Student ID</th>
+                <th>Grade</th>
+                <th>Section</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <tr>
+                <td>Example Student</td>
+                <td>NBS-2026-001</td>
+                <td>Grade 10</td>
+                <td>A</td>
+              </tr>
+            </tbody>
+          </table>
+
+        </div>
+
+        <div class="panel">
+
+          <h2 class="section-title">Recent Examination Results</h2>
+
+          <table>
+            <thead>
+              <tr>
+                <th>Subject</th>
+                <th>Exam</th>
+                <th>Score</th>
+                <th>Result</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <tr>
+                <td>Mathematics</td>
+                <td>Midterm</td>
+                <td>85/100</td>
+                <td><span class="badge badge-green">Sample</span></td>
+              </tr>
+
+              <tr>
+                <td>English</td>
+                <td>Midterm</td>
+                <td>79/100</td>
+                <td><span class="badge badge-green">Sample</span></td>
+              </tr>
+
+              <tr>
+                <td>Biology</td>
+                <td>Midterm</td>
+                <td>82/100</td>
+                <td><span class="badge badge-green">Sample</span></td>
+              </tr>
+            </tbody>
+          </table>
+
+        </div>
+
+        <div class="panel">
+
+          <h2 class="section-title">School Announcements</h2>
+
+          <div class="announcement">
+            <h4>Parent Meeting</h4>
+            <p>
+              Please check the official school notice for the next parent meeting.
+            </p>
+            <small>Demonstration announcement</small>
+          </div>
+
+          <div class="announcement">
+            <h4>Examination Notice</h4>
+            <p>
+              Examination schedules will be shared through the official school
+              communication channel.
+            </p>
+            <small>Demonstration announcement</small>
+          </div>
+
+        </div>
+
+      </section>
+
+      <!-- CHILDREN PAGE -->
+      <section id="page-children" class="page hidden">
+
+        <div class="panel">
+          <h2 class="section-title">My Children</h2>
+
+          <p style="margin-bottom: 15px; color: #718078;">
+            This page should show only students linked to your parent account.
+          </p>
+
+          <table>
+            <thead>
+              <tr>
+                <th>Student Name</th>
+                <th>Student ID</th>
+                <th>Grade</th>
+                <th>Section</th>
+                <th>School Status</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <tr>
+                <td>Example Student</td>
+                <td>NBS-2026-001</td>
+                <td>Grade 10</td>
+                <td>A</td>
+                <td><span class="badge badge-green">Sample</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+      </section>
+
+      <!-- ATTENDANCE PAGE -->
+      <section id="page-attendance" class="page hidden">
+
+        <div class="panel">
+          <h2 class="section-title">Student Attendance</h2>
+
+          <table>
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Student</th>
+                <th>Status</th>
+                <th>Remark</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <tr>
+                <td>2026-10-15</td>
+                <td>Example Student</td>
+                <td><span class="badge badge-green">Present</span></td>
+                <td>Sample record</td>
+              </tr>
+
+              <tr>
+                <td>2026-10-16</td>
+                <td>Example Student</td>
+                <td><span class="badge badge-orange">Late</span></td>
+                <td>Sample record</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+      </section>
+
+      <!-- RESULTS PAGE -->
+      <section id="page-results" class="page hidden">
+
+        <div class="panel">
+          <h2 class="section-title">Examination Results</h2>
+
+          <table>
+            <thead>
+              <tr>
+                <th>Subject</th>
+                <th>Examination</th>
+                <th>Score</th>
+                <th>Maximum Mark</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <tr>
+                <td>Mathematics</td>
+                <td>Midterm</td>
+                <td>85</td>
+                <td>100</td>
+              </tr>
+
+              <tr>
+                <td>English</td>
+                <td>Midterm</td>
+                <td>79</td>
+                <td>100</td>
+              </tr>
+
+              <tr>
+                <td>Biology</td>
+                <td>Midterm</td>
+                <td>82</td>
+                <td>100</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <p class="message">
+            These are demonstration marks, not official examination records.
+          </p>
+        </div>
+
+      </section>
+
+      <!-- HOMEWORK PAGE -->
+      <section id="page-homework" class="page hidden">
+
+        <div class="panel">
+          <h2 class="section-title">Homework and Assignments</h2>
+
+          <table>
+            <thead>
+              <tr>
+                <th>Subject</th>
+                <th>Assignment</th>
+                <th>Due Date</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <tr>
+                <td>Mathematics</td>
+                <td>Chapter 3 Exercises</td>
+                <td>2026-10-22</td>
+                <td><span class="badge badge-orange">Pending</span></td>
+              </tr>
+
+              <tr>
+                <td>English</td>
+                <td>Writing Assignment</td>
+                <td>2026-10-24</td>
+                <td><span class="badge badge-green">Sample</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+      </section>
+
+      <!-- FEES PAGE -->
+      <section id="page-fees" class="page hidden">
+
+        <div class="panel">
+          <h2 class="section-title">School Fees and Payments</h2>
+
+          <table>
+            <thead>
+              <tr>
+                <th>Fee Description</th>
+                <th>Total Amount</th>
+                <th>Paid</th>
+                <th>Balance</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <tr>
+                <td>School Fee</td>
+                <td>ETB 5,000</td>
+                <td>ETB 3,500</td>
+                <td>ETB 1,500</td>
+                <td><span class="badge badge-orange">Sample Balance</span></td>
+              </tr>
+            </tbody>
+          </table>
+
+          <p class="message">
+            This is sample information. Real balances must come from verified
+            school accounting records.
+          </p>
+        </div>
+
+      </section>
+
+      <!-- TIMETABLE PAGE -->
+      <section id="page-timetable" class="page hidden">
+
+        <div class="panel">
+          <h2 class="section-title">Class Timetable</h2>
+
+          <table>
+            <thead>
+              <tr>
+                <th>Day</th>
+                <th>08:00–09:00</th>
+                <th>09:00–10:00</th>
+                <th>10:30–11:30</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <tr>
+                <td>Monday</td>
+                <td>Mathematics</td>
+                <td>English</td>
+                <td>Biology</td>
+              </tr>
+
+              <tr>
+                <td>Tuesday</td>
+                <td>Physics</td>
+                <td>Chemistry</td>
+                <td>Mathematics</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+      </section>
+
+      <!-- ANNOUNCEMENTS PAGE -->
+      <section id="page-announcements" class="page hidden">
+
+        <div class="panel">
+          <h2 class="section-title">School Announcements</h2>
+
+          <div class="announcement">
+            <h4>Parent Meeting</h4>
+            <p>Check the official school notice for meeting details.</p>
+            <small>Demonstration announcement</small>
+          </div>
+
+          <div class="announcement">
+            <h4>Academic Update</h4>
+            <p>Academic updates will be published by authorized school staff.</p>
+            <small>Demonstration announcement</small>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- MESSAGES PAGE -->
+      <section id="page-messages" class="page hidden">
+
+        <div class="panel">
+          <h2 class="section-title">Messages</h2>
+
+          <p style="line-height: 1.7; color: #718078;">
+            The parent portal will eventually allow parents to communicate
+            with authorized teachers, the Registrar, or school administration.
+          </p>
+
+          <p class="message">
+            Messaging is not connected yet. A real messaging feature requires
+            backend endpoints, recipient permissions, and message storage.
+          </p>
+        </div>
+
+      </section>
+
+      <!-- PROFILE PAGE -->
+      <section id="page-profile" class="page hidden">
+
+        <div class="panel">
+          <h2 class="section-title">My Profile</h2>
+
+          <div class="form-group">
+            <label>Full Name</label>
+            <input type="text" value="Parent Account" readonly>
+          </div>
+
+          <div class="form-group">
+            <label>Username</label>
+            <input type="text" value="parent_demo" readonly>
+          </div>
+
+          <div class="form-group">
+            <label>Role</label>
+            <input type="text" value="Parent" readonly>
+          </div>
+
+          <p class="message">
+            These are demonstration details. In the real system, the profile
+            should come from the authenticated account.
+          </p>
+        </div>
+
+      </section>
+
+      <!-- CHANGE PASSWORD PAGE -->
+      <section id="page-change-password" class="page hidden">
+
+        <div class="panel">
+          <h2 class="section-title">Change Password</h2>
+
+          <form id="password-form">
+
+            <div class="form-group">
+              <label for="current-password">Current Password</label>
+              <input id="current-password" type="password"
+                     autocomplete="current-password" required>
+            </div>
+
+            <div class="form-group">
+              <label for="new-password">New Password</label>
+              <input id="new-password" type="password"
+                     autocomplete="new-password" minlength="8" required>
+            </div>
+
+            <div class="form-group">
+              <label for="confirm-password">Confirm New Password</label>
+              <input id="confirm-password" type="password"
+                     autocomplete="new-password" minlength="8" required>
+            </div>
+
+            <button class="btn" type="submit">Update Password</button>
+
+            <p id="password-message" class="message" aria-live="polite"></p>
+
+          </form>
+        </div>
+
+      </section>
+
+    </div>
+
+    <footer class="footer">
+      NIBRETE BUZUNEH Secondary and Preparatory School
+      <br>
+      Parent Portal — Frontend Demonstration
+    </footer>
+
+  </main>
+
+</div>
+
+<script>
+  "use strict";
+
+  // Page titles shown at the top of the dashboard.
+  const pageTitles = {
+    dashboard: "Parent Dashboard",
+    children: "My Children",
+    attendance: "Attendance",
+    results: "Examination Results",
+    homework: "Homework",
+    fees: "Fees and Payments",
+    timetable: "Class Timetable",
+    announcements: "School Announcements",
+    messages: "Messages",
+    profile: "My Profile",
+    "change-password": "Change Password"
+  };
+
+  const userButton = document.getElementById("user-button");
+  const userDropdown = document.getElementById("user-dropdown");
+  const pageTitle = document.getElementById("page-title");
+
+  // Open or close the account dropdown.
+  userButton.addEventListener("click", function () {
+    const isOpening = userDropdown.classList.contains("hidden");
+
+    userDropdown.classList.toggle("hidden");
+    userButton.setAttribute("aria-expanded", String(isOpening));
+  });
+
+  // Display the selected page.
+  function showPage(pageName) {
+    const selectedPage = document.getElementById("page-" + pageName);
+
+    if (!selectedPage) {
+      return;
+    }
+
+    document.querySelectorAll(".page").forEach(function (page) {
+      page.classList.add("hidden");
+    });
+
+    selectedPage.classList.remove("hidden");
+
+    pageTitle.textContent = pageTitles[pageName] || "Parent Portal";
+
+    document.querySelectorAll(".nav-link").forEach(function (button) {
+      button.classList.toggle(
+        "active",
+        button.dataset.page === pageName
+      );
+    });
+
+    userDropdown.classList.add("hidden");
+    userButton.setAttribute("aria-expanded", "false");
+  }
+
+  // Sidebar navigation.
+  document.querySelectorAll("[data-page]").forEach(function (button) {
+    button.addEventListener("click", function () {
+      showPage(button.dataset.page);
+    });
+  });
+
+  // Demonstration-only password validation.
+  // This does NOT update a real account password.
+  document.getElementById("password-form").addEventListener(
+    "submit",
+    function (event) {
+      event.preventDefault();
+
+      const currentPassword =
+        document.getElementById("current-password").value;
+
+      const newPassword =
+        document.getElementById("new-password").value;
+
+      const confirmPassword =
+        document.getElementById("confirm-password").value;
+
+      const message = document.getElementById("password-message");
+
+      if (!currentPassword) {
+        message.textContent = "Enter your current password.";
+        return;
+      }
+
+      if (newPassword.length < 8) {
+        message.textContent =
+          "Your new password must contain at least 8 characters.";
+        return;
+      }
+
+      if (newPassword !== confirmPassword) {
+        message.textContent =
+          "The new password and confirmation do not match.";
+        return;
+      }
+
+      message.textContent =
+        "The form is valid, but password changes require a secure backend.";
+
+      message.style.color = "#8a5a00";
+    }
+  );
+
+  // Demonstration-only logout.
+  // A real application must end the server session.
+  document.getElementById("logout-button").addEventListener(
+    "click",
+    function () {
+      const confirmed = window.confirm(
+        "Do you want to log out of the parent portal?"
+      );
+
+      if (confirmed) {
+        alert(
+          "Demo only: connect logout to your backend before using this system."
+        );
+
+        userDropdown.classList.add("hidden");
+        userButton.setAttribute("aria-expanded", "false");
+      }
+    }
+  );
+
+  // Start at the dashboard.
+  showPage("dashboard");
+</script>
+
+</body>
+</html>
+```

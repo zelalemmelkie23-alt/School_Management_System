@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta
+        name="description"
+        content="Administrator dashboard for NIBRETE BUZUNEH Secondary and Preparatory School."
+    >
+    <title>Admin Dashboard | NIBRETE BUZUNEH School</title>
+    <style>
+        :root {
+            color-scheme: light;
+            --navy: #0f172a;
+            --navy-light: #1e293b;
+            --green: #16a34a;
+            --green-light: #dcfce7;
+            --blue: #2563eb; 
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 16px;
+            margin-bottom: 22px;
+        }
+
+        .stat-card,
+        .panel {
+            min-width: 0;
+            border: 1px solid var(--border);
+            border-radius: 13px;
+            background: var(--surface);
+            box-shadow: 0 4px 14px rgb(15 23 42 / 4%);
+        }
+
+        .stat-card {
+            padding: 19px;
+        }
+
+        .stat-label {
+            color: var(--muted);
+            font-size: 0.82rem;
+            font-weight: 700;
+        }
+
+        .stat-value {
+            display: block;
+            margin: 12px 0 7px;
+            font-size: 1.65rem;
+            font-weight: 800;
+            overflow-wrap: anywhere;
+        }
+
+        .stat-description {
+            color: var(--muted);
+            font-size: 0.75rem;
+            line-height: 1.5;
+        }
+
+        .blue {
+            color: var(--blue);
+        }
+
+        .green {
+            color: var(--green);
+        }
+
+        .amber {
+            color: var(--amber);
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1.6fr) minmax(240px, 0.9fr);
+            align-items: start;
+            gap: 18px;
+        }
+
+        .panel {
+            padding: 20px;
+        }
+
+        .panel-heading {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .panel-heading h2 {
+            margin: 0 0 6px;
+            font-size: 1.05rem;
+        }
+
+        .panel-heading p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 0.8rem;
+            line-height: 1.5;
+        }
+
+        .search {
+            width: 100%;
+            margin-bottom: 14px;
+            padding: 11px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            white-space: nowrap;
+        }
+
+        th,
+        td {
+            padding: 12px 9px;
+            border-bottom: 1px solid var(--border);
+            text-align: left;
+            font-size: 0.82rem;
+        }
+
+        th {
+            background: #f8fafc;
+            color: var(--muted);
+            font-size: 0.7rem;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+
+        .student-name {
+            font-weight: 700;
+        }
+
+        .student-id {
+            margin-top: 4px;
+            color: var(--muted);
+            font-size: 0.72rem;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 5px 8px;
+            border-radius: 999px;
+            background: var(--green-light);
+            color: #166534;
+            font-size: 0.7rem;
+            font-weight: 800;
+        }
+
+        .badge.inactive {
+            background: var(--red-light);
+            color: #991b1b;
+        }
+
+        .badge.other {
+            background: var(--amber-light);
+            color: #92400e;
+        }
+
+        .empty-state {
+            padding: 24px 10px;
+            color: var(--muted);
+            text-align: center;
+            white-space: normal;
+        }
+
+        .quick-links {
+            display: grid;
+            gap: 10px;
+        }
+
+        .quick-link {
+            display: block;
+            padding: 13px;
+            border: 1px solid var(--border);
+            border-radius: 9px;
+        }
+
+        .quick-link:hover {
+            border-color: #86efac;
+            background: #f0fdf4;
+        }
+
+        .quick-link strong {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 0.84rem;
+        }
+
+        .quick-link span {
+            color: var(--muted);
+            font-size: 0.75rem;
+            line-height: 1.45;
+        }
+
+        .refresh-button {
+            padding: 8px 11px;
+            border: 1px solid var(--border);
+            border-radius: 7px;
+            background: white;
+            color: var(--text);
+            font-weight: 700;
+        }
+
+        .refresh-button:hover {
+            background: #f1f5f9;
+        }
+
+        .refresh-button:disabled {
+            cursor: wait;
+            opacity: 0.65;
+        }
+
+        footer {
+            padding: 22px 12px;
+            color: var(--muted);
+            font-size: 0.78rem;
+            text-align: center;
+        }
+
+        @media (max-width: 1050px) {
+            .stats {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 760px) {
+            .topbar {
+                align-items: flex-start;
+                flex-direction: column;
+                padding: 15px 18px;
+            }
+
+            .layout {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                padding: 16px;
+            }
+
+            .side-links {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .sidebar-note {
+                margin-top: 16px;
+            }
+
+            main {
+                padding: 22px 16px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .top-nav {
+                gap: 12px;
+            }
+
+            .page-heading {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .date-label {
+                text-align: left;
+            }
+
+            .stats,
+            .side-links {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="topbar">
+        <div class="brand">
+            NIBRETE BUZUNEH
+            <small>Secondary and Preparatory School</small>
+        </div>
+        <nav class="top-nav" aria-label="Main navigation">
+            <a href="index.html">Home</a>
+            <a href="registrationform.html">Students</a>
+            <a href="fees.html">Finance</a>
+            <a href="login.html" id="logoutLink">Logout</a>
+        </nav>
+    </header>
+
+    <div class="layout">
+        <aside class="sidebar">
+            <h2>SCHOOL PANEL</h2>
+            <nav class="side-links" aria-label="Administrator menu">
+                <a href="admindash%20bord.html" aria-current="page">Dashboard Overview</a>
+                <a href="dashboard.html">School Dashboard</a>
+                <a href="registrationform.html">Student Registration</a>
+                <a href="registration-review.html">Review Applications</a>
+                <a href="teacher-portal.html">Teacher Management</a>
+                <a href="attendance.html">Attendance</a>
+                <a href="fees.html">Fee Management</a>
+            </nav>
+            <div class="sidebar-note">
+                <strong>Administrator Panel</strong><br>
+                Review student records and monitor school operations from one place.
+            </div>
+        </aside>
+
+        <main>
+            <div class="page-heading">
+                <div>
+                    <h1>Admin Dashboard</h1>
+                    <p>School performance and daily activity at a glance.</p>
+                </div>
+                <p class="date-label" id="currentDate"></p>
+            </div>
+
+            <div id="dashboardMessage" class="notice" role="status" aria-live="polite"></div>
+
+            <section class="welcome" aria-label="Welcome">
+                <h2 id="welcomeTitle">Welcome, Administrator</h2>
+                <p id="welcomeText">Your school overview will appear here after dashboard data loads.</p>
+            </section>
+
+            <section class="stats" aria-label="School statistics">
+                <article class="stat-card">
+                    <span class="stat-label">Total Students</span>
+                    <strong class="stat-value blue" id="studentCount">—</strong>
+                    <span class="stat-description">Registered student records</span>
+                </article>
+                <article class="stat-card">
+                    <span class="stat-label">Total Teachers</span>
+                    <strong class="stat-value green" id="teacherCount">—</strong>
+                    <span class="stat-description">Registered teacher accounts</span>
+                </article>
+                <article class="stat-card">
+                    <span class="stat-label">Attendance Rate</span>
+                    <strong class="stat-value amber" id="attendanceRate">—</strong>
+                    <span class="stat-description">Present entries in recorded attendance</span>
+                </article>
+                <article class="stat-card">
+                    <span class="stat-label">Fees Collected</span>
+                    <strong class="stat-value green" id="feesCollected">—</strong>
+                    <span class="stat-description">Payments recorded in fee entries</span>
+                </article>
+            </section>
+
+            <div class="content-grid">
+                <section class="panel">
+                    <div class="panel-heading">
+                        <div>
+                            <h2>Student Records</h2>
+                            <p>Search recently registered students by name, ID, grade, or status.</p>
+                        </div>
+                        <a class="quick-link" href="registrationform.html"><strong>Add student</strong></a>
+                    </div>
+                    <label for="studentSearch" class="stat-label">Search students</label>
+                    <input
+                        class="search"
+                        id="studentSearch"
+                        type="search"
+                        placeholder="Enter a name, ID, grade, or status"
+                    >
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Student</th>
+                                    <th>Grade</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="studentTableBody">
+                                <tr><td colspan="3" class="empty-state">Loading student records...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section class="panel">
+                    <div class="panel-heading">
+                        <div>
+                            <h2>Quick Actions</h2>
+                            <p>Go directly to a school management task.</p>
+                        </div>
+                    </div>
+                    <div class="quick-links">
+                        <a class="quick-link" href="registrationform.html">
+                            <strong>Student Registration</strong>
+                            <span>Add, find, and update student records.</span>
+                        </a>
+                        <a class="quick-link" href="registration-review.html">
+                            <strong>Review Applications</strong>
+                            <span>View and process submitted applications.</span>
+                        </a>
+                        <a class="quick-link" href="teacher-portal.html">
+                            <strong>Teacher Management</strong>
+                            <span>Open the teacher portal.</span>
+                        </a>
+                        <a class="quick-link" href="attendance.html">
+                            <strong>Attendance</strong>
+                            <span>Review recorded attendance.</span>
+                        </a>
+                        <a class="quick-link" href="fees.html">
+                            <strong>Fee Management</strong>
+                            <span>Review fee records and payments.</span>
+                        </a>
+                    </div>
+                    <div class="panel-heading" style="margin-top: 20px; margin-bottom: 0;">
+                        <p id="lastUpdated">Dashboard data has not loaded yet.</p>
+                        <button class="refresh-button" type="button" id="refreshButton">Refresh</button>
+                    </div>
+                </section>
+            </div>
+
+            <footer>
+                &copy; <span id="currentYear"></span>
+                NIBRETE BUZUNEH Secondary and Preparatory School.
+            </footer>
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        (function () {
+            'use strict';
+
+            const $ = function (id) {
+                return document.getElementById(id);
+            };
+            const state = {
+                students: [],
+                users: [],
+                attendance: [],
+                fees: [],
+                loading: false
+            };
+
+            function setMessage(text, type) {
+                const message = $('dashboardMessage');
+                message.textContent = text;
+                message.className = 'notice ' + type;
+            }
+
+            function clearMessage() {
+                const message = $('dashboardMessage');
+                message.textContent = '';
+                message.className = 'notice';
+            }
+
+            function listFromResponse(response, collectionName) {
+                if (Array.isArray(response)) {
+                    return response;
+                }
+
+                if (response && Array.isArray(response[collectionName])) {
+                    return response[collectionName];
+                }
+
+                throw new Error('The server returned an invalid ' + collectionName + ' list.');
+            }
+
+            function getStudentName(student) {
+                const fullName = [
+                    student.firstName,
+                    student.middleName,
+                    student.lastName
+                ].filter(Boolean).join(' ');
+
+                return String(fullName || student.name || student.fullName || 'Unnamed Student');
+            }
+
+            function getStudentId(student) {
+                return String(student.studentId ?? student.admissionNumber ?? student.id ?? '');
+            }
+
+            function formatNumber(value) {
+                return Number(value).toLocaleString();
+            }
+
+            function formatMoney(value) {
+                return 'ETB ' + Number(value).toLocaleString('en-ET', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                });
+            }
+
+            function getPaidAmount(fee) {
+                const total = Math.max(0, Number(fee.amount) || 0);
+                const recordedPaid = fee.amountPaid ?? fee.paidAmount;
+
+                if (recordedPaid !== undefined && recordedPaid !== null) {
+                    return Math.min(total, Math.max(0, Number(recordedPaid) || 0));
+                }
+
+                return String(fee.status || '').toLowerCase() === 'paid' ? total : 0;
+            }
+
+            function renderStudents() {
+                const query = $('studentSearch').value.trim().toLowerCase();
+                const filtered = state.students.filter(function (student) {
+                    const searchableText = [
+                        getStudentName(student),
+                        getStudentId(student),
+                        student.grade,
+                        student.gradeLevel,
+                        student.status
+                    ].join(' ').toLowerCase();
+
+                    return searchableText.includes(query);
+                });
+                const tbody = $('studentTableBody');
+                tbody.replaceChildren();
+
+                if (filtered.length === 0) {
+                    const row = document.createElement('tr');
+                    const cell = document.createElement('td');
+                    cell.colSpan = 3;
+                    cell.className = 'empty-state';
+                    cell.textContent = state.students.length
+                        ? 'No matching students found.'
+                        : 'No student records are available.';
+                    row.appendChild(cell);
+                    tbody.appendChild(row);
+                    return;
+                }
+
+                filtered.slice().reverse().slice(0, 10).forEach(function (student) {
+                    const row = document.createElement('tr');
+                    const nameCell = document.createElement('td');
+                    const name = document.createElement('div');
+                    name.className = 'student-name';
+                    name.textContent = getStudentName(student);
+                    const id = document.createElement('div');
+                    id.className = 'student-id';
+                    id.textContent = 'ID: ' + (getStudentId(student) || 'N/A');
+                    nameCell.append(name, id);
+
+                    const gradeCell = document.createElement('td');
+                    gradeCell.textContent = String(student.grade ?? student.gradeLevel ?? 'N/A');
+
+                    const statusCell = document.createElement('td');
+                    const badge = document.createElement('span');
+                    const status = String(student.status || 'Active');
+                    const normalizedStatus = status.toLowerCase();
+                    badge.className = 'badge' + (
+                        normalizedStatus === 'active'
+                            ? ''
+                            : normalizedStatus === 'inactive'
+                                ? ' inactive'
+                                : ' other'
+                    );
+                    badge.textContent = status;
+                    statusCell.appendChild(badge);
+                    row.append(nameCell, gradeCell, statusCell);
+                    tbody.appendChild(row);
+                });
+            }
+
+            function renderDashboard() {
+                $('studentCount').textContent = formatNumber(state.students.length);
+                $('teacherCount').textContent = formatNumber(state.users.filter(function (user) {
+                    return String(user.role || '').toLowerCase() === 'teacher';
+                }).length);
+                $('attendanceRate').textContent = state.attendance.length
+                    ? Math.round(
+                        state.attendance.filter(function (record) {
+                            return String(record.status || '').toLowerCase() === 'present';
+                        }).length / state.attendance.length * 100
+                    ) + '%'
+                    : '0%';
+                $('feesCollected').textContent = formatMoney(state.fees.reduce(function (sum, fee) {
+                    return sum + getPaidAmount(fee);
+                }, 0));
+                $('welcomeText').textContent =
+                    formatNumber(state.students.length) + ' student records and ' +
+                    formatNumber(state.attendance.length) + ' attendance records are available.';
+                $('lastUpdated').textContent = 'Updated at ' + new Date().toLocaleTimeString();
+                renderStudents();
+            }
+
+            async function loadDashboard() {
+                if (state.loading) {
+                    return;
+                }
+
+                const requiredFunctions = ['getStudents', 'getUsers', 'getAttendance', 'getFees'];
+                const missingFunctions = requiredFunctions.filter(function (name) {
+                    return !window.SchoolApp || typeof window.SchoolApp[name] !== 'function';
+                });
+
+                if (missingFunctions.length) {
+                    setMessage('Dashboard data functions are missing: ' + missingFunctions.join(', ') + '.', 'error');
+                    return;
+                }
+
+                state.loading = true;
+                clearMessage();
+                $('refreshButton').disabled = true;
+                $('refreshButton').textContent = 'Loading...';
+
+                try {
+                    const responses = await Promise.all([
+                        window.SchoolApp.getStudents(),
+                        window.SchoolApp.getUsers(),
+                        window.SchoolApp.getAttendance(),
+                        window.SchoolApp.getFees()
+                    ]);
+                    state.students = listFromResponse(responses[0], 'students');
+                    state.users = listFromResponse(responses[1], 'users');
+                    state.attendance = listFromResponse(responses[2], 'attendance');
+                    state.fees = listFromResponse(responses[3], 'fees');
+                    renderDashboard();
+                    setMessage('Dashboard data loaded successfully.', 'success');
+                } catch (error) {
+                    console.error('Unable to load admin dashboard data:', error);
+                    setMessage(error.message || 'Unable to load dashboard data. Check that the backend is running.', 'error');
+                } finally {
+                    state.loading = false;
+                    $('refreshButton').disabled = false;
+                    $('refreshButton').textContent = 'Refresh';
+                }
+            }
+
+            $('currentDate').textContent = new Date().toLocaleDateString('en-ET', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+            $('currentYear').textContent = new Date().getFullYear();
+            $('studentSearch').addEventListener('input', renderStudents);
+            $('refreshButton').addEventListener('click', loadDashboard);
+            $('logoutLink').addEventListener('click', function (event) {
+                event.preventDefault();
+                if (!window.confirm('Are you sure you want to log out?')) {
+                    return;
+                }
+
+                if (!window.SchoolApp || typeof window.SchoolApp.logoutUser !== 'function') {
+                    setMessage('The logout function is unavailable. Check app.js.', 'error');
+                    return;
+                }
+                window.SchoolApp.logoutUser();
+            });
+
+            if (!window.SchoolApp || typeof window.SchoolApp.requireAuth !== 'function') {
+                setMessage('The authentication function is unavailable. Check app.js.', 'error');
+                return;
+            }
+
+            try {
+                const user = window.SchoolApp.requireAuth([
+                    'admin',
+                    'super_admin',
+                    'school_admin',
+                    'director',
+                    'principal'
+                ]);
+                if (!user) {
+                    return;
+                }
+
+                const displayName = user.name || user.fullName || user.username || 'Administrator';
+                $('welcomeTitle').textContent = 'Welcome, ' + String(displayName);
+                loadDashboard();
+            } catch (error) {
+                console.error('Administrator authentication failed:', error);
+                setMessage('Administrator authentication failed. Please check your login and user role.', 'error');
+            }
+        })();
+    </script>
+</body>
+</html>

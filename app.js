@@ -5,7 +5,14 @@
     // CONFIGURATION
     // =====================================================
 
-    const API_BASE = '/api';
+    const isLocalDevelopmentHost =
+        window.location.hostname === 'localhost' ||
+        window.location.hostname === '127.0.0.1' ||
+        window.location.hostname === '[::1]';
+    const API_BASE =
+        isLocalDevelopmentHost && window.location.port !== '3000'
+            ? window.location.protocol + '//' + window.location.hostname + ':3000/api'
+            : '/api';
     const SESSION_KEY = 'current_user';
 
     const STORAGE_KEYS = {
@@ -35,7 +42,7 @@
 
             // Supports same-origin cookie sessions if your
             // backend has been configured to use them.
-            credentials: 'same-origin'
+            credentials: 'include'
         };
 
         if (options.body !== undefined) {
@@ -140,9 +147,14 @@
                     ? user.email
                     : '',
 
+            studentId:
+                typeof (user.studentId ?? user.student_id) === 'string'
+                    ? user.studentId ?? user.student_id
+                    : null,
+
             role:
                 typeof user.role === 'string'
-                    ? user.role.toLowerCase()
+                    ? user.role.trim().toLowerCase().replace(/[\s-]+/g, '_')
                     : ''
         };
     }
@@ -216,6 +228,13 @@
     function getUsers() {
         // The backend must restrict this endpoint to authorized staff.
         return request('/users');
+    }
+
+    function createTeacherAccount(account) {
+        return request('/users', {
+            method: 'POST',
+            body: JSON.stringify(account)
+        });
     }
 
     // =====================================================
@@ -573,11 +592,18 @@
         }
 
         if (expectedRole) {
-            const allowedRoles = Array.isArray(expectedRole)
+            const allowedRoles = (Array.isArray(expectedRole)
                 ? expectedRole
-                : [expectedRole];
+                : [expectedRole])
+                .map(function (role) {
+                    return String(role).trim().toLowerCase().replace(/[\s-]+/g, '_');
+                });
+            const currentRole = String(user.role)
+                .trim()
+                .toLowerCase()
+                .replace(/[\s-]+/g, '_');
 
-            if (!allowedRoles.includes(user.role)) {
+            if (!allowedRoles.includes(currentRole)) {
                 redirectByRole();
                 return null;
             }
@@ -602,17 +628,20 @@
 
         const rolePages = {
             admin: 'dashboard.html',
+            super_admin: 'dashboard.html',
+            school_admin: 'dashboard.html',
+            director: 'dashboard.html',
+            principal: 'dashboard.html',
             registrar: 'registration-review.html',
-            principal: 'principal-dashboard.html',
             teacher: 'teacher-portal.html',
-            student: 'student-portal.html',
-            parent: 'parent-portal.html',
-            registrar: 'registrar-portal.html',
-            hr: 'hr-portal.html',
-            accountant: 'accountant-portal.html'
+            student: 'student-portal.html'
         };
 
-        const destination = rolePages[user.role];
+        const role = String(user.role)
+            .trim()
+            .toLowerCase()
+            .replace(/[\s-]+/g, '_');
+        const destination = rolePages[role];
 
         if (!destination) {
             clearCurrentUser();
@@ -653,11 +682,15 @@
 
     function hasRole(role) {
         const user = getCurrentUser();
+        const currentRole = user && typeof user.role === 'string'
+            ? user.role.trim().toLowerCase().replace(/[\s-]+/g, '_')
+            : '';
+        const expectedRole = String(role)
+            .trim()
+            .toLowerCase()
+            .replace(/[\s-]+/g, '_');
 
-        return Boolean(
-            user &&
-            user.role === String(role).toLowerCase()
-        );
+        return Boolean(currentRole && currentRole === expectedRole);
     }
 
     // =====================================================
@@ -669,6 +702,7 @@
         STORAGE_KEYS,
 
         getUsers,
+        createTeacherAccount,
 
         getStudents,
         addStudent,

@@ -359,6 +359,61 @@
             box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1);
         }
 
+        .account-form {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 14px;
+        }
+
+        .account-form label {
+            display: grid;
+            gap: 6px;
+            color: var(--text);
+            font-size: 0.82rem;
+            font-weight: 700;
+        }
+
+        .account-form input {
+            width: 100%;
+            min-width: 0;
+            padding: 11px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 9px;
+        }
+
+        .account-form .full-width {
+            grid-column: 1 / -1;
+        }
+
+        .account-message {
+            min-height: 1.4em;
+            margin: 0;
+            font-size: 0.83rem;
+        }
+
+        .account-message.error {
+            color: #991b1b;
+        }
+
+        .account-message.success {
+            color: #166534;
+        }
+
+        .account-submit {
+            justify-self: start;
+            border: 0;
+            border-radius: 9px;
+            padding: 11px 15px;
+            background: var(--green);
+            color: white;
+            font-weight: 700;
+        }
+
+        .account-submit:disabled {
+            cursor: wait;
+            opacity: 0.65;
+        }
+
         /* STUDENT TABLE */
 
         .table-wrapper {
@@ -603,6 +658,14 @@
             .panel {
                 padding: 16px;
             }
+
+            .account-form {
+                grid-template-columns: 1fr;
+            }
+
+            .account-form .full-width {
+                grid-column: auto;
+            }
         }
     </style>
 </head>
@@ -644,7 +707,7 @@
                     <a href="attendance.html">Attendance</a>
                 </li>
                 <li>
-                    <a href="results.html">Exam Results</a>
+                    <a href="teacher-portal.html">Exam Results and Entry</a>
                 </li>
                 <li>
                     <a href="fees.html">Fee Management</a>
@@ -721,6 +784,40 @@
                 </span>
             </article>
 
+        </section>
+
+        <section class="panel" style="margin: 20px 0;">
+            <div class="panel-header">
+                <div>
+                    <h2>Create Teacher Account</h2>
+                    <p>Only an administrator can create teacher logins. Share the password with the teacher securely.</p>
+                </div>
+            </div>
+
+            <form id="teacherAccountForm" class="account-form">
+                <label>
+                    Teacher full name
+                    <input name="fullName" type="text" maxlength="100" autocomplete="name" required>
+                </label>
+                <label>
+                    Username
+                    <input name="username" type="text" minlength="3" maxlength="30"
+                           pattern="[A-Za-z0-9._-]{3,30}" autocomplete="username" required>
+                </label>
+                <label>
+                    Email address
+                    <input name="email" type="email" maxlength="254" autocomplete="email" required>
+                </label>
+                <label>
+                    Temporary password
+                    <input name="password" type="password" minlength="8" maxlength="128"
+                           autocomplete="new-password" required>
+                </label>
+                <p id="teacherAccountMessage" class="account-message full-width" role="status" aria-live="polite"></p>
+                <button id="createTeacherButton" class="account-submit full-width" type="submit">
+                    Create Teacher Account
+                </button>
+            </form>
         </section>
 
         <section class="content-grid">
@@ -1362,14 +1459,62 @@
 
     $('refreshButton').addEventListener('click', loadDashboard);
 
+    $('teacherAccountForm').addEventListener('submit', async function (event) {
+        event.preventDefault();
+        const form = event.currentTarget;
+        const button = $('createTeacherButton');
+        const message = $('teacherAccountMessage');
+        const account = {
+            fullName: form.elements.fullName.value.trim(),
+            username: form.elements.username.value.trim(),
+            email: form.elements.email.value.trim(),
+            password: form.elements.password.value
+        };
+
+        button.disabled = true;
+        button.textContent = 'Creating account...';
+        message.textContent = '';
+        message.className = 'account-message full-width';
+
+        try {
+            const result = await window.SchoolApp.createTeacherAccount(account);
+            message.textContent = result.message || 'Teacher account created. Share the login details securely.';
+            message.className = 'account-message full-width success';
+            form.reset();
+            await loadDashboard();
+        } catch (error) {
+            console.error('Unable to create teacher account:', error);
+            message.textContent = error.message || 'Could not create teacher account.';
+            message.className = 'account-message full-width error';
+        } finally {
+            button.disabled = false;
+            button.textContent = 'Create Teacher Account';
+        }
+    });
+
     $('logoutLink').addEventListener('click', function (event) {
         const confirmed = window.confirm(
             'Are you sure you want to log out?'
         );
 
+        event.preventDefault();
+
         if (!confirmed) {
-            event.preventDefault();
+            return;
         }
+
+        if (
+            !window.SchoolApp ||
+            typeof window.SchoolApp.logoutUser !== 'function'
+        ) {
+            setMessage(
+                'The logout function is unavailable. Check app.js.',
+                'error'
+            );
+            return;
+        }
+
+        window.SchoolApp.logoutUser();
     });
 
     if (
@@ -1390,7 +1535,17 @@
          * The existing app.js determines how authentication works.
          */
 
-        window.SchoolApp.requireAuth('admin');
+        const currentUser = window.SchoolApp.requireAuth([
+            'admin',
+            'super_admin',
+            'school_admin',
+            'director',
+            'principal'
+        ]);
+
+        if (!currentUser) {
+            return;
+        }
 
     } catch (error) {
         console.error('Dashboard authentication check failed:', error);
