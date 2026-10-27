@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node --env-file-if-exists=.env server.js",
     "db:init": "node --env-file-if-exists=.env scripts/init-db.js",
+    "admin:reset-password": "node --env-file-if-exists=.env scripts/reset-admin-password.js",
     "test": "node --test"
   },
   "engines": {

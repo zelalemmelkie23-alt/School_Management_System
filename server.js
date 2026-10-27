@@ -900,11 +900,15 @@ function createSchoolServer(options = {}) {
                 const username = text(body.username, 'Username', { required: true, max: 30 });
                 const email = text(body.email, 'Email address', { required: true, max: 254 }).toLowerCase();
                 const password = typeof body.password === 'string' ? body.password : '';
+                const role = body.role === undefined ? 'teacher' : normalizeRole(body.role);
 
                 if (!/^[A-Za-z0-9._-]{3,30}$/.test(username)) {
                     throw new HttpError(400, 'Username must be 3-30 characters and use letters, numbers, dots, underscores, or hyphens.');
                 }
                 if (!validEmail(email)) throw new HttpError(400, 'Enter a valid email address.');
+                if (!['teacher', 'registrar'].includes(role)) {
+                    throw new HttpError(400, 'Account role must be teacher or registrar.');
+                }
                 if (password.length < 8 || password.length > 128) {
                     throw new HttpError(400, 'Password must be between 8 and 128 characters.');
                 }
@@ -913,8 +917,8 @@ function createSchoolServer(options = {}) {
                 try {
                     database.prepare(`
                         INSERT INTO users (id, full_name, username, email, password_hash, role)
-                        VALUES (?, ?, ?, ?, ?, 'teacher')
-                    `).run(userId, fullName, username, email, hashPassword(password));
+                        VALUES (?, ?, ?, ?, ?, ?)
+                    `).run(userId, fullName, username, email, hashPassword(password), role);
                 } catch (error) {
                     if (String(error.message).includes('UNIQUE')) {
                         throw new HttpError(409, 'That username or email address is already in use.');
@@ -929,7 +933,9 @@ function createSchoolServer(options = {}) {
                 `).get(userId);
                 return jsonResponse(response, 201, {
                     success: true,
-                    message: 'Teacher account created.',
+                    message: role === 'registrar'
+                        ? 'Registrar account created.'
+                        : 'Teacher account created.',
                     user
                 });
             }

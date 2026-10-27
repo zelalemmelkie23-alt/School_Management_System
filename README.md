@@ -24,13 +24,21 @@
 
 There is no demo/default admin password. The first admin is created only when all `ADMIN_*` values are configured. A production school deployment still requires HTTPS, backups, controlled user provisioning, and operational policies.
 
-### Create teacher accounts
+### Reset a forgotten administrator password
+
+1. Stop the running server.
+2. In the project folder, run `npm run admin:reset-password` from an interactive terminal. The command uses `ADMIN_USERNAME` and `DB_PATH` from `.env` and asks for the new password twice without displaying it.
+3. Use a new password between 12 and 128 characters, then restart the server with `npm start` and sign in at `http://localhost:3000/login.html`.
+
+The command updates the existing `admin` account only. It does not display or change the password in `.env`, and it cannot create or change other account roles.
+
+### Create teacher and registrar accounts
 
 1. Sign in as an administrator and open `dashboard.html`.
-2. Use the **Create Teacher Account** form to enter the teacher's full name, a unique username, email, and a password of at least 8 characters.
-3. Share the username and password with the teacher securely. The teacher signs in through `login.html` and is directed to `teacher-portal.html`.
+2. Use the **Create Teacher or Registrar Account** form to select the role and enter the staff member's full name, a unique username, email, and a password of at least 8 characters.
+3. Share the username and temporary password securely. Teachers sign in through `login.html` and are directed to `teacher-portal.html`; registrars are directed to `registration-review.html`.
 
-The server always assigns the `teacher` role for this form; users cannot create administrator accounts through it. Student accounts are created separately by approving an admission application in `registration-review.html`.
+The server allows this form to create only `teacher` and `registrar` accounts; users cannot create administrator accounts through it. Student accounts are created separately by approving an admission application in `registration-review.html`.
 
 ## 3. የፋይሎች መመሪያ
 
@@ -75,7 +83,7 @@ The following API routes are implemented in `server.js` and enforce session and 
 | `POST` | `/api/auth/login` | መግባት |
 | `POST` | `/api/auth/signup` | አካውንት መፍጠር |
 | `POST` | `/api/auth/logout` | የሰርቨር መግቢያን ማቋረጥ |
-| `GET`, `POST` | `/api/users` | የተጠቃሚ ዝርዝር (GET) እና በadmin ብቻ የteacher account መፍጠር (POST) |
+| `GET`, `POST` | `/api/users` | የተጠቃሚ ዝርዝር (GET) እና በadmin ብቻ teacher/registrar account መፍጠር (POST) |
 | `GET`, `POST`, `PUT`, `DELETE` | `/api/students`, `/api/students/:id` | የተማሪ መረጃ ማስተዳደር |
 | `POST`, `GET`, `PATCH` | `/api/registrations` እና `/api/registrations/:id` | ማመልከቻ መላክና መገምገም |
 | `GET`, `POST` | `/api/attendance` | መገኘት ማየትና መመዝገብ |

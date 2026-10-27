@@ -719,13 +719,13 @@
                     <a href="registrationform.html">Student Registration</a>
                 </li>
                 <li>
-                    <a href="teacher-portal.html">Teacher Management</a>
+                    <a href="#teacherManagement">Teacher Management</a>
                 </li>
                 <li>
                     <a href="attendance.html">Attendance</a>
                 </li>
                 <li>
-                    <a href="teacher-portal.html">Exam Results and Entry</a>
+                    <a href="#schoolOverview">Exam Results Summary</a>
                 </li>
                 <li>
                     <a href="fees.html">Fee Management</a>
@@ -804,17 +804,24 @@
 
         </section>
 
-        <section class="panel" style="margin: 20px 0;">
+        <section class="panel" id="teacherManagement" style="margin: 20px 0;">
             <div class="panel-header">
                 <div>
-                    <h2>Create Teacher Account</h2>
-                    <p>Only an administrator can create teacher logins. Share the password with the teacher securely.</p>
+                    <h2>Create Teacher or Registrar Account</h2>
+                    <p>Only an administrator can create staff logins. Share each temporary password securely.</p>
                 </div>
             </div>
 
             <form id="teacherAccountForm" class="account-form">
                 <label>
-                    Teacher full name
+                    Account type
+                    <select name="role" required>
+                        <option value="teacher">Teacher</option>
+                        <option value="registrar">Registrar</option>
+                    </select>
+                </label>
+                <label>
+                    Full name
                     <input name="fullName" type="text" maxlength="100" autocomplete="name" required>
                 </label>
                 <label>
@@ -833,7 +840,7 @@
                 </label>
                 <p id="teacherAccountMessage" class="account-message full-width" role="status" aria-live="polite"></p>
                 <button id="createTeacherButton" class="account-submit full-width" type="submit">
-                    Create Teacher Account
+                    Create Staff Account
                 </button>
             </form>
         </section>
@@ -938,7 +945,7 @@
 
             <div>
 
-                <section class="panel">
+                <section class="panel" id="schoolOverview">
                     <div class="panel-header">
                         <div>
                             <h2>Quick Actions</h2>
@@ -958,9 +965,9 @@
                             <span>Approve or reject pending student registrations.</span>
                         </a>
 
-                        <a class="quick-link" href="teacher-portal.html">
-                            <strong>Teacher Portal</strong>
-                            <span>Access teacher features.</span>
+                        <a class="quick-link" href="#teacherManagement">
+                            <strong>Teacher Management</strong>
+                            <span>Create teacher accounts and assign sections and subjects.</span>
                         </a>
 
                         <a class="quick-link" href="attendance.html">
@@ -1375,8 +1382,9 @@
         filterStudents();
         renderOverview();
     }
-
-    function renderTeacherAssignments() {
+2
+    function rendenpm start
+    rTeacherAssignments() {
         const teacherSelect = $('assignmentTeacher');
         const sectionSelect = $('assignmentSection');
         const assignmentBody = $('teacherAssignmentTableBody');
@@ -1606,6 +1614,7 @@
         const button = $('createTeacherButton');
         const message = $('teacherAccountMessage');
         const account = {
+            role: form.elements.role.value,
             fullName: form.elements.fullName.value.trim(),
             username: form.elements.username.value.trim(),
             email: form.elements.email.value.trim(),
@@ -1618,18 +1627,18 @@
         message.className = 'account-message full-width';
 
         try {
-            const result = await window.SchoolApp.createTeacherAccount(account);
-            message.textContent = result.message || 'Teacher account created. Share the login details securely.';
+            const result = await window.SchoolApp.createStaffAccount(account);
+            message.textContent = result.message || 'Staff account created. Share the login details securely.';
             message.className = 'account-message full-width success';
             form.reset();
             await loadDashboard();
         } catch (error) {
-            console.error('Unable to create teacher account:', error);
-            message.textContent = error.message || 'Could not create teacher account.';
+            console.error('Unable to create staff account:', error);
+            message.textContent = error.message || 'Could not create staff account.';
             message.className = 'account-message full-width error';
         } finally {
             button.disabled = false;
-            button.textContent = 'Create Teacher Account';
+            button.textContent = 'Create Staff Account';
         }
     });
 

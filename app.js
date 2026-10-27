@@ -230,7 +230,7 @@
         return request('/users');
     }
 
-    function createTeacherAccount(account) {
+    function createStaffAccount(account) {
         return request('/users', {
             method: 'POST',
             body: JSON.stringify(account)
@@ -726,7 +726,7 @@
         STORAGE_KEYS,
 
         getUsers,
-        createTeacherAccount,
+        createStaffAccount,
         getTeacherAssignments,
         createTeacherAssignment,
         deleteTeacherAssignment,

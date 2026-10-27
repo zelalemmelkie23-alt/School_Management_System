@@ -8,6 +8,7 @@ const os = require('node:os');
 const path = require('node:path');
 const test = require('node:test');
 const { createSchoolServer } = require('../server');
+const { resetAdminPassword } = require('../scripts/reset-admin-password');
 
 test('server startup creates the configured database and serves the application', async () => {
     const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'school-startup-'));
@@ -75,7 +76,7 @@ test('server startup creates the configured database and serves the application'
 
 async function withServer(run) {
     const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'school-api-'));
-    const { server } = createSchoolServer({
+    const { server, database } = createSchoolServer({
         dbPath: path.join(directory, 'test.sqlite'),
         bootstrapAdmin: {
             fullName: 'Test Administrator',
@@ -89,7 +90,7 @@ async function withServer(run) {
     const baseUrl = `http://127.0.0.1:${server.address().port}`;
 
     try {
-        await run(baseUrl);
+        await run(baseUrl, database);
     } finally {
         await new Promise((resolve, reject) => server.close((error) => error ? reject(error) : resolve()));
         fs.rmSync(directory, { recursive: true, force: true });
@@ -111,6 +112,49 @@ test('health endpoint confirms SQLite is connected', async () => {
         const response = await fetch(`${baseUrl}/api/health`);
         assert.equal(response.status, 200);
         assert.deepEqual(await response.json(), { status: 'ok', database: 'connected' });
+    });
+});
+
+test('administrator password reset updates only the selected admin account', async () => {
+    await withServer(async (baseUrl, database) => {
+        const originalHash = database.prepare(
+            'SELECT password_hash FROM users WHERE username = ?'
+        ).get('admin').password_hash;
+        const newPassword = 'new-admin-password-123';
+
+        resetAdminPassword(database, 'ADMIN', newPassword);
+
+        const updatedHash = database.prepare(
+            'SELECT password_hash FROM users WHERE username = ?'
+        ).get('admin').password_hash;
+        assert.notEqual(updatedHash, originalHash);
+        assert.notEqual(updatedHash, newPassword);
+
+        const oldLogin = await fetch(`${baseUrl}/api/auth/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                identifier: 'admin',
+                password: 'correct-horse-battery'
+            })
+        });
+        assert.equal(oldLogin.status, 401);
+        const newLogin = await login(baseUrl, 'admin', newPassword);
+        assert.equal(newLogin.response.status, 200);
+        assert.equal(newLogin.body.user.role, 'admin');
+    });
+});
+
+test('administrator password reset rejects invalid passwords and non-admin accounts', async () => {
+    await withServer(async (_baseUrl, database) => {
+        assert.throws(
+            () => resetAdminPassword(database, 'admin', 'too-short'),
+            /between 12 and 128 characters/
+        );
+        assert.throws(
+            () => resetAdminPassword(database, 'missing-admin', 'valid-admin-password'),
+            /No administrator account was found/
+        );
     });
 });
 
@@ -138,7 +182,7 @@ test('login creates an authenticated session and protects student endpoints', as
     });
 });
 
-test('administrators can create teacher accounts and other roles cannot', async () => {
+test('administrators can create teacher and registrar accounts but other roles cannot', async () => {
     await withServer(async (baseUrl) => {
         const { cookie: adminCookie } = await login(baseUrl);
         const createTeacher = await fetch(`${baseUrl}/api/users`, {
@@ -152,7 +196,7 @@ test('administrators can create teacher accounts and other roles cannot', async 
                 username: 'hana.teacher',
                 email: 'hana.teacher@example.test',
                 password: 'teacher-password-123',
-                role: 'admin'
+                role: 'teacher'
             })
         });
         assert.equal(createTeacher.status, 201);
@@ -165,11 +209,40 @@ test('administrators can create teacher accounts and other roles cannot', async 
         assert.equal(teacherLogin.response.status, 200);
         assert.equal(teacherLogin.body.user.role, 'teacher');
 
+        const createRegistrar = await fetch(`${baseUrl}/api/users`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Cookie: adminCookie
+            },
+            body: JSON.stringify({
+                fullName: 'Registrar Almaz Bekele',
+                username: 'almaz.registrar',
+                email: 'almaz.registrar@example.test',
+                password: 'registrar-password-123',
+                role: 'registrar'
+            })
+        });
+        assert.equal(createRegistrar.status, 201);
+        const createdRegistrar = await createRegistrar.json();
+        assert.equal(createdRegistrar.user.role, 'registrar');
+        assert.equal('password' in createdRegistrar.user, false);
+
+        const registrarLogin = await login(baseUrl, 'almaz.registrar', 'registrar-password-123');
+        assert.equal(registrarLogin.response.status, 200);
+        assert.equal(registrarLogin.body.user.role, 'registrar');
+
+        const registrations = await fetch(`${baseUrl}/api/registrations`, {
+            headers: { Cookie: registrarLogin.cookie }
+        });
+        assert.equal(registrations.status, 200);
+        assert.deepEqual(await registrations.json(), []);
+
         const forbidden = await fetch(`${baseUrl}/api/users`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                Cookie: teacherLogin.cookie
+                Cookie: registrarLogin.cookie
             },
             body: JSON.stringify({
                 fullName: 'Unauthorized User',
@@ -179,6 +252,22 @@ test('administrators can create teacher accounts and other roles cannot', async 
             })
         });
         assert.equal(forbidden.status, 403);
+
+        const invalidRole = await fetch(`${baseUrl}/api/users`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Cookie: adminCookie
+            },
+            body: JSON.stringify({
+                fullName: 'Unauthorized Administrator',
+                username: 'unauthorized.admin',
+                email: 'unauthorized.admin@example.test',
+                password: 'administrator-password-123',
+                role: 'admin'
+            })
+        });
+        assert.equal(invalidRole.status, 400);
 
         const duplicate = await fetch(`${baseUrl}/api/users`, {
             method: 'POST',
