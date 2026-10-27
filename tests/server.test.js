@@ -212,6 +212,146 @@ test('administrators can create teacher accounts and other roles cannot', async 
     });
 });
 
+test('teacher assignments scope section rosters, results, and attendance', async () => {
+    await withServer(async (baseUrl) => {
+        const { cookie: adminCookie } = await login(baseUrl);
+        const teacherResponse = await fetch(`${baseUrl}/api/users`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Cookie: adminCookie },
+            body: JSON.stringify({
+                fullName: 'Section Teacher',
+                username: 'section.teacher',
+                email: 'section.teacher@example.test',
+                password: 'teacher-password-123'
+            })
+        });
+        assert.equal(teacherResponse.status, 201);
+        const { user } = await teacherResponse.json();
+
+        for (const student of [
+            { studentId: 'SEC-A-1', fullName: 'Student One', grade: 'Grade 9', stream: 'A' },
+            { studentId: 'SEC-A-2', fullName: 'Student Two', grade: 'Grade 9', stream: 'A' },
+            { studentId: 'SEC-B-1', fullName: 'Student Three', grade: 'Grade 9', stream: 'B' }
+        ]) {
+            const response = await fetch(`${baseUrl}/api/students`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', Cookie: adminCookie },
+                body: JSON.stringify(student)
+            });
+            assert.equal(response.status, 201);
+        }
+
+        const assignmentResponse = await fetch(`${baseUrl}/api/teacher-assignments`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Cookie: adminCookie },
+            body: JSON.stringify({
+                teacherId: user.id,
+                grade: 'Grade 9',
+                stream: 'A',
+                subject: 'Mathematics'
+            })
+        });
+        assert.equal(assignmentResponse.status, 201);
+        const assignment = (await assignmentResponse.json()).assignment;
+
+        const duplicateAssignment = await fetch(`${baseUrl}/api/teacher-assignments`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Cookie: adminCookie },
+            body: JSON.stringify({
+                teacherId: user.id,
+                grade: 'Grade 9',
+                stream: 'A',
+                subject: 'Mathematics'
+            })
+        });
+        assert.equal(duplicateAssignment.status, 409);
+
+        const { cookie: teacherCookie } = await login(baseUrl, 'section.teacher', 'teacher-password-123');
+        const teacherStudents = await fetch(`${baseUrl}/api/students`, {
+            headers: { Cookie: teacherCookie }
+        });
+        assert.deepEqual(
+            (await teacherStudents.json()).map((student) => student.studentId).sort(),
+            ['SEC-A-1', 'SEC-A-2']
+        );
+
+        const resultBody = {
+            studentId: 'SEC-A-1',
+            subject: 'Mathematics',
+            score: 85,
+            grade: 'A',
+            term: 'Term 1',
+            academicYear: '2026/2027',
+            examType: 'Test'
+        };
+        const permittedResult = await fetch(`${baseUrl}/api/results`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Cookie: teacherCookie },
+            body: JSON.stringify(resultBody)
+        });
+        assert.equal(permittedResult.status, 201);
+
+        const wrongSubject = await fetch(`${baseUrl}/api/results`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Cookie: teacherCookie },
+            body: JSON.stringify({ ...resultBody, subject: 'Biology' })
+        });
+        assert.equal(wrongSubject.status, 403);
+
+        const otherSectionResult = await fetch(`${baseUrl}/api/results`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Cookie: teacherCookie },
+            body: JSON.stringify({ ...resultBody, studentId: 'SEC-B-1' })
+        });
+        assert.equal(otherSectionResult.status, 403);
+
+        const teacherResults = await fetch(`${baseUrl}/api/results`, {
+            headers: { Cookie: teacherCookie }
+        });
+        assert.equal((await teacherResults.json()).length, 1);
+
+        const date = '2026-10-25';
+        const sectionAttendance = await fetch(`${baseUrl}/api/attendance/bulk`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Cookie: teacherCookie },
+            body: JSON.stringify({
+                date,
+                records: [
+                    { studentId: 'SEC-A-1', status: 'Present' },
+                    { studentId: 'SEC-A-2', status: 'Late' }
+                ]
+            })
+        });
+        assert.equal(sectionAttendance.status, 200);
+        assert.equal((await sectionAttendance.json()).count, 2);
+
+        const forbiddenAttendance = await fetch(`${baseUrl}/api/attendance/bulk`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Cookie: teacherCookie },
+            body: JSON.stringify({
+                date,
+                records: [{ studentId: 'SEC-B-1', status: 'Absent' }]
+            })
+        });
+        assert.equal(forbiddenAttendance.status, 403);
+
+        const teacherAttendance = await fetch(`${baseUrl}/api/attendance`, {
+            headers: { Cookie: teacherCookie }
+        });
+        assert.equal((await teacherAttendance.json()).length, 2);
+
+        const removed = await fetch(`${baseUrl}/api/teacher-assignments/${assignment.id}`, {
+            method: 'DELETE',
+            headers: { Cookie: adminCookie }
+        });
+        assert.equal(removed.status, 200);
+        const noLongerAssigned = await fetch(`${baseUrl}/api/students`, {
+            headers: { Cookie: teacherCookie }
+        });
+        assert.deepEqual(await noLongerAssigned.json(), []);
+    });
+});
+
 test('local development frontend can authenticate across ports', async () => {
     await withServer(async (baseUrl) => {
         const preflight = await fetch(`${baseUrl}/api/auth/login`, {

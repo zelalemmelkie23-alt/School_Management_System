@@ -381,6 +381,15 @@
             border-radius: 9px;
         }
 
+        .account-form select {
+            width: 100%;
+            min-width: 0;
+            padding: 11px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 9px;
+            background: white;
+        }
+
         .account-form .full-width {
             grid-column: 1 / -1;
         }
@@ -412,6 +421,15 @@
         .account-submit:disabled {
             cursor: wait;
             opacity: 0.65;
+        }
+
+        .assignment-remove {
+            border: 0;
+            border-radius: 7px;
+            padding: 7px 10px;
+            background: var(--red-light);
+            color: #991b1b;
+            font-weight: 700;
         }
 
         /* STUDENT TABLE */
@@ -820,6 +838,55 @@
             </form>
         </section>
 
+        <section class="panel" style="margin: 20px 0;">
+            <div class="panel-header">
+                <div>
+                    <h2>Assign Teacher Sections and Subjects</h2>
+                    <p>Teachers can view and manage only students in their assigned grade, section, and subject.</p>
+                </div>
+            </div>
+
+            <form id="teacherAssignmentForm" class="account-form">
+                <label>
+                    Teacher
+                    <select name="teacherId" id="assignmentTeacher" required>
+                        <option value="">Select a teacher</option>
+                    </select>
+                </label>
+                <label>
+                    Grade and section
+                    <select name="sectionIndex" id="assignmentSection" required>
+                        <option value="">Select a section</option>
+                    </select>
+                </label>
+                <label class="full-width">
+                    Subject
+                    <input name="subject" type="text" maxlength="100" placeholder="e.g. Mathematics" required>
+                </label>
+                <p id="teacherAssignmentMessage" class="account-message full-width" role="status" aria-live="polite"></p>
+                <button id="saveTeacherAssignmentButton" class="account-submit full-width" type="submit">
+                    Save Assignment
+                </button>
+            </form>
+
+            <div class="table-wrapper" style="margin-top: 18px;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Teacher</th>
+                            <th>Grade</th>
+                            <th>Section</th>
+                            <th>Subject</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="teacherAssignmentTableBody">
+                        <tr><td colspan="5" class="empty-state">No assignments loaded.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
         <section class="content-grid">
 
             <!-- STUDENT RECORDS -->
@@ -973,6 +1040,7 @@
         attendance: [],
         fees: [],
         results: [],
+        assignments: [],
         loading: false
     };
 
@@ -1308,6 +1376,73 @@
         renderOverview();
     }
 
+    function renderTeacherAssignments() {
+        const teacherSelect = $('assignmentTeacher');
+        const sectionSelect = $('assignmentSection');
+        const assignmentBody = $('teacherAssignmentTableBody');
+        const teachers = state.users.filter(function (user) {
+            return String(user.role || '').toLowerCase() === 'teacher';
+        });
+        const sections = new Map();
+
+        state.students.forEach(function (student) {
+            const grade = String(student.grade || '').trim();
+            const stream = String(student.stream || '').trim();
+            if (grade) sections.set(JSON.stringify([grade, stream]), { grade, stream });
+        });
+
+        teacherSelect.replaceChildren(new Option('Select a teacher', ''));
+        teachers.forEach(function (teacher) {
+            const option = new Option(
+                teacher.fullName || teacher.username || 'Teacher',
+                teacher.id
+            );
+            teacherSelect.appendChild(option);
+        });
+
+        sectionSelect.replaceChildren(new Option('Select a section', ''));
+        Array.from(sections.values())
+            .sort(function (left, right) {
+                return left.grade.localeCompare(right.grade) || left.stream.localeCompare(right.stream);
+            })
+            .forEach(function (section) {
+                const option = new Option(
+                    section.grade + (section.stream ? ' - ' + section.stream : ' - No stream'),
+                    JSON.stringify([section.grade, section.stream])
+                );
+                sectionSelect.appendChild(option);
+            });
+
+        assignmentBody.replaceChildren();
+        if (!state.assignments.length) {
+            const row = document.createElement('tr');
+            const cell = createCell('No teacher assignments have been created yet.');
+            cell.colSpan = 5;
+            cell.className = 'empty-state';
+            row.appendChild(cell);
+            assignmentBody.appendChild(row);
+            return;
+        }
+
+        state.assignments.forEach(function (assignment) {
+            const row = document.createElement('tr');
+            row.appendChild(createCell(assignment.teacherName || 'Teacher'));
+            row.appendChild(createCell(assignment.grade));
+            row.appendChild(createCell(assignment.stream || 'No stream'));
+            row.appendChild(createCell(assignment.subject));
+
+            const actionCell = document.createElement('td');
+            const removeButton = document.createElement('button');
+            removeButton.type = 'button';
+            removeButton.className = 'assignment-remove';
+            removeButton.dataset.assignmentId = assignment.id;
+            removeButton.textContent = 'Remove';
+            actionCell.appendChild(removeButton);
+            row.appendChild(actionCell);
+            assignmentBody.appendChild(row);
+        });
+    }
+
     async function loadDashboard() {
         if (state.loading) {
             return;
@@ -1327,7 +1462,8 @@
             'getUsers',
             'getAttendance',
             'getFees',
-            'getResults'
+            'getResults',
+            'getTeacherAssignments'
         ];
 
         const missingFunctions = requiredFunctions.filter(function (name) {
@@ -1356,7 +1492,7 @@
 
         try {
             /*
-             * Fetch all five collections.
+             * Fetch dashboard data and teacher assignments.
              * app.js must implement these functions.
              */
 
@@ -1365,7 +1501,8 @@
                 window.SchoolApp.getUsers(),
                 window.SchoolApp.getAttendance(),
                 window.SchoolApp.getFees(),
-                window.SchoolApp.getResults()
+                window.SchoolApp.getResults(),
+                window.SchoolApp.getTeacherAssignments()
             ]);
 
             state.students = Array.isArray(responses[0])
@@ -1383,7 +1520,11 @@
             state.results = Array.isArray(responses[4])
                 ? responses[4] : [];
 
+            state.assignments = Array.isArray(responses[5])
+                ? responses[5] : [];
+
             renderDashboard();
+            renderTeacherAssignments();
 
             setMessage(
                 'Dashboard data loaded successfully.',
@@ -1489,6 +1630,68 @@
         } finally {
             button.disabled = false;
             button.textContent = 'Create Teacher Account';
+        }
+    });
+
+    $('teacherAssignmentForm').addEventListener('submit', async function (event) {
+        event.preventDefault();
+        const form = event.currentTarget;
+        const button = $('saveTeacherAssignmentButton');
+        const message = $('teacherAssignmentMessage');
+        const selectedSection = form.elements.sectionIndex.value;
+        let section;
+
+        try {
+            section = JSON.parse(selectedSection);
+            if (!Array.isArray(section) || section.length !== 2) {
+                throw new Error('Select a valid grade and section.');
+            }
+        } catch (error) {
+            message.textContent = error.message || 'Select a valid grade and section.';
+            message.className = 'account-message full-width error';
+            return;
+        }
+
+        button.disabled = true;
+        button.textContent = 'Saving assignment...';
+        message.textContent = '';
+        message.className = 'account-message full-width';
+
+        try {
+            const result = await window.SchoolApp.createTeacherAssignment({
+                teacherId: form.elements.teacherId.value,
+                grade: section[0],
+                stream: section[1],
+                subject: form.elements.subject.value.trim()
+            });
+            message.textContent = result.message || 'Teacher assignment saved.';
+            message.className = 'account-message full-width success';
+            form.elements.subject.value = '';
+            await loadDashboard();
+        } catch (error) {
+            console.error('Unable to save teacher assignment:', error);
+            message.textContent = error.message || 'Could not save teacher assignment.';
+            message.className = 'account-message full-width error';
+        } finally {
+            button.disabled = false;
+            button.textContent = 'Save Assignment';
+        }
+    });
+
+    $('teacherAssignmentTableBody').addEventListener('click', async function (event) {
+        const button = event.target.closest('button[data-assignment-id]');
+        if (!button) return;
+
+        button.disabled = true;
+        try {
+            await window.SchoolApp.deleteTeacherAssignment(button.dataset.assignmentId);
+            await loadDashboard();
+        } catch (error) {
+            console.error('Unable to remove teacher assignment:', error);
+            $('teacherAssignmentMessage').textContent =
+                error.message || 'Could not remove teacher assignment.';
+            $('teacherAssignmentMessage').className = 'account-message full-width error';
+            button.disabled = false;
         }
     });
 

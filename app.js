@@ -237,6 +237,23 @@
         });
     }
 
+    function getTeacherAssignments() {
+        return request('/teacher-assignments');
+    }
+
+    function createTeacherAssignment(assignment) {
+        return request('/teacher-assignments', {
+            method: 'POST',
+            body: JSON.stringify(assignment)
+        });
+    }
+
+    function deleteTeacherAssignment(assignmentId) {
+        return request('/teacher-assignments/' + encodeURIComponent(assignmentId), {
+            method: 'DELETE'
+        });
+    }
+
     // =====================================================
     // STUDENTS
     // =====================================================
@@ -368,6 +385,13 @@
         return request('/attendance', {
             method: 'POST',
             body: JSON.stringify(record)
+        });
+    }
+
+    function saveAttendanceBatch(date, records) {
+        return request('/attendance/bulk', {
+            method: 'POST',
+            body: JSON.stringify({ date, records })
         });
     }
 
@@ -703,7 +727,9 @@
 
         getUsers,
         createTeacherAccount,
-
+        getTeacherAssignments,
+        createTeacherAssignment,
+        deleteTeacherAssignment,
         getStudents,
         addStudent,
         updateStudent,
@@ -716,6 +742,7 @@
 
         getAttendance,
         addAttendance,
+        saveAttendanceBatch,
 
         getFees,
         addFee,

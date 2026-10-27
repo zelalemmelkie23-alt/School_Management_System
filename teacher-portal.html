@@ -604,6 +604,7 @@
     <nav aria-label="Main navigation">
         <a class="nav-link" href="index.html">Home</a>
         <a class="nav-link" href="#resultForm">Enter Results</a>
+        <a class="nav-link" href="#sectionAttendance">Section Attendance</a>
         <a class="nav-link" href="#recentResults">Recent Results</a>
 
         <button
@@ -727,55 +728,36 @@
                 <div class="form-grid">
 
                     <div class="field full">
-                        <label for="studentId">Student ID</label>
-
-                        <input
-                            type="text"
-                            id="studentId"
-                            name="studentId"
-                            maxlength="50"
-                            placeholder="Enter registered student ID"
-                            autocomplete="off"
-                            required
-                        >
-
-                        <span class="help-text">
-                            Enter the ID assigned to the student.
-                        </span>
+                        <label for="sectionSelect">Assigned Grade and Section</label>
+                        <select id="sectionSelect" required>
+                            <option value="">Loading assigned sections...</option>
+                        </select>
                     </div>
 
-                    <div class="field full">
-                        <label for="studentName">Student Name</label>
+                    <div class="field">
+                        <label for="studentId">Student</label>
+                        <select id="studentId" name="studentId" required>
+                            <option value="">Select a student</option>
+                        </select>
+                        <span class="help-text">Only students in your assigned section are listed.</span>
+                    </div>
 
+                    <div class="field">
+                        <label for="studentName">Student Name</label>
                         <input
                             type="text"
                             id="studentName"
                             name="studentName"
-                            maxlength="150"
                             placeholder="Student name"
+                            readonly
                             required
                         >
-
-                        <span class="help-text">
-                            Confirm the student's name before saving.
-                        </span>
                     </div>
 
                     <div class="field">
                         <label for="subject">Subject</label>
-
                         <select id="subject" name="subject" required>
-                            <option value="">Select subject</option>
-                            <option value="Mathematics">Mathematics</option>
-                            <option value="Physics">Physics</option>
-                            <option value="Chemistry">Chemistry</option>
-                            <option value="Biology">Biology</option>
-                            <option value="English">English</option>
-                            <option value="Amharic">Amharic</option>
-                            <option value="Civics">Civics</option>
-                            <option value="Geography">Geography</option>
-                            <option value="History">History</option>
-                            <option value="Computer Science">Computer Science</option>
+                            <option value="">Select an assigned subject</option>
                         </select>
                     </div>
 
@@ -962,6 +944,49 @@
 
     </div>
 
+    <section class="panel" id="sectionAttendance">
+        <div class="panel-heading">
+            <div>
+                <h2>Section Attendance</h2>
+                <p>Mark attendance for every student in your assigned section.</p>
+            </div>
+        </div>
+
+        <div id="attendanceMessage" class="message" role="status" aria-live="polite"></div>
+
+        <div class="form-grid">
+            <div class="field">
+                <label for="attendanceSectionSelect">Assigned Grade and Section</label>
+                <select id="attendanceSectionSelect">
+                    <option value="">Loading assigned sections...</option>
+                </select>
+            </div>
+            <div class="field">
+                <label for="attendanceDate">Date</label>
+                <input id="attendanceDate" type="date" required>
+            </div>
+        </div>
+
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Student</th>
+                        <th>Student ID</th>
+                        <th>Attendance status</th>
+                    </tr>
+                </thead>
+                <tbody id="attendanceRosterBody">
+                    <tr><td colspan="3" class="empty-state">Loading assigned students...</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="button-row">
+            <button class="button" type="button" id="saveAttendanceButton">Save Section Attendance</button>
+        </div>
+    </section>
+
 </main>
 
 <footer class="footer">
@@ -991,6 +1016,7 @@
         tableMessage: $('tableMessage'),
 
         resultForm: $('resultForm'),
+        sectionSelect: $('sectionSelect'),
         studentId: $('studentId'),
         studentName: $('studentName'),
         subject: $('subject'),
@@ -1009,6 +1035,11 @@
         resultSearch: $('resultSearch'),
         gradeFilter: $('gradeFilter'),
         resultTableBody: $('teacherResultTableBody'),
+        attendanceSectionSelect: $('attendanceSectionSelect'),
+        attendanceDate: $('attendanceDate'),
+        attendanceMessage: $('attendanceMessage'),
+        attendanceRosterBody: $('attendanceRosterBody'),
+        saveAttendanceButton: $('saveAttendanceButton'),
 
         studentCount: $('studentCount'),
         resultCount: $('resultCount'),
@@ -1019,6 +1050,8 @@
     let currentUser = null;
     let students = [];
     let results = [];
+    let assignments = [];
+    let attendance = [];
 
     function showMessage(element, message, type = 'info') {
         element.textContent = message;
@@ -1084,6 +1117,136 @@
         return students.find(function (student) {
             return normalizeId(getStudentId(student)) === wantedId;
         }) || null;
+    }
+
+    function getSectionKey(grade, stream) {
+        return JSON.stringify([String(grade || ''), String(stream || '')]);
+    }
+
+    function getStudentSectionKey(student) {
+        return getSectionKey(student?.grade, student?.stream);
+    }
+
+    function getSelectedSection(select) {
+        if (!select.value) return null;
+        try {
+            const section = JSON.parse(select.value);
+            return Array.isArray(section) && section.length === 2
+                ? { grade: String(section[0]), stream: String(section[1]) }
+                : null;
+        } catch (error) {
+            console.error('Invalid section selection:', error);
+            return null;
+        }
+    }
+
+    function renderAssignmentControls() {
+        const sections = new Map();
+        assignments.forEach(function (assignment) {
+            const key = getSectionKey(assignment.grade, assignment.stream);
+            sections.set(key, {
+                key,
+                grade: String(assignment.grade || ''),
+                stream: String(assignment.stream || '')
+            });
+        });
+
+        [elements.sectionSelect, elements.attendanceSectionSelect].forEach(function (select) {
+            const previousValue = select.value;
+            select.replaceChildren(new Option(
+                sections.size ? 'Select an assigned section' : 'No sections assigned',
+                ''
+            ));
+            sections.forEach(function (section) {
+                const label = section.grade + (section.stream ? ' - ' + section.stream : ' - No stream');
+                select.appendChild(new Option(label, section.key));
+            });
+            select.value = sections.has(previousValue)
+                ? previousValue
+                : (sections.size ? sections.keys().next().value : '');
+        });
+
+        const selectedKey = elements.sectionSelect.value;
+        const availableSubjects = assignments.filter(function (assignment) {
+            return getSectionKey(assignment.grade, assignment.stream) === selectedKey;
+        });
+        const previousSubject = elements.subject.value;
+        elements.subject.replaceChildren(new Option(
+            availableSubjects.length ? 'Select an assigned subject' : 'No subjects assigned',
+            ''
+        ));
+        availableSubjects.forEach(function (assignment) {
+            elements.subject.appendChild(new Option(assignment.subject, assignment.subject));
+        });
+        if (availableSubjects.some(item => item.subject === previousSubject)) {
+            elements.subject.value = previousSubject;
+        }
+
+        const selectedStudentId = elements.studentId.value;
+        const sectionStudents = students.filter(function (student) {
+            return getStudentSectionKey(student) === selectedKey;
+        });
+        elements.studentId.replaceChildren(new Option(
+            sectionStudents.length ? 'Select a student' : 'No students in this section',
+            ''
+        ));
+        sectionStudents.forEach(function (student) {
+            const studentId = getStudentId(student);
+            if (studentId) {
+                elements.studentId.appendChild(new Option(
+                    getStudentName(student) + ' (' + studentId + ')',
+                    studentId
+                ));
+            }
+        });
+        elements.studentId.value = sectionStudents.some(student =>
+            getStudentId(student) === selectedStudentId
+        ) ? selectedStudentId : '';
+        elements.studentName.value = getStudentName(findStudent(elements.studentId.value));
+
+        renderAttendanceRoster();
+    }
+
+    function renderAttendanceRoster() {
+        const section = getSelectedSection(elements.attendanceSectionSelect);
+        const sectionKey = section
+            ? getSectionKey(section.grade, section.stream)
+            : '';
+        const selectedDate = elements.attendanceDate.value;
+        const sectionStudents = students.filter(student =>
+            getStudentSectionKey(student) === sectionKey
+        );
+
+        if (!sectionStudents.length) {
+            elements.attendanceRosterBody.innerHTML = `
+                <tr><td colspan="3" class="empty-state">
+                    ${assignments.length ? 'No students are available in this assigned section.' : 'No sections have been assigned to this teacher.'}
+                </td></tr>
+            `;
+            return;
+        }
+
+        elements.attendanceRosterBody.innerHTML = sectionStudents.map(function (student) {
+            const studentId = getStudentId(student);
+            const saved = attendance.find(record =>
+                getResultStudentId(record) === studentId && record.date === selectedDate
+            );
+            const currentStatus = saved ? safeText(saved.status, '') : '';
+            return `
+                <tr>
+                    <td>${escapeHtml(getStudentName(student))}</td>
+                    <td>${escapeHtml(studentId)}</td>
+                    <td>
+                        <select class="attendance-status" data-student-id="${escapeHtml(studentId)}" aria-label="Attendance status for ${escapeHtml(getStudentName(student))}">
+                            <option value="" ${currentStatus ? '' : 'selected'}>Choose status</option>
+                            <option value="Present" ${currentStatus === 'Present' ? 'selected' : ''}>Present</option>
+                            <option value="Absent" ${currentStatus === 'Absent' ? 'selected' : ''}>Absent</option>
+                            <option value="Late" ${currentStatus === 'Late' ? 'selected' : ''}>Late</option>
+                        </select>
+                    </td>
+                </tr>
+            `;
+        }).join('');
     }
 
     function calculateGrade(score) {
@@ -1254,19 +1417,24 @@
 
         showMessage(
             elements.pageMessage,
-            'Loading student and examination records...',
+            'Loading assigned sections, students, attendance, and results...',
             'info'
         );
 
         try {
             const response = await Promise.all([
+                SchoolApp.getTeacherAssignments(),
                 SchoolApp.getStudents(),
-                SchoolApp.getResults()
+                SchoolApp.getResults(),
+                SchoolApp.getAttendance()
             ]);
 
-            students = Array.isArray(response[0]) ? response[0] : [];
-            results = Array.isArray(response[1]) ? response[1] : [];
+            assignments = Array.isArray(response[0]) ? response[0] : [];
+            students = Array.isArray(response[1]) ? response[1] : [];
+            results = Array.isArray(response[2]) ? response[2] : [];
+            attendance = Array.isArray(response[3]) ? response[3] : [];
 
+            renderAssignmentControls();
             renderStatistics();
             renderResults();
 
@@ -1415,9 +1583,62 @@
 
     function handleStudentIdChange() {
         const student = findStudent(elements.studentId.value.trim());
+        elements.studentName.value = getStudentName(student);
+    }
 
-        if (student) {
-            elements.studentName.value = getStudentName(student);
+    async function saveSectionAttendance() {
+        hideMessage(elements.attendanceMessage);
+        const date = elements.attendanceDate.value;
+        const section = getSelectedSection(elements.attendanceSectionSelect);
+        if (!section) {
+            showMessage(elements.attendanceMessage, 'Select an assigned section.', 'error');
+            return;
+        }
+        if (!date) {
+            showMessage(elements.attendanceMessage, 'Select an attendance date.', 'error');
+            return;
+        }
+
+        const sectionKey = getSectionKey(section.grade, section.stream);
+        const sectionStudents = students.filter(student =>
+            getStudentSectionKey(student) === sectionKey
+        );
+        const records = Array.from(elements.attendanceRosterBody.querySelectorAll('.attendance-status'))
+            .map(function (select) {
+                return {
+                    studentId: select.dataset.studentId,
+                    status: select.value
+                };
+            });
+        if (!sectionStudents.length || records.length !== sectionStudents.length) {
+            showMessage(elements.attendanceMessage, 'There are no students to mark in this section.', 'error');
+            return;
+        }
+        if (records.some(record => !record.status)) {
+            showMessage(elements.attendanceMessage, 'Choose an attendance status for every student before saving.', 'error');
+            return;
+        }
+
+        elements.saveAttendanceButton.disabled = true;
+        elements.saveAttendanceButton.textContent = 'Saving attendance...';
+        try {
+            const response = await SchoolApp.saveAttendanceBatch(date, records);
+            showMessage(
+                elements.attendanceMessage,
+                response.message || 'Section attendance saved.',
+                'success'
+            );
+            await loadData();
+        } catch (error) {
+            console.error('Unable to save section attendance:', error);
+            showMessage(
+                elements.attendanceMessage,
+                error.message || 'Could not save section attendance.',
+                'error'
+            );
+        } finally {
+            elements.saveAttendanceButton.disabled = false;
+            elements.saveAttendanceButton.textContent = 'Save Section Attendance';
         }
     }
 
@@ -1478,6 +1699,13 @@
             handleStudentIdChange
         );
 
+        elements.sectionSelect.addEventListener('change', function () {
+            renderAssignmentControls();
+        });
+        elements.attendanceSectionSelect.addEventListener('change', renderAttendanceRoster);
+        elements.attendanceDate.addEventListener('change', renderAttendanceRoster);
+        elements.saveAttendanceButton.addEventListener('click', saveSectionAttendance);
+
         elements.resultForm.addEventListener(
             'submit',
             handleSubmit
@@ -1496,6 +1724,13 @@
         elements.gradeFilter.addEventListener('change', renderResults);
 
         elements.logoutButton.addEventListener('click', handleLogout);
+
+        const now = new Date();
+        elements.attendanceDate.value = [
+            now.getFullYear(),
+            String(now.getMonth() + 1).padStart(2, '0'),
+            String(now.getDate()).padStart(2, '0')
+        ].join('-');
 
         loadData();
     }

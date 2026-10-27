@@ -215,9 +215,22 @@ function initializeDatabase(database) {
             FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
         );
 
+        CREATE TABLE IF NOT EXISTS teacher_assignments (
+            id TEXT PRIMARY KEY,
+            teacher_id TEXT NOT NULL,
+            grade TEXT NOT NULL,
+            stream TEXT NOT NULL DEFAULT '',
+            subject TEXT NOT NULL,
+            created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            UNIQUE (teacher_id, grade, stream, subject),
+            FOREIGN KEY (teacher_id) REFERENCES users(id) ON DELETE CASCADE
+        );
+
         CREATE INDEX IF NOT EXISTS idx_attendance_student ON attendance(student_id);
         CREATE INDEX IF NOT EXISTS idx_fees_student ON fees(student_id);
         CREATE INDEX IF NOT EXISTS idx_results_student ON results(student_id);
+        CREATE INDEX IF NOT EXISTS idx_teacher_assignments_teacher
+            ON teacher_assignments(teacher_id);
         CREATE INDEX IF NOT EXISTS idx_registrations_status ON registrations(status);
         CREATE INDEX IF NOT EXISTS idx_registration_documents_registration
             ON registration_documents(registration_id);
@@ -457,6 +470,17 @@ function createSchoolServer(options = {}) {
             throw new HttpError(403, 'You do not have permission to view these records.');
         }
         return user.student_id;
+    };
+
+    const teacherHasAssignment = (teacherId, student, subject) => {
+        const query = subject
+            ? `SELECT 1 FROM teacher_assignments
+               WHERE teacher_id = ? AND grade = ? AND stream = ? AND subject = ?`
+            : `SELECT 1 FROM teacher_assignments
+               WHERE teacher_id = ? AND grade = ? AND stream = ?`;
+        const params = [teacherId, student.grade, student.stream || ''];
+        if (subject) params.push(subject);
+        return Boolean(database.prepare(query).get(...params));
     };
 
     const server = createServer(async (request, response) => {
@@ -792,6 +816,73 @@ function createSchoolServer(options = {}) {
                 return jsonResponse(response, 200, { success: true, message: 'Application updated.' });
             }
 
+            if (pathname === '/api/teacher-assignments' && request.method === 'GET') {
+                const user = requireUser(request, [...PRIVILEGED_ROLES, 'teacher']);
+                const assignments = normalizeRole(user.role) === 'teacher'
+                    ? database.prepare(`
+                        SELECT id, teacher_id AS teacherId, grade, stream, subject
+                        FROM teacher_assignments
+                        WHERE teacher_id = ?
+                        ORDER BY grade, stream, subject
+                    `).all(user.id)
+                    : database.prepare(`
+                        SELECT assignments.id, assignments.teacher_id AS teacherId,
+                               users.full_name AS teacherName, assignments.grade,
+                               assignments.stream, assignments.subject
+                        FROM teacher_assignments AS assignments
+                        JOIN users ON users.id = assignments.teacher_id
+                        ORDER BY users.full_name, assignments.grade, assignments.stream,
+                                 assignments.subject
+                    `).all();
+                return jsonResponse(response, 200, assignments);
+            }
+
+            if (pathname === '/api/teacher-assignments' && request.method === 'POST') {
+                requireUser(request, PRIVILEGED_ROLES);
+                const body = await readJson(request);
+                const teacherId = text(body.teacherId, 'Teacher', { required: true, max: 64 });
+                const grade = text(body.grade, 'Grade', { required: true, max: 30 });
+                const stream = text(body.stream, 'Section', { max: 60 });
+                const subject = text(body.subject, 'Subject', { required: true, max: 100 });
+                const teacher = database.prepare('SELECT id FROM users WHERE id = ? AND role = ?')
+                    .get(teacherId, 'teacher');
+                if (!teacher) throw new HttpError(404, 'Teacher account not found.');
+                const sectionExists = database.prepare(`
+                    SELECT 1 FROM students
+                    WHERE active = 1 AND grade = ? AND COALESCE(stream, '') = ?
+                `).get(grade, stream);
+                if (!sectionExists) throw new HttpError(400, 'Select a section that has active students.');
+
+                const assignmentId = randomUUID();
+                try {
+                    database.prepare(`
+                        INSERT INTO teacher_assignments (id, teacher_id, grade, stream, subject)
+                        VALUES (?, ?, ?, ?, ?)
+                    `).run(assignmentId, teacherId, grade, stream, subject);
+                } catch (error) {
+                    if (String(error.message).includes('UNIQUE')) {
+                        throw new HttpError(409, 'This teacher already has that subject assignment for this section.');
+                    }
+                    throw error;
+                }
+                return jsonResponse(response, 201, {
+                    success: true,
+                    message: 'Teacher assignment saved.',
+                    assignment: {
+                        id: assignmentId, teacherId, grade, stream, subject
+                    }
+                });
+            }
+
+            const assignmentMatch = pathname.match(/^\/api\/teacher-assignments\/([^/]+)$/);
+            if (assignmentMatch && request.method === 'DELETE') {
+                requireUser(request, PRIVILEGED_ROLES);
+                const result = database.prepare('DELETE FROM teacher_assignments WHERE id = ?')
+                    .run(assignmentMatch[1]);
+                if (!result.changes) throw new HttpError(404, 'Teacher assignment not found.');
+                return jsonResponse(response, 200, { success: true, message: 'Teacher assignment removed.' });
+            }
+
             if (pathname === '/api/users' && request.method === 'GET') {
                 requireUser(request, PRIVILEGED_ROLES);
                 const users = database.prepare(`
@@ -846,9 +937,21 @@ function createSchoolServer(options = {}) {
             if (pathname === '/api/students' && request.method === 'GET') {
                 const user = requireUser(request, [...DATA_ACCESS_ROLES, 'student']);
                 const scope = studentScope(request, user, [...REGISTRATION_ROLES, 'teacher', 'accountant']);
-                const rows = scope
-                    ? database.prepare('SELECT * FROM students WHERE active = 1 AND student_id = ?').all(scope)
-                    : database.prepare('SELECT * FROM students WHERE active = 1 ORDER BY full_name').all();
+                const role = normalizeRole(user.role);
+                const rows = role === 'teacher'
+                    ? database.prepare(`
+                        SELECT students.* FROM students
+                        WHERE students.active = 1 AND EXISTS (
+                            SELECT 1 FROM teacher_assignments
+                            WHERE teacher_assignments.teacher_id = ?
+                              AND teacher_assignments.grade = students.grade
+                              AND teacher_assignments.stream = COALESCE(students.stream, '')
+                        )
+                        ORDER BY students.grade, students.stream, students.full_name
+                    `).all(user.id)
+                    : scope
+                        ? database.prepare('SELECT * FROM students WHERE active = 1 AND student_id = ?').all(scope)
+                        : database.prepare('SELECT * FROM students WHERE active = 1 ORDER BY full_name').all();
                 return jsonResponse(response, 200, rows.map(makeStudent));
             }
 
@@ -928,13 +1031,77 @@ function createSchoolServer(options = {}) {
             if (pathname === '/api/attendance' && request.method === 'GET') {
                 const user = requireUser(request, [...REGISTRATION_ROLES, 'teacher', 'student']);
                 const scope = studentScope(request, user, [...REGISTRATION_ROLES, 'teacher']);
-                const records = scope
-                    ? database.prepare('SELECT * FROM attendance WHERE student_id = ? ORDER BY date DESC').all(scope)
-                    : database.prepare('SELECT * FROM attendance ORDER BY date DESC').all();
+                const role = normalizeRole(user.role);
+                const records = role === 'teacher'
+                    ? database.prepare(`
+                        SELECT attendance.* FROM attendance
+                        JOIN students ON students.student_id = attendance.student_id
+                        WHERE EXISTS (
+                            SELECT 1 FROM teacher_assignments
+                            WHERE teacher_assignments.teacher_id = ?
+                              AND teacher_assignments.grade = students.grade
+                              AND teacher_assignments.stream = COALESCE(students.stream, '')
+                        )
+                        ORDER BY attendance.date DESC
+                    `).all(user.id)
+                    : scope
+                        ? database.prepare('SELECT * FROM attendance WHERE student_id = ? ORDER BY date DESC').all(scope)
+                        : database.prepare('SELECT * FROM attendance ORDER BY date DESC').all();
                 return jsonResponse(response, 200, records.map((row) => ({
                     id: row.id, studentId: row.student_id, studentName: row.student_name,
                     date: row.date, status: row.status, createdAt: row.created_at
                 })));
+            }
+
+            if (pathname === '/api/attendance/bulk' && request.method === 'POST') {
+                const user = requireUser(request, [...PRIVILEGED_ROLES, 'registrar', 'teacher']);
+                const body = await readJson(request);
+                const date = text(body.date, 'Attendance date', { required: true, max: 10 });
+                if (!validDate(date)) throw new HttpError(400, 'Enter a valid attendance date.');
+                if (!Array.isArray(body.records) || body.records.length === 0 || body.records.length > 500) {
+                    throw new HttpError(400, 'Attendance must include between 1 and 500 student records.');
+                }
+
+                const seen = new Set();
+                const records = body.records.map((record) => {
+                    const studentId = text(record?.studentId, 'Student ID', { required: true, max: 64 });
+                    const status = text(record?.status, 'Attendance status', { required: true, max: 20 });
+                    if (!['Present', 'Absent', 'Late'].includes(status)) {
+                        throw new HttpError(400, 'Attendance status must be Present, Absent, or Late.');
+                    }
+                    if (seen.has(studentId)) throw new HttpError(400, 'A student can appear only once in an attendance submission.');
+                    seen.add(studentId);
+                    const student = studentFromDatabase(database, studentId);
+                    if (!student) throw new HttpError(404, `Student ${studentId} was not found.`);
+                    if (normalizeRole(user.role) === 'teacher' && !teacherHasAssignment(user.id, student)) {
+                        throw new HttpError(403, 'You are not assigned to this student’s section.');
+                    }
+                    return { studentId, status, studentName: student.full_name };
+                });
+
+                const saveRecord = database.prepare(`
+                    INSERT INTO attendance (id, student_id, student_name, date, status, created_by)
+                    VALUES (?, ?, ?, ?, ?, ?)
+                    ON CONFLICT (student_id, date) DO UPDATE SET
+                        student_name = excluded.student_name,
+                        status = excluded.status,
+                        created_by = excluded.created_by
+                `);
+                database.exec('BEGIN');
+                try {
+                    for (const record of records) {
+                        saveRecord.run(randomUUID(), record.studentId, record.studentName, date, record.status, user.id);
+                    }
+                    database.exec('COMMIT');
+                } catch (error) {
+                    database.exec('ROLLBACK');
+                    throw error;
+                }
+                return jsonResponse(response, 200, {
+                    success: true,
+                    message: 'Section attendance saved.',
+                    count: records.length
+                });
             }
 
             if (pathname === '/api/attendance' && request.method === 'POST') {
@@ -945,6 +1112,9 @@ function createSchoolServer(options = {}) {
                 const status = text(body.status, 'Attendance status', { required: true, max: 20 });
                 const student = studentFromDatabase(database, studentId);
                 if (!student) throw new HttpError(404, 'Student not found.');
+                if (normalizeRole(user.role) === 'teacher' && !teacherHasAssignment(user.id, student)) {
+                    throw new HttpError(403, 'You are not assigned to this student’s section.');
+                }
                 if (!validDate(date)) throw new HttpError(400, 'Enter a valid attendance date.');
                 if (!['Present', 'Absent', 'Late'].includes(status)) throw new HttpError(400, 'Attendance status must be Present, Absent, or Late.');
                 try {
@@ -1002,9 +1172,23 @@ function createSchoolServer(options = {}) {
             if (pathname === '/api/results' && request.method === 'GET') {
                 const user = requireUser(request, [...REGISTRATION_ROLES, 'teacher', 'student']);
                 const scope = studentScope(request, user, [...REGISTRATION_ROLES, 'teacher']);
-                const rows = scope
-                    ? database.prepare('SELECT * FROM results WHERE student_id = ? ORDER BY date DESC').all(scope)
-                    : database.prepare('SELECT * FROM results ORDER BY date DESC').all();
+                const role = normalizeRole(user.role);
+                const rows = role === 'teacher'
+                    ? database.prepare(`
+                        SELECT results.* FROM results
+                        JOIN students ON students.student_id = results.student_id
+                        WHERE EXISTS (
+                            SELECT 1 FROM teacher_assignments
+                            WHERE teacher_assignments.teacher_id = ?
+                              AND teacher_assignments.grade = students.grade
+                              AND teacher_assignments.stream = COALESCE(students.stream, '')
+                              AND teacher_assignments.subject = results.subject
+                        )
+                        ORDER BY results.date DESC
+                    `).all(user.id)
+                    : scope
+                        ? database.prepare('SELECT * FROM results WHERE student_id = ? ORDER BY date DESC').all(scope)
+                        : database.prepare('SELECT * FROM results ORDER BY date DESC').all();
                 return jsonResponse(response, 200, rows.map((row) => ({
                     id: row.id, studentId: row.student_id, studentName: row.student_name,
                     subject: row.subject, score: row.score, grade: row.grade, term: row.term,
@@ -1026,6 +1210,9 @@ function createSchoolServer(options = {}) {
                 const examType = text(body.examType, 'Exam type', { required: true, max: 60 });
                 const student = studentFromDatabase(database, studentId);
                 if (!student) throw new HttpError(404, 'Student not found.');
+                if (normalizeRole(user.role) === 'teacher' && !teacherHasAssignment(user.id, student, subject)) {
+                    throw new HttpError(403, 'You are not assigned to teach this subject in the student’s section.');
+                }
                 if (!Number.isFinite(score) || score < 0 || score > 100) throw new HttpError(400, 'Score must be between 0 and 100.');
                 const id = randomUUID();
                 database.prepare(`
